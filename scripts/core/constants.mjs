@@ -33,6 +33,7 @@ export const WALLPAPER_MAX_BYTES = 10 * 1024 * 1024;
 export const WALLPAPER_MAX_DIMENSION = 8192;
 export const WALLPAPER_MAX_PIXELS = 16 * 1024 * 1024;
 export const WALLPAPER_DIRECTORY = "lumenn-phone-hub";
+export const BUNDLED_WALLPAPER_PATH = `modules/${MODULE_ID}/assets/wallpaper.webp`;
 
 export const WORLD_CLOCK_ERA_MAX = 32;
 
