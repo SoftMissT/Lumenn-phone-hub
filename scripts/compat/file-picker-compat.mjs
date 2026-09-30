@@ -67,17 +67,37 @@ export function canUploadFiles() {
   }
 }
 
-export function uploadFile({
+function pickerImpl() {
+  return (
+    globalThis.foundry?.applications?.apps?.FilePicker?.implementation ??
+    getFilePickerClass()
+  );
+}
+
+// Best-effort: o `FilePicker.upload` não cria a pasta de destino e falha com
+// "Target directory <path> does not exist" se ela não existir. Criar aqui é um
+// passo preparatório — se falhar por qualquer motivo (inclusive "já existe"),
+// o upload segue e devolve o erro real. Não vale adivinhar a mensagem do
+// Foundry para decidir se a falha foi "já existe".
+export async function ensureDirectory({ source = "data", path = "" } = {}) {
+  if (!path) return false;
+  const target = pickerImpl();
+  if (typeof target?.createDirectory !== "function") return false;
+  try {
+    await target.createDirectory(source, path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function uploadFile({
   source = "data",
   path = "",
   file,
   notify = false,
 } = {}) {
-  const impl =
-    globalThis.foundry?.applications?.apps?.FilePicker?.implementation ??
-    getFilePickerClass();
-  const target =
-    typeof impl?.upload === "function" ? impl : getFilePickerClass();
+  const target = pickerImpl();
   if (!target || typeof target.upload !== "function") {
     return Promise.reject(
       fail(
@@ -94,6 +114,7 @@ export function uploadFile({
       fail(ERROR_CODES.INVALID_ARGUMENT, "Arquivo inválido para upload."),
     );
   }
+  await ensureDirectory({ source, path });
   // O Foundry grava usando o nome do arquivo: dois uploads de "foto.jpg" se
   // sobrescrevem, e o segundo GM apagaria a imagem do primeiro sem aviso. O
   // prefixo aleatório torna cada caminho único; o nome legível continua ali.

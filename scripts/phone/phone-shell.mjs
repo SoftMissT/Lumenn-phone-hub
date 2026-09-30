@@ -430,6 +430,9 @@ export class PhoneShell extends AppBase {
       target?.closest?.("[data-app-id]")?.dataset?.appId;
     const app = AppRegistry.get(appId);
     if (!app) return;
+    // A grade já esconde os apps de GM de quem não é GM. Isto fecha a porta dos
+    // fundos: sem a checagem, mexer no DOM abria qualquer app.
+    if (!app.playerVisible && !(app.gmPanel && isGM())) return;
     shell.currentView = VIEWS.APP;
     shell.activeApp = app;
     shell.render(true);
