@@ -1028,6 +1028,13 @@
   gap: 4px;
 }
 
+/* A barra do "+" e o estado vazio não são fotos: ocupam a largura toda em vez
+   de virar célula da grade. */
+[data-lph-content="photos"] .lph-media-bar,
+[data-lph-content="photos"] .lph-content-empty {
+  grid-column: 1 / -1;
+}
+
 [data-lph-content="photos"] .lph-card {
   padding: 0;
   border: 0;
