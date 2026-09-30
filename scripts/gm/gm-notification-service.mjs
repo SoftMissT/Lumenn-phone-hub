@@ -4,7 +4,8 @@ import { isGM } from "../compat/foundry-compat.mjs";
 import { LumennRepository } from "../persistence/repository.mjs";
 
 export async function sendNotificationAsGM(data) {
-  if (!isGM()) fail(ERROR_CODES.NO_AUTHORITY, "Apenas o GM pode enviar notificações.");
+  if (!isGM())
+    fail(ERROR_CODES.NO_AUTHORITY, "Apenas o GM pode enviar notificações.");
   return LumennRepository.createNotification(data);
 }
 

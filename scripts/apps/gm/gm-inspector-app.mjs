@@ -1,7 +1,15 @@
 import { MODULE_ID, TEMPLATE_ROOT } from "../../core/constants.mjs";
 import { Logger } from "../../core/logger.mjs";
-import { confirmDialog, isGM, renderTemplate } from "../../compat/foundry-compat.mjs";
-import { gmListCharacters, gmResetPin, gmResetWallpaper } from "../../gm/gm-phone-inspector.mjs";
+import {
+  confirmDialog,
+  isGM,
+  renderTemplate,
+} from "../../compat/foundry-compat.mjs";
+import {
+  gmListCharacters,
+  gmResetPin,
+  gmResetWallpaper,
+} from "../../gm/gm-phone-inspector.mjs";
 
 function localize(key, fallback) {
   const i18n = globalThis.game?.i18n;
@@ -18,7 +26,7 @@ function format(key, data, fallback) {
 async function render() {
   if (!isGM()) return "";
   return renderTemplate(`${TEMPLATE_ROOT}/gm/phone-inspector.hbs`, {
-    characters: gmListCharacters()
+    characters: gmListCharacters(),
   });
 }
 
@@ -41,26 +49,34 @@ function onOpen(shell) {
   const runAction = async (action) => {
     const actorUuid = selected();
     if (!actorUuid) {
-      setStatus(localize("LPH.GM.NoCharacter", "No character available."), "error");
+      setStatus(
+        localize("LPH.GM.NoCharacter", "No character available."),
+        "error",
+      );
       return;
     }
     setStatus("");
     try {
       if (action === "open") {
-        globalThis.game?.modules?.get(MODULE_ID)?.api?.openPhoneAsGM?.(actorUuid);
+        globalThis.game?.modules
+          ?.get(MODULE_ID)
+          ?.api?.openPhoneAsGM?.(actorUuid);
         setStatus(localize("LPH.GM.Done", "Done."), "ok");
         return;
       }
       const name = selectedName();
       const confirmed = await confirmDialog({
-        title: action === "reset-pin"
-          ? localize("LPH.GM.ResetPin", "Reset PIN")
-          : localize("LPH.GM.ResetWallpaper", "Reset wallpaper"),
+        title:
+          action === "reset-pin"
+            ? localize("LPH.GM.ResetPin", "Reset PIN")
+            : localize("LPH.GM.ResetWallpaper", "Reset wallpaper"),
         content: format(
-          action === "reset-pin" ? "LPH.GM.ResetPinConfirm" : "LPH.GM.ResetWallpaperConfirm",
+          action === "reset-pin"
+            ? "LPH.GM.ResetPinConfirm"
+            : "LPH.GM.ResetWallpaperConfirm",
           { name },
-          `${name}?`
-        )
+          `${name}?`,
+        ),
       });
       if (!confirmed) return;
       if (action === "reset-pin") await gmResetPin(actorUuid);
@@ -88,5 +104,5 @@ export const gmInspectorApp = {
   playerVisible: false,
   gmPanel: true,
   render,
-  onOpen
+  onOpen,
 };

@@ -1,7 +1,10 @@
 import { TEMPLATE_ROOT } from "../../core/constants.mjs";
 import { Logger } from "../../core/logger.mjs";
 import { isGM, renderTemplate } from "../../compat/foundry-compat.mjs";
-import { listGmAddressableCharacters, sendNotificationAsGM } from "../../gm/gm-notification-service.mjs";
+import {
+  listGmAddressableCharacters,
+  sendNotificationAsGM,
+} from "../../gm/gm-notification-service.mjs";
 
 function localize(key, fallback) {
   const i18n = globalThis.game?.i18n;
@@ -12,7 +15,7 @@ function localize(key, fallback) {
 async function render() {
   if (!isGM()) return "";
   return renderTemplate(`${TEMPLATE_ROOT}/gm/control-center.hbs`, {
-    characters: listGmAddressableCharacters()
+    characters: listGmAddressableCharacters(),
   });
 }
 
@@ -21,14 +24,16 @@ function buildPreview(form) {
   const title = String(form.elements.title?.value ?? "").trim();
   const body = String(form.elements.body?.value ?? "").trim();
   const targetMode = String(form.elements.targetMode?.value ?? "all");
-  const target = targetMode === "all"
-    ? localize("LPH.GM.TargetAll", "All")
-    : (form.elements.targetActorUuid?.selectedOptions?.[0]?.textContent ?? "");
+  const target =
+    targetMode === "all"
+      ? localize("LPH.GM.TargetAll", "All")
+      : (form.elements.targetActorUuid?.selectedOptions?.[0]?.textContent ??
+        "");
   return [
-    `${localize("LPH.GM.Sender", "Sender")}: ${sender || "—"}`,
+    `${localize("LPH.GM.Sender", "Sender")}: ${sender || ""}`,
     `${localize("LPH.GM.Targets", "Recipients")}: ${target}`,
-    `${localize("LPH.GM.TitleLabel", "Title")}: ${title || "—"}`,
-    body
+    `${localize("LPH.GM.TitleLabel", "Title")}: ${title || ""}`,
+    body,
   ].join("\n");
 }
 
@@ -74,9 +79,10 @@ function onOpen(shell) {
       sender: String(form.elements.sender?.value ?? "").trim(),
       title,
       body: String(form.elements.body?.value ?? "").trim(),
-      targetActorUuid: targetMode === "single"
-        ? String(form.elements.targetActorUuid?.value ?? "all")
-        : "all"
+      targetActorUuid:
+        targetMode === "single"
+          ? String(form.elements.targetActorUuid?.value ?? "all")
+          : "all",
     };
     try {
       await sendNotificationAsGM(payload);
@@ -103,5 +109,5 @@ export const gmCentralApp = {
   playerVisible: false,
   gmPanel: true,
   render,
-  onOpen
+  onOpen,
 };

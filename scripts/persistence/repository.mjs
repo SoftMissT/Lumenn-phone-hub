@@ -1,19 +1,23 @@
 import { ERROR_CODES, HOOKS } from "../core/constants.mjs";
 import { fail } from "../core/errors.mjs";
 import { deepClone, isGM, mergeObject } from "../compat/foundry-compat.mjs";
-import { NOTIFICATION_STATUS, normalizeNotification } from "../notifications/notification-model.mjs";
+import {
+  NOTIFICATION_STATUS,
+  normalizeNotification,
+} from "../notifications/notification-model.mjs";
 import {
   listForActor,
   pruneExpired,
   pruneToLimit,
   unreadCount as countUnread,
-  withStatus
+  withStatus,
 } from "../notifications/notification-store.mjs";
 import { JournalStore } from "./journal-store.mjs";
 import { createDefaultPhoneState } from "./schemas.mjs";
 
 function requireGM(action) {
-  if (!isGM()) fail(ERROR_CODES.NO_AUTHORITY, `Ação "${action}" requer autoridade do GM.`);
+  if (!isGM())
+    fail(ERROR_CODES.NO_AUTHORITY, `Ação "${action}" requer autoridade do GM.`);
 }
 
 function emitNotification(notification) {
@@ -41,7 +45,8 @@ export class LumennRepository {
   }
 
   static async updatePhone(actorUuid, patch) {
-    if (!actorUuid) fail(ERROR_CODES.INVALID_ARGUMENT, "actorUuid é obrigatório.");
+    if (!actorUuid)
+      fail(ERROR_CODES.INVALID_ARGUMENT, "actorUuid é obrigatório.");
     requireGM("updatePhone");
     const store = await JournalStore.readStore();
     const current = store.phones[actorUuid] ?? createDefaultPhoneState();
@@ -70,7 +75,10 @@ export class LumennRepository {
     requireGM("createNotification");
     const notification = normalizeNotification(data);
     const store = await JournalStore.readStore();
-    const merged = { ...(store.notifications ?? {}), [notification.id]: notification };
+    const merged = {
+      ...(store.notifications ?? {}),
+      [notification.id]: notification,
+    };
     store.notifications = pruneToLimit(pruneExpired(merged));
     await JournalStore.writeStore(store);
     emitNotification(notification);
@@ -78,20 +86,30 @@ export class LumennRepository {
   }
 
   static async markNotificationRead(actorUuid, ids) {
-    if (!actorUuid) fail(ERROR_CODES.INVALID_ARGUMENT, "actorUuid é obrigatório.");
+    if (!actorUuid)
+      fail(ERROR_CODES.INVALID_ARGUMENT, "actorUuid é obrigatório.");
     requireGM("markNotificationRead");
     const { store, phone } = await readPhoneContext(actorUuid);
-    phone.notificationState = withStatus(phone.notificationState, ids, NOTIFICATION_STATUS.READ);
+    phone.notificationState = withStatus(
+      phone.notificationState,
+      ids,
+      NOTIFICATION_STATUS.READ,
+    );
     store.phones[actorUuid] = phone;
     await JournalStore.writeStore(store);
     return true;
   }
 
   static async dismissNotification(actorUuid, ids) {
-    if (!actorUuid) fail(ERROR_CODES.INVALID_ARGUMENT, "actorUuid é obrigatório.");
+    if (!actorUuid)
+      fail(ERROR_CODES.INVALID_ARGUMENT, "actorUuid é obrigatório.");
     requireGM("dismissNotification");
     const { store, phone } = await readPhoneContext(actorUuid);
-    phone.notificationState = withStatus(phone.notificationState, ids, NOTIFICATION_STATUS.DISMISSED);
+    phone.notificationState = withStatus(
+      phone.notificationState,
+      ids,
+      NOTIFICATION_STATUS.DISMISSED,
+    );
     store.phones[actorUuid] = phone;
     await JournalStore.writeStore(store);
     return true;

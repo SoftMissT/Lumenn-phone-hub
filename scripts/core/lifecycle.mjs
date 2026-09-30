@@ -1,9 +1,17 @@
-import { HOOKS, MODULE_ID, SETTINGS_KEYS, TEMPLATE_PARTIALS } from "./constants.mjs";
+import {
+  HOOKS,
+  MODULE_ID,
+  SETTINGS_KEYS,
+  TEMPLATE_PARTIALS,
+} from "./constants.mjs";
 import { Logger } from "./logger.mjs";
 import { registerSettings } from "./settings.mjs";
 import { exposePublicApi } from "./public-api.mjs";
 import { preloadTemplates } from "../compat/application-compat.mjs";
-import { installControlsEntry, verifyControlsEntry } from "../compat/controls-compat.mjs";
+import {
+  installControlsEntry,
+  verifyControlsEntry,
+} from "../compat/controls-compat.mjs";
 import { registerBuiltinApps } from "../apps/register-builtin-apps.mjs";
 import { initSocket } from "../socket/socket-runtime.mjs";
 import { LumennRepository } from "../persistence/repository.mjs";
@@ -25,7 +33,8 @@ async function runStep(name, step) {
 
 function applyDebugSetting() {
   try {
-    const enabled = game.settings.get(MODULE_ID, SETTINGS_KEYS.DEBUG_LOGGING) === true;
+    const enabled =
+      game.settings.get(MODULE_ID, SETTINGS_KEYS.DEBUG_LOGGING) === true;
     Logger.setDebug(enabled);
   } catch (error) {
     Logger.debug("Setting de debug indisponível:", error);

@@ -8,7 +8,8 @@ export function createLogger(scope = "") {
 
   function write(level, args) {
     if (LEVELS[level] < threshold) return;
-    const sink = typeof console[level] === "function" ? console[level] : console.log;
+    const sink =
+      typeof console[level] === "function" ? console[level] : console.log;
     sink.call(console, prefix, ...args);
   }
 
@@ -30,7 +31,7 @@ export function createLogger(scope = "") {
     },
     error(...args) {
       write("error", args);
-    }
+    },
   };
 }
 

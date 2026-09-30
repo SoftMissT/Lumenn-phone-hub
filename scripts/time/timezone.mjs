@@ -13,7 +13,8 @@ export function isValidTimezone(timezone) {
 export function browserTimezone() {
   if (cachedBrowserTimezone) return cachedBrowserTimezone;
   try {
-    cachedBrowserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+    cachedBrowserTimezone =
+      Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
   } catch {
     cachedBrowserTimezone = "UTC";
   }
@@ -21,13 +22,18 @@ export function browserTimezone() {
 }
 
 export function resolveTimezone(requested) {
-  if (isValidTimezone(requested)) return { timezone: requested, fellBack: false };
-  return { timezone: browserTimezone(), fellBack: typeof requested === "string" && requested.length > 0 };
+  if (isValidTimezone(requested))
+    return { timezone: requested, fellBack: false };
+  return {
+    timezone: browserTimezone(),
+    fellBack: typeof requested === "string" && requested.length > 0,
+  };
 }
 
 export function listTimezones() {
   try {
-    if (typeof Intl.supportedValuesOf === "function") return Intl.supportedValuesOf("timeZone");
+    if (typeof Intl.supportedValuesOf === "function")
+      return Intl.supportedValuesOf("timeZone");
   } catch {
     return [];
   }
@@ -44,7 +50,7 @@ export function getZonedParts(date, timezone) {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    weekday: "short"
+    weekday: "short",
   });
   const parts = {};
   for (const part of formatter.formatToParts(date)) {
@@ -57,7 +63,7 @@ export function getZonedParts(date, timezone) {
     hour: Number(parts.hour) % 24,
     minute: Number(parts.minute),
     second: Number(parts.second),
-    weekday: parts.weekday ?? ""
+    weekday: parts.weekday ?? "",
   };
 }
 

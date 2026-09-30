@@ -6,16 +6,21 @@ export {
   mergeObject,
   deepClone,
   escapeHTML,
-  confirmDialog
+  confirmDialog,
 } from "./application-compat.mjs";
 export {
   installControlsEntry,
   verifyControlsEntry,
   registerControlsEntry,
-  isControlsInstalled
+  isControlsInstalled,
 } from "./controls-compat.mjs";
 export { preloadSound, playSound } from "./audio-compat.mjs";
-export { openFilePicker, getFilePickerClass, uploadFile, canUploadFiles } from "./file-picker-compat.mjs";
+export {
+  openFilePicker,
+  getFilePickerClass,
+  uploadFile,
+  canUploadFiles,
+} from "./file-picker-compat.mjs";
 
 export function getFoundryVersionInfo() {
   const game = globalThis.game ?? {};
@@ -31,7 +36,7 @@ export function getFoundryVersionInfo() {
     build,
     revision,
     isV13: generation === 13,
-    isV14: generation >= 14
+    isV14: generation >= 14,
   };
 }
 
@@ -52,8 +57,10 @@ export function isGM() {
 }
 
 export function resolveActorByUuid(uuid) {
-  if (typeof globalThis.fromUuidSync === "function") return globalThis.fromUuidSync(uuid, { strict: false });
+  if (typeof globalThis.fromUuidSync === "function")
+    return globalThis.fromUuidSync(uuid, { strict: false });
   const parts = String(uuid ?? "").split(".");
-  if (parts.length >= 2 && globalThis.game?.actors) return globalThis.game.actors.get(parts[1]) ?? null;
+  if (parts.length >= 2 && globalThis.game?.actors)
+    return globalThis.game.actors.get(parts[1]) ?? null;
   return null;
 }

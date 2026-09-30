@@ -17,13 +17,19 @@ export function getWorldDefaultWallpaper() {
 }
 
 export async function setWorldDefaultWallpaper(value) {
-  if (!isGM()) fail(ERROR_CODES.NO_AUTHORITY, "Somente o GM define o wallpaper padrão.");
+  if (!isGM())
+    fail(ERROR_CODES.NO_AUTHORITY, "Somente o GM define o wallpaper padrão.");
   const normalized = typeof value === "string" ? value.trim() : "";
   if (normalized) {
     const validation = validateSourceUrl(normalized);
-    if (!validation.valid) fail(ERROR_CODES.INVALID_WALLPAPER, validation.reason);
+    if (!validation.valid)
+      fail(ERROR_CODES.INVALID_WALLPAPER, validation.reason);
   }
-  await game.settings.set(MODULE_ID, SETTINGS_KEYS.DEFAULT_WALLPAPER, normalized);
+  await game.settings.set(
+    MODULE_ID,
+    SETTINGS_KEYS.DEFAULT_WALLPAPER,
+    normalized,
+  );
   return normalized;
 }
 
@@ -32,5 +38,10 @@ export async function savePhoneWallpaper(actorUuid, wallpaper) {
 }
 
 export function resolveWallpaperUrl(phoneState, worldDefault = null) {
-  return phoneState?.wallpaper?.url ?? phoneState?.wallpaperUrl ?? worldDefault ?? null;
+  return (
+    phoneState?.wallpaper?.url ??
+    phoneState?.wallpaperUrl ??
+    worldDefault ??
+    null
+  );
 }

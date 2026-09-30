@@ -1,7 +1,14 @@
 import { PROTOCOL, PROTOCOL_VERSION } from "../core/constants.mjs";
 import { randomId } from "../validation/ids.mjs";
 
-export const ENVELOPE_KINDS = Object.freeze(["request", "accepted", "result", "error", "sync", "heartbeat"]);
+export const ENVELOPE_KINDS = Object.freeze([
+  "request",
+  "accepted",
+  "result",
+  "error",
+  "sync",
+  "heartbeat",
+]);
 
 const RECIPIENT_TOKENS = new Set(["all", "gm"]);
 
@@ -15,10 +22,12 @@ export function createEnvelope(input = {}) {
     sender: input.sender ?? null,
     recipients: input.recipients ?? "gm",
     authorityUserId: input.authorityUserId ?? null,
-    authorityEpoch: Number.isFinite(input.authorityEpoch) ? input.authorityEpoch : null,
+    authorityEpoch: Number.isFinite(input.authorityEpoch)
+      ? input.authorityEpoch
+      : null,
     attempt: Number.isFinite(input.attempt) ? input.attempt : 0,
     expiresAt: Number.isFinite(input.expiresAt) ? input.expiresAt : null,
-    payload: input.payload ?? null
+    payload: input.payload ?? null,
   };
 }
 
@@ -27,10 +36,14 @@ export function isRecipientToken(value) {
 }
 
 export function validateEnvelope(value) {
-  if (!value || typeof value !== "object") return { valid: false, reason: "envelope ausente" };
-  if (value.protocol !== PROTOCOL) return { valid: false, reason: "protocolo inválido" };
-  if (value.version !== PROTOCOL_VERSION) return { valid: false, reason: "versão inválida" };
-  if (!ENVELOPE_KINDS.includes(value.kind)) return { valid: false, reason: "kind inválido" };
+  if (!value || typeof value !== "object")
+    return { valid: false, reason: "envelope ausente" };
+  if (value.protocol !== PROTOCOL)
+    return { valid: false, reason: "protocolo inválido" };
+  if (value.version !== PROTOCOL_VERSION)
+    return { valid: false, reason: "versão inválida" };
+  if (!ENVELOPE_KINDS.includes(value.kind))
+    return { valid: false, reason: "kind inválido" };
   if (typeof value.operation !== "string" || value.operation.length === 0) {
     return { valid: false, reason: "operation ausente" };
   }

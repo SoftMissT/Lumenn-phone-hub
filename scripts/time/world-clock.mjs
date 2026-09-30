@@ -1,14 +1,24 @@
-import { MODULE_ID, SETTINGS_KEYS, WORLD_CLOCK_ERA_MAX } from "../core/constants.mjs";
+import {
+  MODULE_ID,
+  SETTINGS_KEYS,
+  WORLD_CLOCK_ERA_MAX,
+} from "../core/constants.mjs";
 import { Logger } from "../core/logger.mjs";
 import { getZonedParts, resolveTimezone } from "./timezone.mjs";
 
 export function normalizeClockSettings(raw = {}) {
   const displayYear = Number(raw?.displayYear);
-  const era = typeof raw?.era === "string" ? raw.era.trim().slice(0, WORLD_CLOCK_ERA_MAX) : "";
+  const era =
+    typeof raw?.era === "string"
+      ? raw.era.trim().slice(0, WORLD_CLOCK_ERA_MAX)
+      : "";
   return {
     timezone: typeof raw?.timezone === "string" ? raw.timezone.trim() : "",
-    displayYear: Number.isFinite(displayYear) && displayYear > 0 ? Math.trunc(displayYear) : 0,
-    era
+    displayYear:
+      Number.isFinite(displayYear) && displayYear > 0
+        ? Math.trunc(displayYear)
+        : 0,
+    era,
   };
 }
 
@@ -22,14 +32,14 @@ export function computeWorldClock(date, settings, locale) {
     hour: "2-digit",
     minute: "2-digit",
     hourCycle: "h23",
-    timeZone: timezone
+    timeZone: timezone,
   }).format(date);
 
   const dateLabel = new Intl.DateTimeFormat(locale, {
     weekday: "short",
     day: "numeric",
     month: "short",
-    timeZone: timezone
+    timeZone: timezone,
   }).format(date);
 
   return {
@@ -44,7 +54,7 @@ export function computeWorldClock(date, settings, locale) {
     realYear: parts.year,
     year,
     hasNarrativeYear: normalized.displayYear > 0,
-    era: normalized.era
+    era: normalized.era,
   };
 }
 
@@ -53,7 +63,7 @@ export function getClockSettings() {
     return normalizeClockSettings({
       timezone: game.settings.get(MODULE_ID, SETTINGS_KEYS.TIMEZONE),
       displayYear: game.settings.get(MODULE_ID, SETTINGS_KEYS.DISPLAY_YEAR),
-      era: game.settings.get(MODULE_ID, SETTINGS_KEYS.ERA)
+      era: game.settings.get(MODULE_ID, SETTINGS_KEYS.ERA),
     });
   } catch (error) {
     Logger.debug("Settings de relógio indisponíveis:", error);

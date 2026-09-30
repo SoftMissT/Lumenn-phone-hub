@@ -1,19 +1,33 @@
-import { FLAG_KEY, FLAG_NAMESPACE, JOURNAL_NAME, MODULE_ID, SETTINGS_KEYS } from "../core/constants.mjs";
+import {
+  FLAG_KEY,
+  FLAG_NAMESPACE,
+  JOURNAL_NAME,
+  MODULE_ID,
+  SETTINGS_KEYS,
+} from "../core/constants.mjs";
 import { Logger } from "../core/logger.mjs";
 import { createDefaultStore, isValidStore } from "./schemas.mjs";
 
 export class JournalStore {
   static async getEntry() {
-    const storeRef = globalThis.game?.settings?.get(MODULE_ID, SETTINGS_KEYS.STORE_REF) ?? "";
+    const storeRef =
+      globalThis.game?.settings?.get(MODULE_ID, SETTINGS_KEYS.STORE_REF) ?? "";
     const isGM = globalThis.game?.user?.isGM === true;
     let journal = storeRef ? globalThis.game?.journal?.get(storeRef) : null;
 
     if (!journal) {
-      journal = globalThis.game?.journal?.find((entry) => entry.name === JOURNAL_NAME) ?? null;
+      journal =
+        globalThis.game?.journal?.find(
+          (entry) => entry.name === JOURNAL_NAME,
+        ) ?? null;
     }
 
     if (journal && isGM && storeRef !== journal.id) {
-      await globalThis.game.settings.set(MODULE_ID, SETTINGS_KEYS.STORE_REF, journal.id);
+      await globalThis.game.settings.set(
+        MODULE_ID,
+        SETTINGS_KEYS.STORE_REF,
+        journal.id,
+      );
     }
 
     if (!journal && isGM) {
@@ -21,9 +35,13 @@ export class JournalStore {
       journal = await JournalEntry.create({
         name: JOURNAL_NAME,
         ownership: { default: CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER },
-        flags: { [FLAG_NAMESPACE]: { [FLAG_KEY]: createDefaultStore() } }
+        flags: { [FLAG_NAMESPACE]: { [FLAG_KEY]: createDefaultStore() } },
       });
-      await globalThis.game.settings.set(MODULE_ID, SETTINGS_KEYS.STORE_REF, journal.id);
+      await globalThis.game.settings.set(
+        MODULE_ID,
+        SETTINGS_KEYS.STORE_REF,
+        journal.id,
+      );
     }
 
     return journal;

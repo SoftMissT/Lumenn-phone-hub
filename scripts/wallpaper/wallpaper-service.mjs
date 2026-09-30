@@ -1,7 +1,11 @@
 import { ERROR_CODES, WALLPAPER_DIRECTORY } from "../core/constants.mjs";
 import { fail } from "../core/errors.mjs";
 import { Logger } from "../core/logger.mjs";
-import { canUploadFiles, openFilePicker, uploadFile } from "../compat/foundry-compat.mjs";
+import {
+  canUploadFiles,
+  openFilePicker,
+  uploadFile,
+} from "../compat/foundry-compat.mjs";
 import { randomId } from "../validation/ids.mjs";
 import {
   detectImageFormat,
@@ -10,9 +14,13 @@ import {
   validateDimensions,
   validateExtension,
   validateSize,
-  validateSourceUrl
+  validateSourceUrl,
 } from "./wallpaper-validator.mjs";
-import { getWorldDefaultWallpaper, resolveWallpaperUrl, savePhoneWallpaper } from "./wallpaper-storage.mjs";
+import {
+  getWorldDefaultWallpaper,
+  resolveWallpaperUrl,
+  savePhoneWallpaper,
+} from "./wallpaper-storage.mjs";
 
 export function getResolvedWallpaper(phoneState) {
   return resolveWallpaperUrl(phoneState, getWorldDefaultWallpaper());
@@ -44,7 +52,8 @@ export function loadImageMetadata(url) {
   return new Promise((resolve) => {
     try {
       const image = new Image();
-      image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+      image.onload = () =>
+        resolve({ width: image.naturalWidth, height: image.naturalHeight });
       image.onerror = () => resolve(null);
       image.src = url;
     } catch {
@@ -76,20 +85,32 @@ export async function validateFile(file) {
     return { valid: false, reason: "Não foi possível ler o arquivo." };
   }
   const format = detectImageFormat(bytes);
-  if (!format) return { valid: false, reason: "Assinatura de imagem não reconhecida." };
+  if (!format)
+    return { valid: false, reason: "Assinatura de imagem não reconhecida." };
   if (format !== extension.format) {
-    return { valid: false, reason: "A extensão não corresponde ao conteúdo do arquivo." };
+    return {
+      valid: false,
+      reason: "A extensão não corresponde ao conteúdo do arquivo.",
+    };
   }
   if (format === "avif" && !isAvifSupported()) {
     return { valid: false, reason: "AVIF não disponível neste navegador." };
   }
 
   const dimensions = await dimensionsFromFile(file);
-  if (!dimensions) return { valid: false, reason: "Não foi possível decodificar a imagem." };
+  if (!dimensions)
+    return { valid: false, reason: "Não foi possível decodificar a imagem." };
   const dims = validateDimensions(dimensions.width, dimensions.height);
   if (!dims.valid) return dims;
 
-  return { valid: true, reason: "", format, size: file.size, width: dimensions.width, height: dimensions.height };
+  return {
+    valid: true,
+    reason: "",
+    format,
+    size: file.size,
+    width: dimensions.width,
+    height: dimensions.height,
+  };
 }
 
 export async function applyWallpaperFromSource(actorUuid, source) {
@@ -107,7 +128,7 @@ export async function applyWallpaperFromSource(actorUuid, source) {
     width: dimensions?.width ?? null,
     height: dimensions?.height ?? null,
     size: null,
-    hash: await hashReference(url)
+    hash: await hashReference(url),
   };
   return savePhoneWallpaper(actorUuid, wallpaper);
 }
@@ -115,12 +136,25 @@ export async function applyWallpaperFromSource(actorUuid, source) {
 export async function applyWallpaperFromFile(actorUuid, file) {
   const validation = await validateFile(file);
   if (!validation.valid) fail(ERROR_CODES.INVALID_WALLPAPER, validation.reason);
-  if (!canUploadFiles()) fail(ERROR_CODES.UNAUTHORIZED, "Você não tem permissão para enviar arquivos.");
+  if (!canUploadFiles())
+    fail(
+      ERROR_CODES.UNAUTHORIZED,
+      "Você não tem permissão para enviar arquivos.",
+    );
 
   const filename = `${randomId(8)}-${sanitizeFilename(file.name)}`;
-  const response = await uploadFile({ source: "data", path: WALLPAPER_DIRECTORY, file, notify: false });
+  const response = await uploadFile({
+    source: "data",
+    path: WALLPAPER_DIRECTORY,
+    file,
+    notify: false,
+  });
   const url = response?.path ?? response?.url;
-  if (!url) fail(ERROR_CODES.INVALID_WALLPAPER, "O upload não retornou um caminho válido.");
+  if (!url)
+    fail(
+      ERROR_CODES.INVALID_WALLPAPER,
+      "O upload não retornou um caminho válido.",
+    );
 
   const wallpaper = {
     url,
@@ -128,7 +162,7 @@ export async function applyWallpaperFromFile(actorUuid, file) {
     width: validation.width,
     height: validation.height,
     size: validation.size,
-    hash: await hashReference(url)
+    hash: await hashReference(url),
   };
   return savePhoneWallpaper(actorUuid, wallpaper);
 }
@@ -137,7 +171,7 @@ export async function pickWallpaperFromFoundry(actorUuid, current = null) {
   const picked = await openFilePicker({
     type: "image",
     current,
-    callback: undefined
+    callback: undefined,
   });
   if (!picked) return null;
   return applyWallpaperFromSource(actorUuid, picked);

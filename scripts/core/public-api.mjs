@@ -9,7 +9,8 @@ export function exposePublicApi() {
   const api = {
     openPhone(options = {}) {
       const shell = PhoneShell.instance;
-      const actorUuid = typeof options === "string" ? options : options?.actorUuid;
+      const actorUuid =
+        typeof options === "string" ? options : options?.actorUuid;
       if (actorUuid) shell.actorUuid = actorUuid;
       shell.open();
       return shell;
@@ -21,7 +22,10 @@ export function exposePublicApi() {
 
     openPhoneAsGM(actorUuid) {
       if (globalThis.game?.user?.isGM !== true) {
-        fail(ERROR_CODES.NO_AUTHORITY, "Apenas o GM pode abrir o celular de outro personagem.");
+        fail(
+          ERROR_CODES.NO_AUTHORITY,
+          "Apenas o GM pode abrir o celular de outro personagem.",
+        );
       }
       const shell = PhoneShell.instance;
       const actorId = String(actorUuid ?? "").split(".")[1];
@@ -40,7 +44,7 @@ export function exposePublicApi() {
 
       list(actorUuid) {
         return LumennRepository.listNotifications(actorUuid);
-      }
+      },
     },
 
     apps: {
@@ -54,8 +58,8 @@ export function exposePublicApi() {
 
       list(filter) {
         return AppRegistry.list(filter);
-      }
-    }
+      },
+    },
   };
 
   const module = game.modules.get(MODULE_ID);

@@ -1,4 +1,8 @@
-import { CONTROL_GROUP_ID, CONTROL_TOOL_ID, MODULE_ID } from "../core/constants.mjs";
+import {
+  CONTROL_GROUP_ID,
+  CONTROL_TOOL_ID,
+  MODULE_ID,
+} from "../core/constants.mjs";
 import { Logger } from "../core/logger.mjs";
 import { getUnreadNotifications } from "../core/runtime-state.mjs";
 
@@ -19,7 +23,9 @@ function toolTitle() {
 export function registerControlsEntry(controls) {
   if (!controls || typeof controls !== "object") return false;
   if (Object.prototype.hasOwnProperty.call(controls, CONTROL_GROUP_ID)) {
-    Logger.warn(`Colisão de control "${CONTROL_GROUP_ID}"; instalação abortada em favor de API/macro.`);
+    Logger.warn(
+      `Colisão de control "${CONTROL_GROUP_ID}"; instalação abortada em favor de API/macro.`,
+    );
     return false;
   }
 
@@ -39,9 +45,9 @@ export function registerControlsEntry(controls) {
         onChange: () => {
           const api = globalThis.game?.modules?.get(MODULE_ID)?.api;
           if (typeof api?.openPhone === "function") api.openPhone();
-        }
-      }
-    }
+        },
+      },
+    },
   };
 
   Logger.debug("Botão da barra de controles registrado.");

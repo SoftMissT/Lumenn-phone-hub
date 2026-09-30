@@ -1,6 +1,18 @@
 const ALLOWED_PROTOCOLS = new Set(["https:"]);
-const FORBIDDEN_PROTOCOLS = new Set(["javascript:", "data:", "file:", "blob:", "vbscript:"]);
-const WALLPAPER_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".avif"]);
+const FORBIDDEN_PROTOCOLS = new Set([
+  "javascript:",
+  "data:",
+  "file:",
+  "blob:",
+  "vbscript:",
+]);
+const WALLPAPER_EXTENSIONS = new Set([
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".webp",
+  ".avif",
+]);
 
 export function getUrlProtocol(value) {
   if (typeof value !== "string" || value.length === 0) return "";

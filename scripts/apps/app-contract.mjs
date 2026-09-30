@@ -14,7 +14,7 @@ export const APP_CONTRACT_FIELDS = Object.freeze([
   "render",
   "onOpen",
   "onClose",
-  "permissions"
+  "permissions",
 ]);
 
 function fnOrNull(value) {
@@ -26,12 +26,15 @@ export function normalizeAppDefinition(input) {
     fail(ERROR_CODES.INVALID_APP, "Definição de app inválida.");
   }
   if (typeof input.id !== "string" || !APP_ID_RE.test(input.id)) {
-    fail(ERROR_CODES.INVALID_APP, `id de app inválido: ${String(input.id)}`, { id: input.id });
+    fail(ERROR_CODES.INVALID_APP, `id de app inválido: ${String(input.id)}`, {
+      id: input.id,
+    });
   }
   return Object.freeze({
     id: input.id,
     name: typeof input.name === "string" && input.name ? input.name : input.id,
-    icon: typeof input.icon === "string" && input.icon ? input.icon : "fas fa-cube",
+    icon:
+      typeof input.icon === "string" && input.icon ? input.icon : "fas fa-cube",
     order: Number.isFinite(input.order) ? Math.trunc(input.order) : 100,
     dockEligible: input.dockEligible === true,
     playerVisible: input.playerVisible !== false,
@@ -39,6 +42,8 @@ export function normalizeAppDefinition(input) {
     render: fnOrNull(input.render),
     onOpen: fnOrNull(input.onOpen),
     onClose: fnOrNull(input.onClose),
-    permissions: Array.isArray(input.permissions) ? Object.freeze([...input.permissions]) : Object.freeze([])
+    permissions: Array.isArray(input.permissions)
+      ? Object.freeze([...input.permissions])
+      : Object.freeze([]),
   });
 }

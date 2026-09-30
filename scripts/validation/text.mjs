@@ -44,12 +44,15 @@ export function truncateLines(value, maxLines) {
 }
 
 export function sanitizePlainText(value) {
-  return String(value ?? "").replace(/\r\n|\r/g, "\n").replace(CONTROL_CHARS, "");
+  return String(value ?? "")
+    .replace(/\r\n|\r/g, "\n")
+    .replace(CONTROL_CHARS, "");
 }
 
 export function prepareNotificationText(value, maxGraphemes, maxLines) {
   let text = sanitizePlainText(value);
   if (Number.isFinite(maxLines)) text = truncateLines(text, maxLines);
-  if (Number.isFinite(maxGraphemes)) text = truncateGraphemes(text, maxGraphemes);
+  if (Number.isFinite(maxGraphemes))
+    text = truncateGraphemes(text, maxGraphemes);
   return text;
 }

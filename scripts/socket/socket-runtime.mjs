@@ -1,7 +1,16 @@
-import { ERROR_CODES, HOOKS, SOCKET_NAMESPACE, SOCKET_TIMEOUT_MS } from "../core/constants.mjs";
+import {
+  ERROR_CODES,
+  HOOKS,
+  SOCKET_NAMESPACE,
+  SOCKET_TIMEOUT_MS,
+} from "../core/constants.mjs";
 import { Logger } from "../core/logger.mjs";
 import { LumennError } from "../core/errors.mjs";
-import { createEnvelope, validateEnvelope, addressesUser } from "./socket-envelope.mjs";
+import {
+  createEnvelope,
+  validateEnvelope,
+  addressesUser,
+} from "./socket-envelope.mjs";
 import { LumennRepository } from "../persistence/repository.mjs";
 
 const pending = new Map();
@@ -14,19 +23,35 @@ async function handleOperation(operation, payload = {}) {
     case "lph-create-notification":
       return LumennRepository.createNotification(payload);
     case "lph-mark-read":
-      return LumennRepository.markNotificationRead(payload.actorUuid, payload.ids);
+      return LumennRepository.markNotificationRead(
+        payload.actorUuid,
+        payload.ids,
+      );
     case "lph-dismiss":
-      return LumennRepository.dismissNotification(payload.actorUuid, payload.ids);
+      return LumennRepository.dismissNotification(
+        payload.actorUuid,
+        payload.ids,
+      );
     default:
-      throw new LumennError(ERROR_CODES.INVALID_ARGUMENT, `Operação desconhecida: ${operation}`);
+      throw new LumennError(
+        ERROR_CODES.INVALID_ARGUMENT,
+        `Operação desconhecida: ${operation}`,
+      );
   }
 }
 
-export function socketRequest(operation, payload, timeoutMs = SOCKET_TIMEOUT_MS) {
-  if (globalThis.game?.user?.isGM === true) return handleOperation(operation, payload);
+export function socketRequest(
+  operation,
+  payload,
+  timeoutMs = SOCKET_TIMEOUT_MS,
+) {
+  if (globalThis.game?.user?.isGM === true)
+    return handleOperation(operation, payload);
   const socket = globalThis.game?.socket;
   if (!socket) {
-    return Promise.reject(new LumennError(ERROR_CODES.NO_AUTHORITY, "Sockets indisponíveis."));
+    return Promise.reject(
+      new LumennError(ERROR_CODES.NO_AUTHORITY, "Sockets indisponíveis."),
+    );
   }
 
   return new Promise((resolve, reject) => {
@@ -35,12 +60,17 @@ export function socketRequest(operation, payload, timeoutMs = SOCKET_TIMEOUT_MS)
       operation,
       payload,
       recipients: "gm",
-      sender: globalThis.game.user.id
+      sender: globalThis.game.user.id,
     });
 
     const timer = setTimeout(() => {
       pending.delete(envelope.operationId);
-      reject(new LumennError(ERROR_CODES.SOCKET_TIMEOUT, `Timeout na operação ${operation}.`));
+      reject(
+        new LumennError(
+          ERROR_CODES.SOCKET_TIMEOUT,
+          `Timeout na operação ${operation}.`,
+        ),
+      );
     }, timeoutMs);
 
     pending.set(envelope.operationId, { resolve, reject, timer });
@@ -59,8 +89,8 @@ function broadcastNotification(notification) {
       payload: notification,
       recipients: "all",
       sender: globalThis.game.user.id,
-      authorityUserId: globalThis.game.user.id
-    })
+      authorityUserId: globalThis.game.user.id,
+    }),
   );
 }
 
@@ -72,7 +102,10 @@ async function handleRequest(envelope) {
     return;
   }
   try {
-    const result = await handleOperation(envelope.operation, envelope.payload ?? {});
+    const result = await handleOperation(
+      envelope.operation,
+      envelope.payload ?? {},
+    );
     socket.emit(
       SOCKET_NAMESPACE,
       createEnvelope({
@@ -82,8 +115,8 @@ async function handleRequest(envelope) {
         payload: result,
         recipients: [envelope.sender],
         sender: globalThis.game.user.id,
-        authorityUserId: globalThis.game.user.id
-      })
+        authorityUserId: globalThis.game.user.id,
+      }),
     );
   } catch (error) {
     Logger.error("Erro ao processar requisição:", error);
@@ -96,8 +129,8 @@ async function handleRequest(envelope) {
         payload: { message: error?.message ?? "Erro remoto." },
         recipients: [envelope.sender],
         sender: globalThis.game.user.id,
-        authorityUserId: globalThis.game.user.id
-      })
+        authorityUserId: globalThis.game.user.id,
+      }),
     );
   }
 }
@@ -108,7 +141,8 @@ function resolvePending(envelope) {
   if (!addressesUser(envelope.recipients, globalThis.game.user.id)) return true;
   pending.delete(envelope.operationId);
   clearTimeout(entry.timer);
-  if (envelope.kind === "error") entry.reject(new Error(envelope.payload?.message ?? "Erro remoto."));
+  if (envelope.kind === "error")
+    entry.reject(new Error(envelope.payload?.message ?? "Erro remoto."));
   else entry.resolve(envelope.payload);
   return true;
 }
@@ -127,7 +161,10 @@ async function onMessage(envelope) {
 
   if (envelope.kind === "sync") {
     if (envelope.operation === "lph-notification-created") {
-      globalThis.Hooks?.callAll?.(HOOKS.NOTIFICATION_RECEIVED, envelope.payload);
+      globalThis.Hooks?.callAll?.(
+        HOOKS.NOTIFICATION_RECEIVED,
+        envelope.payload,
+      );
     }
     return;
   }

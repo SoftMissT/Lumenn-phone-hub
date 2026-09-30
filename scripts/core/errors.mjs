@@ -22,7 +22,8 @@ export function toUserMessage(code, fallback = "") {
   if (i18n) {
     const key = `LPH.Errors.${code}`;
     const localized = i18n.localize(key);
-    if (typeof localized === "string" && localized && localized !== key) return localized;
+    if (typeof localized === "string" && localized && localized !== key)
+      return localized;
   }
   return fallback || code || ERROR_CODES.INVALID_ARGUMENT;
 }

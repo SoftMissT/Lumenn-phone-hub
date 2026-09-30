@@ -10,7 +10,7 @@ export function createDefaultStore() {
     createdAt: now,
     updatedAt: now,
     phones: {},
-    notifications: {}
+    notifications: {},
   };
 }
 
@@ -23,8 +23,8 @@ export function createDefaultPhoneState() {
       theme: "dark",
       notificationsEnabled: true,
       haptics: true,
-      sound: true
-    }
+      sound: true,
+    },
   };
 }
 
@@ -33,7 +33,8 @@ export function isValidStore(store) {
   if (typeof store.schemaVersion !== "number") return false;
   if (typeof store.revision !== "number") return false;
   if (typeof store.phones !== "object" || store.phones === null) return false;
-  if (typeof store.notifications !== "object" || store.notifications === null) return false;
+  if (typeof store.notifications !== "object" || store.notifications === null)
+    return false;
   return true;
 }
 
@@ -42,6 +43,6 @@ export function normalizeStore(store) {
   return {
     ...store,
     phones: { ...store.phones },
-    notifications: { ...store.notifications }
+    notifications: { ...store.notifications },
   };
 }

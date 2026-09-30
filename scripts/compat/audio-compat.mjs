@@ -1,7 +1,9 @@
 import { Logger } from "../core/logger.mjs";
 
 function audioHelper() {
-  return globalThis.foundry?.audio?.AudioHelper ?? globalThis.AudioHelper ?? null;
+  return (
+    globalThis.foundry?.audio?.AudioHelper ?? globalThis.AudioHelper ?? null
+  );
 }
 
 export async function preloadSound(src) {
@@ -22,12 +24,14 @@ export function playSound(src, options = {}) {
   try {
     const result = helper.play(
       { src, volume: 0.35, autoplay: true, loop: false, ...options },
-      options.onlyOnce ?? true
+      options.onlyOnce ?? true,
     );
-    return Promise.resolve(result).then(() => true).catch((error) => {
-      Logger.warn("Playback de som bloqueado ou indisponível:", error);
-      return false;
-    });
+    return Promise.resolve(result)
+      .then(() => true)
+      .catch((error) => {
+        Logger.warn("Playback de som bloqueado ou indisponível:", error);
+        return false;
+      });
   } catch (error) {
     Logger.warn("Playback de som bloqueado ou indisponível:", error);
     return Promise.resolve(false);

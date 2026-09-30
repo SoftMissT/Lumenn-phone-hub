@@ -1,6 +1,6 @@
 const state = {
   unreadNotifications: 0,
-  runtimeReady: false
+  runtimeReady: false,
 };
 
 export function getUnreadNotifications() {
@@ -13,7 +13,9 @@ export function setUnreadNotifications(value) {
 }
 
 export function incrementUnreadNotifications(delta = 1) {
-  return setUnreadNotifications(state.unreadNotifications + (Number(delta) || 0));
+  return setUnreadNotifications(
+    state.unreadNotifications + (Number(delta) || 0),
+  );
 }
 
 export function isRuntimeReady() {

@@ -3,16 +3,23 @@ import { fail, LumennError } from "../core/errors.mjs";
 
 export function getFilePickerClass() {
   const f = globalThis.foundry ?? {};
-  return f.applications?.apps?.FilePicker?.implementation
-    ?? f.applications?.apps?.FilePicker
-    ?? globalThis.FilePicker
-    ?? null;
+  return (
+    f.applications?.apps?.FilePicker?.implementation ??
+    f.applications?.apps?.FilePicker ??
+    globalThis.FilePicker ??
+    null
+  );
 }
 
 export function openFilePicker(options = {}) {
   const Picker = getFilePickerClass();
   if (!Picker) {
-    return Promise.reject(new LumennError(ERROR_CODES.NOT_IMPLEMENTED, "FilePicker indisponível nesta versão do Foundry."));
+    return Promise.reject(
+      new LumennError(
+        ERROR_CODES.NOT_IMPLEMENTED,
+        "FilePicker indisponível nesta versão do Foundry.",
+      ),
+    );
   }
 
   if (typeof Picker.pick === "function") {
@@ -34,12 +41,17 @@ export function openFilePicker(options = {}) {
         callback: (path) => {
           settle(path);
           picker.close();
-        }
+        },
       });
       picker.addEventListener?.("close", () => settle(null));
       picker.render(true);
     } catch {
-      reject(new LumennError(ERROR_CODES.NOT_IMPLEMENTED, "FilePicker indisponível nesta versão do Foundry."));
+      reject(
+        new LumennError(
+          ERROR_CODES.NOT_IMPLEMENTED,
+          "FilePicker indisponível nesta versão do Foundry.",
+        ),
+      );
     }
   });
 }
@@ -54,14 +66,32 @@ export function canUploadFiles() {
   }
 }
 
-export function uploadFile({ source = "data", path = "", file, notify = false } = {}) {
-  const impl = globalThis.foundry?.applications?.apps?.FilePicker?.implementation ?? getFilePickerClass();
-  const target = typeof impl?.upload === "function" ? impl : getFilePickerClass();
+export function uploadFile({
+  source = "data",
+  path = "",
+  file,
+  notify = false,
+} = {}) {
+  const impl =
+    globalThis.foundry?.applications?.apps?.FilePicker?.implementation ??
+    getFilePickerClass();
+  const target =
+    typeof impl?.upload === "function" ? impl : getFilePickerClass();
   if (!target || typeof target.upload !== "function") {
-    return Promise.reject(fail(ERROR_CODES.NOT_IMPLEMENTED, "Upload indisponível nesta versão do Foundry."));
+    return Promise.reject(
+      fail(
+        ERROR_CODES.NOT_IMPLEMENTED,
+        "Upload indisponível nesta versão do Foundry.",
+      ),
+    );
   }
-  if (typeof globalThis.File !== "function" || !(file instanceof globalThis.File)) {
-    return Promise.reject(fail(ERROR_CODES.INVALID_ARGUMENT, "Arquivo inválido para upload."));
+  if (
+    typeof globalThis.File !== "function" ||
+    !(file instanceof globalThis.File)
+  ) {
+    return Promise.reject(
+      fail(ERROR_CODES.INVALID_ARGUMENT, "Arquivo inválido para upload."),
+    );
   }
   return target.upload(source, path, file, {}, { notify });
 }

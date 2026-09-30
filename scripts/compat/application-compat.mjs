@@ -9,9 +9,10 @@ export function getApplicationBase() {
   if (baseClass) return baseClass;
   const api = globalThis.foundry?.applications?.api ?? {};
   if (typeof api.ApplicationV2 === "function") {
-    baseClass = typeof api.HandlebarsApplicationMixin === "function"
-      ? api.HandlebarsApplicationMixin(api.ApplicationV2)
-      : api.ApplicationV2;
+    baseClass =
+      typeof api.HandlebarsApplicationMixin === "function"
+        ? api.HandlebarsApplicationMixin(api.ApplicationV2)
+        : api.ApplicationV2;
     return baseClass;
   }
   if (typeof globalThis.Application === "function") {
@@ -19,7 +20,10 @@ export function getApplicationBase() {
     baseClass = globalThis.Application;
     return baseClass;
   }
-  fail(ERROR_CODES.UNSUPPORTED_VERSION, "Nenhuma classe de Application Foundry disponível.");
+  fail(
+    ERROR_CODES.UNSUPPORTED_VERSION,
+    "Nenhuma classe de Application Foundry disponível.",
+  );
 }
 
 export function createPhoneApplication() {
@@ -34,7 +38,10 @@ export async function renderTemplate(path, context = {}) {
   if (features().legacyRenderTemplate) {
     return globalThis.renderTemplate(path, context);
   }
-  fail(ERROR_CODES.UNSUPPORTED_VERSION, "renderTemplate indisponível nesta versão do Foundry.");
+  fail(
+    ERROR_CODES.UNSUPPORTED_VERSION,
+    "renderTemplate indisponível nesta versão do Foundry.",
+  );
 }
 
 let partialPreload = null;
@@ -43,18 +50,23 @@ export function preloadTemplates(paths = []) {
   if (partialPreload) return partialPreload;
 
   const list = (Array.isArray(paths) ? paths : []).filter(
-    (path) => typeof path === "string" && path.length > 0
+    (path) => typeof path === "string" && path.length > 0,
   );
   if (!list.length) return Promise.resolve(false);
 
   const f = globalThis.foundry ?? {};
   const modern = f.applications?.handlebars?.loadTemplates;
-  const loader = typeof modern === "function"
-    ? modern
-    : (features().legacyLoadTemplates ? globalThis.loadTemplates : null);
+  const loader =
+    typeof modern === "function"
+      ? modern
+      : features().legacyLoadTemplates
+        ? globalThis.loadTemplates
+        : null;
 
   if (typeof loader !== "function") {
-    Logger.error("loadTemplates indisponível; os partials não serão pré-carregados.");
+    Logger.error(
+      "loadTemplates indisponível; os partials não serão pré-carregados.",
+    );
     return Promise.resolve(false);
   }
 
@@ -74,26 +86,34 @@ export function preloadTemplates(paths = []) {
 
 export function mergeObject(original, other, options = {}) {
   const utils = globalThis.foundry?.utils;
-  if (typeof utils?.mergeObject === "function") return utils.mergeObject(original, other, options);
+  if (typeof utils?.mergeObject === "function")
+    return utils.mergeObject(original, other, options);
   return Object.assign(options.inplace ? original : { ...original }, other);
 }
 
 export function deepClone(value) {
   const utils = globalThis.foundry?.utils;
   if (typeof utils?.deepClone === "function") return utils.deepClone(value);
-  return globalThis.structuredClone ? globalThis.structuredClone(value) : JSON.parse(JSON.stringify(value));
+  return globalThis.structuredClone
+    ? globalThis.structuredClone(value)
+    : JSON.parse(JSON.stringify(value));
 }
 
 export function escapeHTML(value) {
   const utils = globalThis.foundry?.utils;
-  if (typeof utils?.escapeHTML === "function") return utils.escapeHTML(String(value ?? ""));
-  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  })[char]);
+  if (typeof utils?.escapeHTML === "function")
+    return utils.escapeHTML(String(value ?? ""));
+  return String(value ?? "").replace(
+    /[&<>"']/g,
+    (char) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[char],
+  );
 }
 
 export function confirmDialog({ title = "", content = "" } = {}) {
@@ -102,7 +122,7 @@ export function confirmDialog({ title = "", content = "" } = {}) {
     return api.DialogV2.confirm({
       window: { title: escapeHTML(title) },
       content: `<p>${escapeHTML(content)}</p>`,
-      modal: true
+      modal: true,
     });
   }
   const fallback = globalThis.confirm;
