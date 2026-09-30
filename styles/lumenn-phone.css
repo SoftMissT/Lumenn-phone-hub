@@ -1,0 +1,796 @@
+:root {
+  /* Tamanhos Globais (Safe Areas / Controls) */
+  --lph-control-size: 48px;
+  --lph-border-radius-phone: 42px;
+  --lph-border-radius-app: 18px;
+  
+  /* Z-Index Hierarchy */
+  --lph-z-wallpaper: 0;
+  --lph-z-content: 10;
+  --lph-z-notch: 20;
+  --lph-z-glass: 30;
+  --lph-z-overlay: 100;
+}
+
+/* Tema Claro */
+.lph-theme-light {
+  --lph-sys-bg: #f5f5f7;
+  --lph-surface: rgba(255, 255, 255, 0.75);
+  --lph-surface-elevated: rgba(255, 255, 255, 0.9);
+  --lph-border: rgba(0, 0, 0, 0.1);
+  --lph-text-primary: #1d1d1f;
+  --lph-text-secondary: #86868b;
+  --lph-accent: #0071e3;
+  --lph-danger: #ff3b30;
+  --lph-glass-blur: blur(16px);
+}
+
+/* Tema Escuro */
+.lph-theme-dark {
+  --lph-sys-bg: #0b0c10;
+  --lph-surface: rgba(24, 25, 30, 0.75);
+  --lph-surface-elevated: rgba(35, 36, 45, 0.85);
+  --lph-border: rgba(255, 255, 255, 0.12);
+  --lph-text-primary: #f5f5f7;
+  --lph-text-secondary: #98989d;
+  --lph-accent: #0a84ff;
+  --lph-danger: #ff453a;
+  --lph-glass-blur: blur(16px);
+}
+
+/* Base Phone Window Container */
+.lumenn-phone-window {
+  width: 360px;
+  height: 720px;
+  border-radius: var(--lph-border-radius-phone);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65), 0 0 0 8px #1a1a1e, 0 0 0 10px rgba(255, 255, 255, 0.08);
+  background: var(--lph-sys-bg, #000);
+  color: var(--lph-text-primary, #fff);
+  position: relative;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Wallpaper Background Layer */
+.lph-wallpaper-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: var(--lph-z-wallpaper);
+  transition: transform 0.4s ease, filter 0.3s ease;
+}
+
+.lph-wallpaper-blur {
+  filter: blur(20px) brightness(0.7);
+  transform: scale(1.05);
+}
+
+/* Dynamic Island / Notch */
+.lph-notch-container {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110px;
+  height: 28px;
+  background: #000000;
+  border-radius: 20px;
+  z-index: var(--lph-z-notch);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.lph-camera-lens {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #1a2a40, #02060d);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.lph-speaker-grill {
+  width: 36px;
+  height: 4px;
+  background: #111;
+  border-radius: 2px;
+}
+
+/* Status Bar */
+.lph-status-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 44px;
+  padding: 10px 20px 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: var(--lph-z-notch);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: var(--lph-text-primary);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.lph-status-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Main Screen Viewport */
+.lph-screen-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding-top: 48px;
+  padding-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  z-index: var(--lph-z-content);
+  overflow: hidden;
+}
+
+/* Lock Screen */
+.lph-lock-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px 20px 20px 20px;
+  text-align: center;
+}
+
+.lph-lock-clock {
+  margin-top: 20px;
+}
+
+.lph-lock-time {
+  font-size: 64px;
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: -1px;
+  margin-bottom: 6px;
+}
+
+.lph-lock-date {
+  font-size: 16px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+/* Notifications Summary in Lockscreen */
+.lph-lock-notifications {
+  width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lph-notif-card {
+  background: var(--lph-surface);
+  backdrop-filter: var(--lph-glass-blur);
+  border: 1px solid var(--lph-border);
+  border-radius: var(--lph-border-radius-app);
+  padding: 12px 14px;
+  text-align: left;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.lph-notif-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--lph-text-secondary);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.lph-notif-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.lph-notif-body {
+  font-size: 12px;
+  opacity: 0.85;
+  line-height: 1.3;
+}
+
+.lph-unlock-hint {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.8;
+  animation: lphPulse 2s infinite ease-in-out;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+}
+
+@keyframes lphPulse {
+  0%, 100% { opacity: 0.6; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-4px); }
+}
+
+/* PIN Keypad Screen */
+.lph-pin-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.lph-pin-header {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.lph-pin-dots {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.lph-pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--lph-text-primary);
+  transition: all 0.15s ease;
+}
+
+.lph-pin-dot.filled {
+  background: var(--lph-text-primary);
+}
+
+.lph-pin-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 72px);
+  gap: 16px;
+  justify-content: center;
+}
+
+.lph-pin-btn {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1px solid var(--lph-border);
+  background: var(--lph-surface);
+  backdrop-filter: var(--lph-glass-blur);
+  color: var(--lph-text-primary);
+  font-size: 26px;
+  font-weight: 400;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease, background 0.15s ease;
+}
+
+.lph-pin-btn:active {
+  transform: scale(0.92);
+  background: var(--lph-surface-elevated);
+}
+
+.lph-pin-btn sub {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.6;
+  margin-top: -4px;
+}
+
+.lph-pin-btn.fn-btn {
+  font-size: 14px;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+}
+
+.lph-pin-error {
+  color: var(--lph-danger);
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 16px;
+  min-height: 18px;
+  text-align: center;
+}
+
+/* Home Screen & App Grid */
+.lph-home-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px 20px 10px 20px;
+}
+
+.lph-app-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px 12px;
+}
+
+.lph-app-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.lph-app-glyph {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  background: var(--lph-surface-elevated);
+  backdrop-filter: var(--lph-glass-blur);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: var(--lph-text-primary);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: transform 0.15s ease;
+}
+
+.lph-app-icon:hover .lph-app-glyph {
+  transform: scale(1.08);
+}
+
+.lph-app-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  color: var(--lph-text-primary);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+
+/* Dock */
+.lph-dock-container {
+  background: var(--lph-surface);
+  backdrop-filter: var(--lph-glass-blur);
+  border: 1px solid var(--lph-border);
+  border-radius: 26px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 8px;
+}
+
+/* Home Indicator Bar (Swipe Bar) */
+.lph-home-bar-container {
+  width: 100%;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.lph-home-bar {
+  width: 120px;
+  height: 5px;
+  background: var(--lph-text-primary);
+  border-radius: 3px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, width 0.2s ease;
+}
+
+.lph-home-bar-container:hover .lph-home-bar {
+  opacity: 1;
+  width: 130px;
+}
+
+/* App view inside the phone */
+.lph-app-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 10px;
+}
+
+.lph-app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.lph-app-title {
+  font-weight: 600;
+}
+
+.lph-app-spacer {
+  width: 40px;
+}
+
+.lph-app-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--lph-surface);
+  backdrop-filter: var(--lph-glass-blur);
+  padding: 14px;
+  border-radius: var(--lph-border-radius-app);
+}
+
+/* No-character state */
+.lph-no-character {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--lph-text-secondary);
+}
+
+/* Lock screen year and era */
+.lph-lock-era {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+.lph-lock-era-label {
+  color: var(--lph-accent);
+}
+
+.lph-pin-locked {
+  color: var(--lph-danger);
+}
+
+/* Sidebar tab rules removed: entry point is the left scene controls bar. */
+
+/* Settings app */
+.lph-settings-app {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.lph-settings-app h3 {
+  margin: 4px 0 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.7;
+}
+
+.lph-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.lph-settings-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--lph-border);
+  border-radius: var(--lph-border-radius-app);
+}
+
+.lph-settings-label {
+  font-weight: 600;
+}
+
+.lph-settings-state {
+  margin: 0;
+  font-size: 12px;
+  color: var(--lph-text-secondary);
+}
+
+.lph-settings-actions,
+.lph-theme-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lph-settings-error {
+  margin: 0;
+  min-height: 14px;
+  font-size: 12px;
+  color: var(--lph-danger);
+}
+
+.lph-settings-note {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--lph-text-secondary);
+  opacity: 0.85;
+}
+
+.lph-pin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ============================================================
+   Accessibility
+   ============================================================ */
+
+/* Focus visibility */
+.lph-pin-btn:focus-visible,
+.lph-unlock-hint:focus-visible,
+.lph-app-icon:focus-visible,
+.lph-home-bar-container:focus-visible,
+.lph-notif-card:focus-visible,
+.lph-settings-app :is(button, input, select, textarea, a):focus-visible,
+.lph-app-body :is(button, input, select, textarea, a):focus-visible,
+[class*="lph-gm-"] :is(button, input, select, textarea, a):focus-visible {
+  outline: 2px solid var(--lph-accent, currentColor);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .lph-unlock-hint,
+  .lph-wallpaper-layer,
+  .lph-pin-dot,
+  .lph-pin-btn,
+  .lph-app-glyph,
+  .lph-home-bar,
+  .lumenn-phone-window,
+  .lumenn-phone-window * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast */
+@media (prefers-contrast: more) {
+  .lph-notif-card,
+  .lph-dock-container,
+  .lph-app-body,
+  .lph-settings-block {
+    border-color: var(--lph-text-primary);
+    border-width: 2px;
+  }
+
+  .lph-notif-header,
+  .lph-notif-body,
+  .lph-settings-state,
+  .lph-status-bar,
+  .lph-pin-btn sub,
+  .lph-app-label,
+  .lph-home-bar {
+    opacity: 1;
+  }
+}
+
+/* Forced colors */
+@media (forced-colors: active) {
+  .lph-pin-btn,
+  .lph-settings-app :is(button, input, select, textarea),
+  .lph-app-body :is(button, input, select, textarea),
+  [class*="lph-gm-"] :is(button, input, select, textarea) {
+    border: 1px solid ButtonBorder;
+    forced-color-adjust: auto;
+  }
+}
+
+/* Wallpaper legibility scrim */
+.lph-wallpaper-layer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.45) 100%);
+  pointer-events: none;
+}
+
+/* Reflow safety */
+.lph-app-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.lph-notif-title,
+.lph-notif-body,
+.lph-notif-sender {
+  overflow-wrap: anywhere;
+}
+
+.lph-settings-row {
+  flex-wrap: wrap;
+}
+
+.lph-settings-row > input[type="url"] {
+  min-width: 0;
+  flex: 1 1 160px;
+}
+
+.lph-pin-pad {
+  max-width: 100%;
+}
+
+.lph-app-glyph {
+  min-width: var(--lph-control-size, 48px);
+  min-height: var(--lph-control-size, 48px);
+}
+
+/* Screen-reader-only utility */
+.lph-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* GM mode banner inside the phone */
+.lph-gm-banner {
+  position: relative;
+  z-index: var(--lph-z-glass);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 48px 10px 0 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--lph-accent);
+  border-radius: var(--lph-border-radius-app);
+  background: var(--lph-surface-elevated);
+  backdrop-filter: var(--lph-glass-blur);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lph-gm-banner-label {
+  color: var(--lph-accent);
+  overflow-wrap: anywhere;
+}
+
+.lph-gm-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lph-gm-banner-actions button {
+  padding: 4px 8px;
+  border: 1px solid var(--lph-border);
+  border-radius: 8px;
+  background: var(--lph-surface);
+  color: var(--lph-text-primary);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* GM Control Center and Inspector */
+.lph-gm-central,
+.lph-gm-inspector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.lph-gm-field,
+.lph-settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lph-gm-field > label,
+.lph-settings-field > label {
+  font-weight: 600;
+}
+
+.lph-gm-field > input,
+.lph-gm-field > textarea,
+.lph-gm-field > select,
+.lph-settings-field > input,
+.lph-settings-field > textarea,
+.lph-settings-field > select {
+  width: 100%;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--lph-border);
+  border-radius: 8px;
+  background: var(--lph-surface);
+  color: var(--lph-text-primary);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.lph-gm-field > textarea {
+  resize: vertical;
+}
+
+.lph-gm-preview {
+  min-height: 2.5em;
+  padding: 8px 10px;
+  border: 1px dashed var(--lph-border);
+  border-radius: var(--lph-border-radius-app);
+  background: var(--lph-surface);
+  color: var(--lph-text-secondary);
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.lph-gm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lph-gm-actions > button,
+.lph-gm-send {
+  padding: 8px 12px;
+  border: 1px solid var(--lph-border);
+  border-radius: 8px;
+  background: var(--lph-surface-elevated);
+  color: var(--lph-text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lph-gm-send {
+  align-self: flex-start;
+  border-color: var(--lph-accent);
+  color: var(--lph-accent);
+}
+
+.lph-gm-status {
+  margin: 0;
+  min-height: 14px;
+  font-size: 12px;
+  color: var(--lph-text-secondary);
+}
+
+.lph-gm-status[data-kind="ok"] {
+  color: var(--lph-accent);
+}
+
+.lph-gm-status[data-kind="error"] {
+  color: var(--lph-danger);
+}
+
+

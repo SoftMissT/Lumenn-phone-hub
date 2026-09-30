@@ -1,0 +1,30 @@
+<form class="lph-gm-central" data-lph-gm-central-form>
+    <div class="lph-gm-field">
+        <label for="lph-gm-sender">{{localize "LPH.GM.Sender"}}</label>
+        <input id="lph-gm-sender" type="text" name="sender" maxlength="80" autocomplete="off">
+    </div>
+    <div class="lph-gm-field">
+        <label for="lph-gm-title">{{localize "LPH.GM.TitleLabel"}}</label>
+        <input id="lph-gm-title" type="text" name="title" maxlength="80" required>
+    </div>
+    <div class="lph-gm-field">
+        <label for="lph-gm-body">{{localize "LPH.GM.Body"}}</label>
+        <textarea id="lph-gm-body" name="body" rows="4" maxlength="500"></textarea>
+    </div>
+    <div class="lph-gm-field">
+        <label for="lph-gm-target-mode">{{localize "LPH.GM.Targets"}}</label>
+        <select id="lph-gm-target-mode" name="targetMode">
+            <option value="all">{{localize "LPH.GM.TargetAll"}}</option>
+            <option value="single">{{localize "LPH.GM.TargetSingle"}}</option>
+        </select>
+    </div>
+    <div class="lph-gm-field" data-lph-gm-single hidden>
+        <label for="lph-gm-target-actor">{{localize "LPH.GM.Character"}}</label>
+        <select id="lph-gm-target-actor" name="targetActorUuid">
+            {{#each characters}}<option value="{{this.uuid}}">{{this.name}}</option>{{/each}}
+        </select>
+    </div>
+    <div class="lph-gm-preview" data-lph-gm-preview aria-live="polite"></div>
+    <button type="submit" class="lph-gm-send">{{localize "LPH.GM.Send"}}</button>
+    <p class="lph-gm-status" data-lph-gm-central-status role="status"></p>
+</form>

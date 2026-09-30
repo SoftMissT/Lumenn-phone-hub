@@ -1,0 +1,14 @@
+/**
+ * Lumenn Phone Hub - Dark Theme Overrides
+ */
+.lumenn-phone-window.lph-theme-dark {
+    --lph-sys-bg: #0b0c10;
+    --lph-surface: rgba(24, 25, 30, 0.75);
+    --lph-surface-elevated: rgba(35, 36, 45, 0.85);
+    --lph-border: rgba(255, 255, 255, 0.12);
+    --lph-text-primary: #f5f5f7;
+    --lph-text-secondary: #98989d;
+    --lph-accent: #0a84ff;
+    --lph-danger: #ff453a;
+    --lph-glass-blur: blur(16px);
+}

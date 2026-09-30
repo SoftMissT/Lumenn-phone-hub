@@ -1,0 +1,75 @@
+<div class="lph-settings-app">
+    <h3>{{localize "LPH.Settings.Appearance"}}</h3>
+    <div class="lph-settings-row">
+        <span>{{localize "LPH.Settings.Theme"}}</span>
+        <div class="lph-theme-choices">
+            <button type="button" data-lph-theme="light" {{#if (eq theme "light")}}disabled{{/if}}>
+                {{localize "LPH.Settings.ThemeLight"}}
+            </button>
+            <button type="button" data-lph-theme="dark" {{#if (eq theme "dark")}}disabled{{/if}}>
+                {{localize "LPH.Settings.ThemeDark"}}
+            </button>
+        </div>
+    </div>
+
+    <div class="lph-settings-block">
+        <span class="lph-settings-label">{{localize "LPH.Settings.Wallpaper"}}</span>
+        <p class="lph-settings-state">
+            {{#if hasCustomWallpaper}}{{localize "LPH.Settings.WallpaperCustom"}}{{else}}{{localize "LPH.Settings.WallpaperDefault"}}{{/if}}
+        </p>
+        <div class="lph-settings-actions">
+            <button type="button" data-lph-wallpaper="browse">{{localize "LPH.Settings.WallpaperBrowse"}}</button>
+            <button type="button" data-lph-wallpaper="upload">{{localize "LPH.Settings.WallpaperUpload"}}</button>
+            <button type="button" data-lph-wallpaper="default">{{localize "LPH.Settings.WallpaperReset"}}</button>
+        </div>
+        <div class="lph-settings-row">
+            <input type="url" data-lph-wallpaper-url placeholder="{{localize 'LPH.Settings.WallpaperUrlPlaceholder'}}">
+            <button type="button" data-lph-wallpaper="url">{{localize "LPH.Settings.WallpaperApply"}}</button>
+        </div>
+        <input type="file" accept="image/png,image/jpeg,image/webp,image/avif" data-lph-wallpaper-file hidden>
+        <p class="lph-settings-error" data-lph-wallpaper-error></p>
+    </div>
+
+    <div class="lph-settings-block">
+        <span class="lph-settings-label">{{localize "LPH.Settings.Security"}}</span>
+        <p class="lph-settings-state">
+            {{#if hasPin}}{{localize "LPH.Settings.PinSet"}}{{else}}{{localize "LPH.Settings.PinNotSet"}}{{/if}}
+        </p>
+        <p class="lph-settings-note">{{localize "LPH.Settings.PinHint"}}</p>
+        <div class="lph-settings-actions">
+            {{#if hasPin}}
+            <button type="button" data-lph-pin-action="change">{{localize "LPH.Settings.PinChange"}}</button>
+            <button type="button" data-lph-pin-action="remove">{{localize "LPH.Settings.PinRemove"}}</button>
+            {{else}}
+            <button type="button" data-lph-pin-action="create">{{localize "LPH.Settings.PinCreate"}}</button>
+            {{/if}}
+        </div>
+        <form class="lph-pin-form" data-lph-pin-form hidden>
+            <div class="lph-settings-field" data-lph-pin-current hidden>
+                <label for="lph-pin-current">{{localize "LPH.Settings.PinCurrent"}}</label>
+                <input id="lph-pin-current" type="password" inputmode="numeric" autocomplete="off" maxlength="6" name="current">
+            </div>
+            <div class="lph-settings-field" data-lph-pin-new>
+                <label for="lph-pin-new">{{localize "LPH.Settings.PinNew"}}</label>
+                <input id="lph-pin-new" type="password" inputmode="numeric" autocomplete="new-password" maxlength="6" name="next">
+            </div>
+            <div class="lph-settings-field" data-lph-pin-confirm>
+                <label for="lph-pin-confirm">{{localize "LPH.Settings.PinConfirm"}}</label>
+                <input id="lph-pin-confirm" type="password" inputmode="numeric" autocomplete="new-password" maxlength="6" name="confirm">
+            </div>
+            <button type="submit" class="lph-gm-send">{{localize "LPH.Settings.PinApply"}}</button>
+        </form>
+        <p class="lph-settings-error" data-lph-pin-status role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="lph-settings-row">
+        <label for="lph-sound-toggle">{{localize "LPH.Settings.NotificationSound"}}</label>
+        <input id="lph-sound-toggle" type="checkbox" data-lph-sound {{#if soundEnabled}}checked{{/if}}>
+    </div>
+
+    <h3>{{localize "LPH.Settings.About"}}</h3>
+    <div class="lph-settings-row">
+        <span>{{localize "LPH.Settings.Version"}}</span>
+        <span>{{version}}</span>
+    </div>
+</div>

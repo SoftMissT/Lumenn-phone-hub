@@ -1,0 +1,29 @@
+<div class="lph-lock-screen">
+    <div class="lph-lock-clock">
+        <div class="lph-lock-time">{{time}}</div>
+        <div class="lph-lock-date">{{date}}</div>
+        <div class="lph-lock-era">
+            <span class="lph-lock-year">{{yearLabel}}</span>{{#if era}}<span class="lph-lock-era-label"> · {{era}}</span>{{/if}}
+        </div>
+    </div>
+
+    {{#if notifications.length}}
+    <div class="lph-lock-notifications">
+        {{#each notifications}}
+        <div class="lph-notif-card" data-notification-id="{{this.id}}">
+            <div class="lph-notif-header">
+                <span class="lph-notif-sender"><i class="fas fa-bell"></i> {{this.sender}}</span>
+            </div>
+            <div class="lph-notif-title">{{this.title}}</div>
+            <div class="lph-notif-body">{{this.body}}</div>
+        </div>
+        {{/each}}
+    </div>
+    {{else}}
+    <div class="lph-lock-notifications-empty"></div>
+    {{/if}}
+
+    <div class="lph-unlock-hint" data-action="prompt-unlock" role="button" tabindex="0">
+        <i class="fas fa-lock" aria-hidden="true"></i> {{localize "LPH.Phone.Unlock"}}
+    </div>
+</div>

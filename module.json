@@ -1,0 +1,49 @@
+{
+  "id": "lumenn-phone-hub",
+  "title": "Lumenn Phone Hub",
+  "description": "Celular diegético para Foundry VTT (v13-v14), independente de sistema.",
+  "version": "0.0.1",
+  "compatibility": {
+    "minimum": "13.350",
+    "verified": "14.356"
+  },
+  "authors": [
+    {
+      "name": "Nelson / SoftMissT"
+    }
+  ],
+  "esmodules": [
+    "scripts/main.mjs"
+  ],
+  "styles": [
+    "styles/lumenn-phone.css",
+    "styles/lumenn-phone-theme-light.css",
+    "styles/lumenn-phone-theme-dark.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "pt-BR",
+      "name": "Português (Brasil)",
+      "path": "lang/pt-BR.json"
+    }
+  ],
+  "socket": true,
+  "url": "https://github.com/SoftMissT/Lumenn-phone-hub",
+  "manifest": "https://github.com/SoftMissT/Lumenn-phone-hub/releases/latest/download/module.json",
+  "download": "https://github.com/SoftMissT/Lumenn-phone-hub/releases/download/v0.0.1/lumenn-phone-hub.zip",
+  "readme": "https://github.com/SoftMissT/Lumenn-phone-hub/blob/main/README.md",
+  "changelog": "https://github.com/SoftMissT/Lumenn-phone-hub/blob/main/CHANGELOG.md",
+  "bugs": "https://github.com/SoftMissT/Lumenn-phone-hub/issues",
+  "license": "MIT",
+  "media": [
+    {
+      "type": "cover",
+      "url": "https://github.com/SoftMissT/Lumenn-phone-hub/raw/main/assets/lumenn-phone-hub-banner.webp"
+    }
+  ]
+}

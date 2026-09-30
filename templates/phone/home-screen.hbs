@@ -1,0 +1,22 @@
+<div class="lph-home-screen">
+    <div class="lph-app-grid">
+        {{#each apps}}
+        <div class="lph-app-icon" data-app-id="{{this.id}}" data-action="launch-app" role="button" tabindex="0" aria-label="{{this.title}}">
+            <div class="lph-app-glyph">
+                <i class="{{this.icon}}" aria-hidden="true"></i>
+            </div>
+            <span class="lph-app-label">{{this.title}}</span>
+        </div>
+        {{/each}}
+    </div>
+
+    <div class="lph-dock-container">
+        {{#each dockApps}}
+        <div class="lph-app-icon" data-app-id="{{this.id}}" data-action="launch-app" role="button" tabindex="0" aria-label="{{this.title}}">
+            <div class="lph-app-glyph">
+                <i class="{{this.icon}}" aria-hidden="true"></i>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>

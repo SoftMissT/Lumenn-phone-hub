@@ -1,0 +1,38 @@
+<div class="lph-pin-screen">
+    <div class="lph-pin-header">
+        {{#if isLocked}}
+            <span class="lph-pin-locked" role="status">{{localize "LPH.Phone.Blocked"}}</span>
+        {{else}}
+            <span>{{localize "LPH.Phone.EnterPin"}}</span>
+        {{/if}}
+    </div>
+
+    <div class="lph-pin-dots" aria-hidden="true">
+        <div class="lph-pin-dot {{#if (gte pinLength 1)}}filled{{/if}}"></div>
+        <div class="lph-pin-dot {{#if (gte pinLength 2)}}filled{{/if}}"></div>
+        <div class="lph-pin-dot {{#if (gte pinLength 3)}}filled{{/if}}"></div>
+        <div class="lph-pin-dot {{#if (gte pinLength 4)}}filled{{/if}}"></div>
+        <div class="lph-pin-dot {{#if (gte pinLength 5)}}filled{{/if}}"></div>
+        <div class="lph-pin-dot {{#if (gte pinLength 6)}}filled{{/if}}"></div>
+    </div>
+
+    <div class="lph-pin-pad" role="group" aria-label="{{localize 'LPH.Phone.EnterPin'}}">
+        <button type="button" class="lph-pin-btn" data-key="1" aria-label="1">1</button>
+        <button type="button" class="lph-pin-btn" data-key="2" aria-label="2">2<sub aria-hidden="true">abc</sub></button>
+        <button type="button" class="lph-pin-btn" data-key="3" aria-label="3">3<sub aria-hidden="true">def</sub></button>
+
+        <button type="button" class="lph-pin-btn" data-key="4" aria-label="4">4<sub aria-hidden="true">ghi</sub></button>
+        <button type="button" class="lph-pin-btn" data-key="5" aria-label="5">5<sub aria-hidden="true">jkl</sub></button>
+        <button type="button" class="lph-pin-btn" data-key="6" aria-label="6">6<sub aria-hidden="true">mno</sub></button>
+
+        <button type="button" class="lph-pin-btn" data-key="7" aria-label="7">7<sub aria-hidden="true">pqrs</sub></button>
+        <button type="button" class="lph-pin-btn" data-key="8" aria-label="8">8<sub aria-hidden="true">tuv</sub></button>
+        <button type="button" class="lph-pin-btn" data-key="9" aria-label="9">9<sub aria-hidden="true">wxyz</sub></button>
+
+        <button type="button" class="lph-pin-btn fn-btn" data-action="cancel-pin">{{localize "LPH.Phone.Cancel"}}</button>
+        <button type="button" class="lph-pin-btn" data-key="0" aria-label="0">0</button>
+        <button type="button" class="lph-pin-btn fn-btn" data-action="backspace-pin" aria-label="{{localize 'LPH.Phone.Backspace'}}"><i class="fas fa-backspace" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="lph-pin-error" role="status" aria-live="polite">{{#if errorMessage}}{{errorMessage}}{{/if}}</div>
+</div>

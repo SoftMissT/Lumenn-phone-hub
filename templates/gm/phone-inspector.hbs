@@ -1,0 +1,14 @@
+<div class="lph-gm-inspector" data-lph-gm-inspector>
+    <div class="lph-gm-field">
+        <label for="lph-gm-actor">{{localize "LPH.GM.Character"}}</label>
+        <select id="lph-gm-actor" data-lph-gm-actor>
+            {{#each characters}}<option value="{{this.uuid}}">{{this.name}}</option>{{/each}}
+        </select>
+    </div>
+    <div class="lph-gm-actions">
+        <button type="button" data-lph-gm-inspect="open">{{localize "LPH.GM.OpenPhone"}}</button>
+        <button type="button" data-lph-gm-inspect="reset-pin">{{localize "LPH.GM.ResetPin"}}</button>
+        <button type="button" data-lph-gm-inspect="reset-wallpaper">{{localize "LPH.GM.ResetWallpaper"}}</button>
+    </div>
+    <p class="lph-gm-status" data-lph-gm-inspector-status role="status"></p>
+</div>

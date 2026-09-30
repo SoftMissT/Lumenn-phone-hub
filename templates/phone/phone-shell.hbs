@@ -1,0 +1,55 @@
+<div class="lumenn-phone-window {{themeClass}}">
+    {{#if wallpaperUrl}}
+    <div class="lph-wallpaper-layer {{#if isBlurWallpaper}}lph-wallpaper-blur{{/if}}"
+         style="background-image: url('{{wallpaperUrl}}');">
+    </div>
+    {{/if}}
+
+    <div class="lph-notch-container">
+        <div class="lph-camera-lens"></div>
+        <div class="lph-speaker-grill"></div>
+    </div>
+
+    {{> "modules/lumenn-phone-hub/templates/phone/status-bar.hbs" time=time}}
+
+    {{#if gmMode}}
+    <div class="lph-gm-banner" role="status">
+        <span class="lph-gm-banner-label">{{gmModeLabel}}</span>
+        <span class="lph-gm-banner-actions">
+            <button type="button" data-lph-gm-action="reset-pin">{{localize "LPH.GM.ResetPin"}}</button>
+            <button type="button" data-lph-gm-action="reset-wallpaper">{{localize "LPH.GM.ResetWallpaper"}}</button>
+        </span>
+    </div>
+    {{/if}}
+
+    <div class="lph-screen-viewport">
+        {{#unless hasCharacter}}
+            <div class="lph-no-character">{{noCharacterMessage}}</div>
+        {{else}}
+            {{#if (eq currentView "lock")}}
+                {{> "modules/lumenn-phone-hub/templates/phone/lock-screen.hbs" time=time date=date yearLabel=yearLabel era=era notifications=notifications}}
+            {{else if (eq currentView "pin")}}
+                {{> "modules/lumenn-phone-hub/templates/phone/pin-pad.hbs" pinLength=pinLength errorMessage=errorMessage isLocked=isLocked}}
+            {{else if (eq currentView "home")}}
+                {{> "modules/lumenn-phone-hub/templates/phone/home-screen.hbs" apps=apps dockApps=dockApps}}
+            {{else if (eq currentView "app")}}
+                <div class="lph-app-container">
+                    <div class="lph-app-header">
+                        <button type="button" class="lph-pin-btn fn-btn" data-action="go-home">
+                            <i class="fas fa-chevron-left"></i> {{localize "LPH.Phone.Back"}}
+                        </button>
+                        <span class="lph-app-title">{{activeAppTitle}}</span>
+                        <div class="lph-app-spacer"></div>
+                    </div>
+                    <div class="lph-app-body">
+                        {{{activeAppContent}}}
+                    </div>
+                </div>
+            {{/if}}
+        {{/unless}}
+    </div>
+
+    <div class="lph-home-bar-container" data-action="go-home" role="button" tabindex="0">
+        <div class="lph-home-bar"></div>
+    </div>
+</div>
