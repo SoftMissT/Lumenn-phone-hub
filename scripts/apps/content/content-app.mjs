@@ -10,6 +10,7 @@ import {
 import { LumennRepository } from "../../persistence/repository.mjs";
 import { PhoneController } from "../../phone/phone-controller.mjs";
 import { groupByThread } from "../../notifications/notification-store.mjs";
+import { getWorldClock } from "../../time/world-clock.mjs";
 import { CONTENT_APPS } from "./content-catalog.mjs";
 
 function localize(key, fallback) {
@@ -128,7 +129,57 @@ function ownCharacterName() {
   return globalThis.game?.user?.character?.name ?? "";
 }
 
+// Uma conversa de celular não é uma lista de bolhas soltas. Tem separador de
+// dia, avatar e nome em quem falou, e a hora colada em cada bolha. Devolve as
+// "linhas" já prontas para o template, misturando separadores e mensagens, para
+// o template não precisar de lógica.
+export function buildConversationLines(
+  messages,
+  ownName,
+  clockOf = () => null,
+  locale,
+) {
+  const lines = [];
+  let lastDay = "";
+  let lastSender = "";
+  for (const message of messages ?? []) {
+    const clock = clockOf(message?.createdAt) ?? null;
+    const day = clock?.date ?? "";
+    if (day && day !== lastDay) {
+      lines.push({ isDate: true, id: `date-${lines.length}`, label: day });
+      lastDay = day;
+      // Depois de um separador o nome volta: já não se sabe quem é.
+      lastSender = "";
+    }
+    const mine = Boolean(ownName) && message?.sender === ownName;
+    const sender = String(message?.sender ?? "");
+    lines.push({
+      isDate: false,
+      id: message?.id,
+      mine,
+      sender,
+      title: message?.title,
+      body: message?.body,
+      avatar: message?.avatar,
+      initial: avatarInitial(sender),
+      hue: avatarHue(sender),
+      time: clock?.time ?? "",
+      // Rajada da mesma pessoa não repete avatar nem nome.
+      opensGroup: mine || sender !== lastSender,
+    });
+    lastSender = sender;
+  }
+  return lines;
+}
+
 function decorateThreads(threads, ownName) {
+  // Hora do MUNDO, não a do computador: o módulo tem fuso, ano narrativo e era
+  // configuráveis, e um carimbo em tempo real quebraria a diégese.
+  const clockOf = (createdAt) => {
+    const date = createdAt instanceof Date ? createdAt : new Date(createdAt);
+    if (Number.isNaN(date.getTime())) return null;
+    return getWorldClock(date);
+  };
   return threads.map((thread) => ({
     ...thread,
     initial: avatarInitial(thread.last?.sender),
@@ -137,6 +188,7 @@ function decorateThreads(threads, ownName) {
     // lidas. O total de mensagens não diz nada e polui a linha.
     preview: headlineExcerpt(thread.last?.body, 60),
     unread: thread.messages.filter((m) => m.status === "unread").length,
+    lines: buildConversationLines(thread.messages, ownName, clockOf),
     messages: thread.messages.map((message) => ({
       ...message,
       mine: Boolean(ownName) && message.sender === ownName,
@@ -275,12 +327,21 @@ function createContentApp(spec) {
       // inteiro e o campo de texto; a seta volta. Antes tudo era um acordeão
       // fechado, então a tela parecia uma lista de nomes sem nenhum histórico.
       body.querySelectorAll("[data-lph-thread]").forEach((node) => {
-        const enter = () => {
+        // Um chat abre no FIM da conversa, na mensagem mais nova - abrir no
+        // começo obriga a rolar toda vez. Também é o que faz a barra de
+        // escrever parar de cobrir a última bolha.
+        const scrollToEnd = () => {
+          const scroller = shell?.element?.querySelector(".lph-app-body");
+          if (!scroller) return;
+          scroller.scrollTop = scroller.scrollHeight;
+        };
+        const open = () => {
           body.classList.add("is-in-conversation");
           node.classList.add("is-active");
           // Guarda no shell, não só no DOM: responder dispara re-render, que
           // recria os nós e expulsaria de volta para a lista de conversas.
           shell.lphActiveThread = node.dataset.lphThread;
+          globalThis.requestAnimationFrame?.(scrollToEnd);
         };
         const leave = (event) => {
           event?.preventDefault();
@@ -290,11 +351,11 @@ function createContentApp(spec) {
           shell.lphActiveThread = null;
         };
         const head = node.querySelector("[data-lph-thread-head]");
-        bindOnce(head, "click", enter);
+        bindOnce(head, "click", open);
         bindOnce(head, "keydown", (event) => {
           if (event.key !== "Enter" && event.key !== " ") return;
           event.preventDefault();
-          enter();
+          open();
         });
         bindOnce(node.querySelector("[data-lph-thread-back]"), "click", leave);
         // Reabre a conversa que estava aberta antes do último render.
@@ -304,6 +365,7 @@ function createContentApp(spec) {
         ) {
           body.classList.add("is-in-conversation");
           node.classList.add("is-active");
+          globalThis.requestAnimationFrame?.(scrollToEnd);
         }
       });
 

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  buildConversationLines,
   computeBalance,
   conversationThread,
   formatAmount,
@@ -121,4 +122,45 @@ test("conversationThread e simetrico e estavel", () => {
 test("conversationThread nao quebra com ator ausente", () => {
   assert.equal(typeof conversationThread(null, "Actor.bbb"), "string");
   assert.equal(typeof conversationThread(undefined, undefined), "string");
+});
+
+// O chat precisa de separador quando o dia vira, e de avatar/nome so quando a
+// pessoa muda - repetir em rajada polui, e faltando o nome ninguem sabe quem
+// falou depois de um separador.
+test("buildConversationLines separa por dia e agrupa por remetente", () => {
+  const clockOf = (createdAt) => ({
+    date: String(createdAt).slice(0, 10),
+    time: "12:00",
+  });
+  const msgs = [
+    { id: "1", sender: "Ana", body: "oi", createdAt: "2026-09-30T10:00:00Z" },
+    { id: "2", sender: "Ana", body: "tudo bem?", createdAt: "2026-09-30T10:01:00Z" },
+    { id: "3", sender: "Bia", body: "oi", createdAt: "2026-09-30T10:02:00Z" },
+    { id: "4", sender: "Ana", body: "voltei", createdAt: "2026-10-01T09:00:00Z" },
+  ];
+  const lines = buildConversationLines(msgs, "Bia", clockOf);
+  const datas = lines.filter((l) => l.isDate).map((l) => l.label);
+  assert.deepEqual(datas, ["2026-09-30", "2026-10-01"]);
+
+  const ms = lines.filter((l) => !l.isDate);
+  assert.equal(ms.length, 4);
+  assert.equal(ms[0].opensGroup, true, "primeira fala abre o grupo");
+  assert.equal(ms[1].opensGroup, false, "rajada da mesma pessoa nao repete");
+  assert.equal(ms[2].mine, true, "Bia sou eu");
+  assert.equal(ms[2].opensGroup, true, "eu sempre abro grupo");
+  assert.equal(ms[3].opensGroup, true, "depois do separador o nome volta");
+  assert.equal(ms[3].time, "12:00");
+  assert.equal(ms[0].initial, "A");
+});
+
+test("buildConversationLines tolera lista vazia e mensagem sem data", () => {
+  assert.deepEqual(buildConversationLines([], "Bia", () => null), []);
+  const semData = buildConversationLines(
+    [{ id: "x", sender: "Ana", body: "oi" }],
+    "Bia",
+    () => null,
+  );
+  assert.equal(semData.length, 1);
+  assert.equal(semData[0].time, "");
+  assert.equal(semData.filter((l) => l.isDate).length, 0);
 });

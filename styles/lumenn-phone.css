@@ -674,6 +674,15 @@
   display: block;
   border: 0;
   background: transparent;
+  /* overflow:hidden vira o bloco contentor do sticky, e a barra de escrever
+     grudava dentro da conversa (fora da tela) em vez de no rodapé. */
+  overflow: visible;
+}
+
+/* Dentro da conversa o seletor de destinatário não faz sentido: você já está
+   falando com alguém. */
+.lph-content-app.is-in-conversation .lph-compose {
+  display: none;
 }
 
 .lph-content-app.is-in-conversation .lph-thread.is-active .lph-thread-body {
@@ -1315,12 +1324,103 @@
   color: #ffffff;
 }
 
-/* Responder dentro do thread. */
+/* ---- Conversa de celular -------------------------------------------------
+   Estrutura de um chat de verdade: carimbo de hora colado em cada bolha,
+   avatar e nome em quem falou, separador de dia e a barra de escrever presa no
+   rodapé. Antes isto era uma lista de bolhas soltas, sem hora nenhuma - que é
+   o que fazia a tela não parecer um mensageiro. */
+
+.lph-content-app.is-in-conversation {
+  gap: 0;
+  background: var(--lph-bg, rgba(0, 0, 0, 0.03));
+}
+
+.lph-chat-date {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 2px;
+}
+
+.lph-chat-date > span {
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--lph-surface-elevated);
+  color: var(--lph-text-secondary);
+  font-size: 11px;
+}
+
+.lph-chat-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.lph-chat-row.is-mine {
+  justify-content: flex-end;
+}
+
+.lph-chat-avatar,
+.lph-chat-avatar-spacer {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.lph-chat-avatar {
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+.lph-chat-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  max-width: 82%;
+}
+
+.lph-chat-row.is-mine .lph-chat-stack {
+  align-items: flex-end;
+}
+
+.lph-chat-name {
+  color: var(--lph-text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Bolha e hora lado a lado, alinhados pelo pé - como no celular. */
+.lph-chat-line {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.lph-chat-time {
+  flex: 0 0 auto;
+  padding-bottom: 2px;
+  color: var(--lph-text-secondary);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.lph-chat-row .lph-bubble {
+  max-width: 100%;
+}
+
+/* Barra de escrever: presa no rodapé, como o campo de um mensageiro. */
 .lph-reply {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 4px;
+  margin-top: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--lph-border);
+  background: var(--lph-surface);
 }
 
 .lph-reply input {
