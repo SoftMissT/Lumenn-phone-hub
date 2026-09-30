@@ -78,8 +78,40 @@ test("uploadFile prefixa o nome com id aleatório (nomes iguais não se sobrescr
   assert.ok(uploaded.every((name) => name.endsWith("-foto.png")));
 });
 
-test("uploadFile propaga o erro quando a pasta não pode ser criada", async () => {
-  stubFoundry({ failCreate: true });
+test("uploadFile tenta o upload mesmo quando a criação da pasta falha", async () => {
+  const calls = [];
+  const impl = {
+    async createDirectory() {
+      calls.push("createDirectory");
+      throw new Error("Target directory does not exist.");
+    },
+    async upload(source, path, file) {
+      calls.push("upload");
+      return { path: `${path}/${file.name}` };
+    },
+  };
+  globalThis.foundry = { applications: { apps: { FilePicker: { implementation: impl } } } };
+  const file = new File(["x"], "foto.png", { type: "image/png" });
+
+  const response = await uploadFile({ path: "lumenn-phone-hub", file });
+
+  // Criar a pasta é preparatório; o upload é a fonte da verdade. Se a criação
+  // falhar, ainda assim tentamos - senão uma mensagem inesperada do Foundry
+  // bloquearia um upload que funcionaria.
+  assert.deepEqual(calls, ["createDirectory", "upload"]);
+  assert.match(response.path, /lumenn-phone-hub\//);
+});
+
+test("uploadFile propaga o erro do próprio upload", async () => {
+  const impl = {
+    async createDirectory() {
+      throw new Error("sem permissão");
+    },
+    async upload() {
+      throw new Error("Target directory D:\\data\\lumenn-phone-hub does not exist.");
+    },
+  };
+  globalThis.foundry = { applications: { apps: { FilePicker: { implementation: impl } } } };
   const file = new File(["x"], "foto.png", { type: "image/png" });
 
   await assert.rejects(
