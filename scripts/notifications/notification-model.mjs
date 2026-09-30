@@ -11,6 +11,7 @@ import {
   countGraphemes,
   prepareNotificationText,
 } from "../validation/text.mjs";
+import { validateSourceUrl } from "../wallpaper/wallpaper-validator.mjs";
 
 const DEFAULT_TTL_DAYS = Math.round(NOTIFICATION_DEFAULT_TTL_MS / 86400000);
 
@@ -26,6 +27,15 @@ export const NOTIFICATION_STATUS = Object.freeze({
 });
 
 const STATUS_VALUES = Object.freeze(Object.values(NOTIFICATION_STATUS));
+
+// Imagem do post/foto/capa. Passa pelo mesmo validador do wallpaper: caminho
+// do Foundry ou https terminando em extensão de imagem. Qualquer outra coisa
+// vira null em vez de virar vetor de injeção no <img src>.
+function normalizeImage(value) {
+  if (typeof value !== "string" || !value.trim()) return null;
+  const url = value.trim();
+  return validateSourceUrl(url).valid ? url : null;
+}
 
 export function normalizeNotification(input = {}, options = {}) {
   const now = Number.isFinite(options.now) ? options.now : Date.now();
@@ -51,7 +61,14 @@ export function normalizeNotification(input = {}, options = {}) {
       NOTIFICATION_MAX_LINES,
     ),
     icon: typeof input.icon === "string" && input.icon ? input.icon : null,
+    image: normalizeImage(input.image),
     app: typeof input.app === "string" && input.app ? input.app : "system",
+    // Agrupa itens em conversa. Mensagens usam um thread por NPC; os outros
+    // apps deixam nulo e cada item vira sua própria linha.
+    thread:
+      typeof input.thread === "string" && input.thread
+        ? input.thread.slice(0, 64)
+        : null,
     createdAt: now,
     status: STATUS_VALUES.includes(input.status)
       ? input.status

@@ -1,4 +1,5 @@
 import assert from "node:assert";
+import { test } from "node:test";
 import {
   isAddressedTo,
   isExpired,
@@ -51,3 +52,15 @@ assert.strictEqual(isAddressedTo({ targetActorUuid: actor }, "Actor.OTHER0000000
 assert.strictEqual(isAddressedTo({ targetActorUuid: actor }, null), false);
 
 console.log("✅ Notification Model: todos os testes passaram.");
+
+test("normalizeNotification guarda imagem válida", () => {
+  const note = normalizeNotification({ image: "lumenn-phone-hub/post.png" });
+  assert.equal(note.image, "lumenn-phone-hub/post.png");
+});
+
+test("normalizeNotification rejeita protocolo proibido e link de página", () => {
+  assert.equal(normalizeNotification({ image: "javascript:alert(1)" }).image, null);
+  assert.equal(normalizeNotification({ image: "https://evil.example/a.html" }).image, null);
+  assert.equal(normalizeNotification({ image: "" }).image, null);
+  assert.equal(normalizeNotification({}).image, null);
+});
