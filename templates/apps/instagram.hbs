@@ -1,4 +1,19 @@
 <div class="lph-content-app lph-ig" data-lph-content="{{appId}}">
+    {{#if canPost}}
+    <div class="lph-ig-compose">
+        <input type="text" class="lph-ig-caption" data-lph-post-caption maxlength="500"
+               autocomplete="off" placeholder="{{captionPlaceholder}}" aria-label="{{captionPlaceholder}}">
+        <button type="button" class="lph-add-photo" data-lph-new-post aria-label="{{postLabel}}">
+            <i class="fas fa-plus" aria-hidden="true"></i>
+        </button>
+    </div>
+    {{else if postLocked}}
+    <div class="lph-ig-compose">
+        <button type="button" class="lph-add-photo lph-add-photo-locked" disabled title="{{postHint}}" aria-label="{{postHint}}">
+            <i class="fas fa-lock" aria-hidden="true"></i>
+        </button>
+    </div>
+    {{/if}}
     {{#if total}}
         {{#if stories}}
         <div class="lph-ig-stories">

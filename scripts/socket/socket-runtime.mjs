@@ -169,7 +169,12 @@ async function onMessage(envelope) {
     return;
   }
 
-  if (envelope.kind === "request" && globalThis.game?.user?.isGM === true) {
+  // Só o GM ATIVO responde. Um evento de socket chega em TODOS os clientes, e
+  // o Foundry permite vários GMs logados ao mesmo tempo: sem a eleição, cada
+  // cliente de GM processava o mesmo pedido e uma mensagem virava quatro
+  // notificações (uma por GM, vezes cada destinatário).
+  // game.user.isActiveGM é o GM que o próprio Foundry elege.
+  if (envelope.kind === "request" && globalThis.game?.user?.isActiveGM === true) {
     await handleRequest(envelope);
   }
 }

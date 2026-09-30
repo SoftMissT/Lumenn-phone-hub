@@ -1346,6 +1346,53 @@
   cursor: not-allowed;
 }
 
+/* Compor: nova mensagem e novo post. Ficam FORA do estado vazio de propósito -
+   se ficassem dentro, não daria para iniciar conversa nem publicar a primeira
+   foto, que é justamente quando mais se precisa deles. */
+.lph-compose,
+.lph-ig-compose {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.lph-compose select,
+.lph-compose input,
+.lph-ig-caption {
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--lph-border, rgba(0, 0, 0, 0.12));
+  border-radius: 10px;
+  background: var(--lph-surface, rgba(255, 255, 255, 0.75));
+  color: var(--lph-text-primary, #1d1d1f);
+  font: inherit;
+  font-size: 13px;
+}
+
+.lph-compose select {
+  flex: 0 1 auto;
+  max-width: 42%;
+}
+
+.lph-compose input,
+.lph-ig-caption {
+  flex: 1 1 auto;
+}
+
+.lph-compose button,
+.lph-ig-compose button {
+  flex: 0 0 auto;
+}
+
+.lph-compose select:focus-visible,
+.lph-compose input:focus-visible,
+.lph-ig-caption:focus-visible {
+  outline: 2px solid var(--lph-accent, #d01452);
+  outline-offset: 1px;
+}
+
 /* Notícias: manchetes que abrem o artigo no mesmo lugar, sem trocar de tela. */
 .lph-news-item,
 .lph-bank-row {

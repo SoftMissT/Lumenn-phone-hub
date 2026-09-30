@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   computeBalance,
+  conversationThread,
   formatAmount,
   headlineExcerpt,
   isCredit,
@@ -102,4 +103,22 @@ test("formatAmount responde a lingua pedida (separador de milhar e decimal)", ()
   assert.equal(formatAmount(1234.5, "$", "pt-BR"), "+$1.234,50");
   assert.equal(formatAmount(1234.5, "$", "en-US"), "+$1,234.50");
   assert.equal(formatAmount(1000, "R$", "pt-BR"), "+R$1.000,00");
+});
+
+// A conversa entre dois personagens tem que cair no MESMO balde nos dois
+// celulares. Sem simetria, remetente e destinatário veriam duas conversas
+// separadas - cada um falando sozinho.
+test("conversationThread e simetrico e estavel", () => {
+  const a = "Actor.aaa";
+  const b = "Actor.bbb";
+  assert.equal(conversationThread(a, b), conversationThread(b, a));
+  assert.equal(conversationThread(a, b), conversationThread(a, b));
+  assert.notEqual(conversationThread(a, b), conversationThread(a, "Actor.ccc"));
+  assert.ok(conversationThread(a, b).includes(a));
+  assert.ok(conversationThread(a, b).includes(b));
+});
+
+test("conversationThread nao quebra com ator ausente", () => {
+  assert.equal(typeof conversationThread(null, "Actor.bbb"), "string");
+  assert.equal(typeof conversationThread(undefined, undefined), "string");
 });

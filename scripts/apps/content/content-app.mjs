@@ -21,6 +21,18 @@ function actorUuidOf(shell) {
   return shell?.actorUuid ?? globalThis.game?.user?.character?.uuid ?? null;
 }
 
+// onOpen roda mais de uma vez sobre o mesmo DOM. Sem esta marca o mesmo
+// listener é ligado duas vezes e um clique vale por dois - foi assim que uma
+// mensagem virou quatro notificações. A chave inclui o evento porque o mesmo
+// nó recebe clique E teclado.
+function bindOnce(node, event, handler) {
+  if (!node) return;
+  const key = `lphWired_${event}`;
+  if (node[key]) return;
+  node[key] = true;
+  node.addEventListener(event, handler);
+}
+
 async function loadItems(actorUuid, appId) {
   if (!actorUuid) return [];
   try {
@@ -144,6 +156,22 @@ function notifyGamemaster(sender, text) {
   }
 }
 
+// Destinatários possíveis: todo usuário com personagem, menos o meu. É a lista
+// que o seletor de nova mensagem mostra.
+function worldRecipients() {
+  const selfUuid = globalThis.game?.user?.character?.uuid ?? null;
+  return (globalThis.game?.users?.contents ?? [])
+    .map((user) => user?.character)
+    .filter((actor) => actor?.uuid && actor.uuid !== selfUuid)
+    .map((actor) => ({ uuid: actor.uuid, name: actor.name }));
+}
+
+// Id de conversa determinístico a partir do par: os dois lados calculam o
+// mesmo id sem combinar nada, e a conversa cai no mesmo balde dos dois lados.
+export function conversationThread(a, b) {
+  return [String(a ?? ""), String(b ?? "")].sort().join("::");
+}
+
 function createContentApp(spec) {
   return {
     id: spec.id,
@@ -179,6 +207,9 @@ function createContentApp(spec) {
         ? decorateThreads(groupByThread(decorated), ownCharacterName())
         : null;
       const stories = spec.stories ? buildStories(decorated) : null;
+      const canBrowse = canBrowseFiles();
+      const canPost = spec.id === "instagram" && canBrowse;
+      const recipients = spec.id === "messages" ? worldRecipients() : null;
       return renderTemplate(
         `${TEMPLATE_ROOT}/${spec.template ?? "apps/content-app.hbs"}`,
         {
@@ -200,6 +231,24 @@ function createContentApp(spec) {
             "Peça ao GM para liberar o acesso a arquivos.",
           ),
           photosNeedsPermission: spec.id === "photos" && !canBrowseFiles(),
+          recipients,
+          canCompose: spec.id === "messages" && Boolean(recipients?.length),
+          composeToLabel: localize("LPH.Apps.ComposeTo", "To"),
+          composePlaceholder: localize(
+            "LPH.Apps.ComposePlaceholder",
+            "Write a message...",
+          ),
+          canPost,
+          postLocked: spec.id === "instagram" && !canBrowse,
+          postLabel: localize("LPH.Apps.NewPost", "New post"),
+          postHint: localize(
+            "LPH.Apps.AddPhotoLocked",
+            "Peça ao GM para liberar o acesso a arquivos.",
+          ),
+          captionPlaceholder: localize(
+            "LPH.Apps.CaptionPlaceholder",
+            "Caption...",
+          ),
           isBank,
           isNews,
           balanceText:
@@ -219,16 +268,13 @@ function createContentApp(spec) {
       // Abrir um thread revela as mensagens; o título do thread é o rótulo.
       body.querySelectorAll("[data-lph-thread]").forEach((node) => {
         const toggle = () => node.classList.toggle("is-open");
-        node
-          .querySelector("[data-lph-thread-head]")
-          ?.addEventListener("click", toggle);
-        node
-          .querySelector("[data-lph-thread-head]")
-          ?.addEventListener("keydown", (event) => {
-            if (event.key !== "Enter" && event.key !== " ") return;
-            event.preventDefault();
-            toggle();
-          });
+        const head = node.querySelector("[data-lph-thread-head]");
+        bindOnce(head, "click", toggle);
+        bindOnce(head, "keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          toggle();
+        });
       });
 
       // Notícias e Banco: tocar no card abre o corpo completo ali mesmo, sem
@@ -239,8 +285,8 @@ function createContentApp(spec) {
           const open = node.classList.toggle("is-open");
           node.setAttribute("aria-expanded", open ? "true" : "false");
         };
-        node.addEventListener("click", toggle);
-        node.addEventListener("keydown", (event) => {
+        bindOnce(node, "click", toggle);
+        bindOnce(node, "keydown", (event) => {
           if (event.key !== "Enter" && event.key !== " ") return;
           event.preventDefault();
           toggle();
@@ -250,7 +296,7 @@ function createContentApp(spec) {
       // Curtir: alterna no lugar, sem re-renderizar - re-render perderia a
       // posição de rolagem do feed no meio da leitura.
       body.querySelectorAll("[data-lph-like]").forEach((button) => {
-        button.addEventListener("click", async (event) => {
+        bindOnce(button, "click", async (event) => {
           event.preventDefault();
           event.stopPropagation();
           const id = button.dataset.lphLike;
@@ -269,9 +315,7 @@ function createContentApp(spec) {
 
       // Adicionar foto: o seletor do próprio Foundry. Quem pode enviar arquivo
       // vê o botão de upload nele; quem não pode, escolhe do que já existe.
-      body
-        .querySelector("[data-lph-add-photo]")
-        ?.addEventListener("click", async () => {
+      bindOnce(body.querySelector("[data-lph-add-photo]"), "click", async () => {
           const actorUuid = actorUuidOf(shell);
           if (!actorUuid) return;
           try {
@@ -294,7 +338,7 @@ function createContentApp(spec) {
       // Responder: a resposta entra no mesmo thread, endereçada ao próprio
       // personagem, para sobreviver ao reload como qualquer outra mensagem.
       body.querySelectorAll("[data-lph-reply]").forEach((form) => {
-        form.addEventListener("submit", async (event) => {
+        bindOnce(form, "submit", async (event) => {
           event.preventDefault();
           event.stopPropagation();
           const input = form.querySelector('input[name="body"]');
@@ -319,6 +363,77 @@ function createContentApp(spec) {
           }
         });
       });
+
+      // Nova mensagem: escreve duas notificações - uma para o destinatário e
+      // uma cópia para mim. O store é por personagem, então sem a cópia eu não
+      // veria a minha própria mensagem depois do reload.
+      // ponytail: duas escritas por mensagem; com N participantes o certo é o
+      // GM fazer o fan-out no repositório.
+      // AVISO: o handler do GM não valida se o pedido pode escrever no ator de
+      // destino - qualquer jogador pode gravar no celular de outro. É o preço
+      // de o protocolo carregar só o targetActorUuid; aceitável entre amigos,
+      // mas é buraco de spoofing de remetente.
+      body.querySelectorAll("[data-lph-compose]").forEach((form) => {
+        bindOnce(form, "submit", async (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          const input = form.querySelector('input[name="body"]');
+          const select = form.querySelector('select[name="to"]');
+          const text = String(input?.value ?? "").trim();
+          const to = String(select?.value ?? "");
+          if (!text || !to) return;
+          const actorUuid = actorUuidOf(shell);
+          if (!actorUuid) return;
+          const me = ownCharacterName();
+          try {
+            for (const target of [to, actorUuid]) {
+              await PhoneController.createNotification({
+                app: "messages",
+                thread: conversationThread(actorUuid, to),
+                targetActorUuid: target,
+                sender: me,
+                title: "",
+                body: text,
+              });
+            }
+            input.value = "";
+            notifyGamemaster(me, text);
+            await shell.render(true);
+          } catch (error) {
+            Logger.error("Falha ao enviar mensagem:", error);
+          }
+        });
+      });
+
+      // Novo post: vai para todo personagem do mundo, não só para o meu. É uma
+      // rede social - um feed onde só eu apareço não serve para nada.
+      bindOnce(body.querySelector("[data-lph-new-post]"), "click", async () => {
+          const actorUuid = actorUuidOf(shell);
+          if (!actorUuid) return;
+          const captionEl = body.querySelector("[data-lph-post-caption]");
+          const caption = String(captionEl?.value ?? "").trim();
+          try {
+            const picked = await openFilePicker({ type: "image", current: "" });
+            if (!picked) return;
+            const sender = ownCharacterName();
+            const targets = [actorUuid, ...worldRecipients().map((r) => r.uuid)];
+            for (const target of targets) {
+              await PhoneController.createNotification({
+                app: "instagram",
+                targetActorUuid: target,
+                sender,
+                title: caption,
+                body: "",
+                image: picked,
+              });
+            }
+            if (captionEl) captionEl.value = "";
+            notifyGamemaster(sender, caption || "(publicou uma foto)");
+            await shell.render(true);
+          } catch (error) {
+            Logger.error("Falha ao publicar:", error);
+          }
+        });
 
       // Recibo de leitura: abrir o app limpa o badge daquele app. Solto de
       // propósito — se o socket do jogador falhar, o conteúdo continua na tela.

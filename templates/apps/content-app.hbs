@@ -12,6 +12,21 @@
         </button>
     </div>
     {{/if}}
+    {{#if canCompose}}
+    <form class="lph-compose" data-lph-compose>
+        <select name="to" required aria-label="{{composeToLabel}}">
+            <option value="">{{composeToLabel}}</option>
+            {{#each recipients}}
+            <option value="{{this.uuid}}">{{this.name}}</option>
+            {{/each}}
+        </select>
+        <input type="text" name="body" maxlength="500" autocomplete="off"
+               placeholder="{{composePlaceholder}}" aria-label="{{composePlaceholder}}">
+        <button type="submit" aria-label="{{sendLabel}}">
+            <i class="fas fa-paper-plane" aria-hidden="true"></i>
+        </button>
+    </form>
+    {{/if}}
     {{#if total}}
         {{#if threaded}}
             {{#each threads}}
