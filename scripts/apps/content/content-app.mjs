@@ -1,6 +1,6 @@
 import { TEMPLATE_ROOT } from "../../core/constants.mjs";
 import { Logger } from "../../core/logger.mjs";
-import { renderTemplate } from "../../compat/foundry-compat.mjs";
+import { escapeHTML, renderTemplate } from "../../compat/application-compat.mjs";
 import { LumennRepository } from "../../persistence/repository.mjs";
 import { PhoneController } from "../../phone/phone-controller.mjs";
 import { groupByThread } from "../../notifications/notification-store.mjs";
@@ -38,6 +38,55 @@ export function buildStories(items = [], limit = 8) {
   return [...seen.values()].slice(0, limit);
 }
 
+// Avatar do contato: sem foto, desenha a inicial do nome num círculo colorido.
+// A cor vem de um hash do nome, então o mesmo NPC tem sempre a mesma cor.
+export function avatarInitial(name) {
+  const text = String(name ?? "").trim();
+  if (!text) return "?";
+  return [...text][0].toUpperCase();
+}
+
+export function avatarHue(name) {
+  const text = String(name ?? "");
+  let hash = 0;
+  for (let i = 0; i < text.length; i += 1) {
+    hash = (hash * 31 + text.charCodeAt(i)) % 360;
+  }
+  return hash;
+}
+
+function ownCharacterName() {
+  return globalThis.game?.user?.character?.name ?? "";
+}
+
+function decorateThreads(threads, ownName) {
+  return threads.map((thread) => ({
+    ...thread,
+    initial: avatarInitial(thread.last?.sender),
+    avatarHue: avatarHue(thread.last?.sender),
+    messages: thread.messages.map((message) => ({
+      ...message,
+      mine: Boolean(ownName) && message.sender === ownName,
+    })),
+  }));
+}
+
+// O GM precisa saber que responderam - sem isto a resposta fica só no celular
+// do jogador e a conversa morre ali.
+function notifyGamemaster(sender, text) {
+  try {
+    const ChatMessage = globalThis.ChatMessage;
+    if (typeof ChatMessage?.create !== "function") return;
+    ChatMessage.create({
+      content: `<p><strong>${escapeHTML(sender)}</strong> respondeu: ${escapeHTML(text)}</p>`,
+      whisper: ChatMessage.getWhisperRecipients?.("GM"),
+      speaker: { alias: "Lumenn Phone" },
+    });
+  } catch (error) {
+    Logger.debug("Aviso ao GM não enviado:", error);
+  }
+}
+
 function createContentApp(spec) {
   return {
     id: spec.id,
@@ -52,7 +101,9 @@ function createContentApp(spec) {
 
     async render({ shell } = {}) {
       const items = await loadItems(actorUuidOf(shell), spec.id);
-      const threads = spec.threaded ? groupByThread(items) : null;
+      const threads = spec.threaded
+        ? decorateThreads(groupByThread(items), ownCharacterName())
+        : null;
       const stories = spec.stories ? buildStories(items) : null;
       return renderTemplate(
         `${TEMPLATE_ROOT}/${spec.template ?? "apps/content-app.hbs"}`,
@@ -65,6 +116,9 @@ function createContentApp(spec) {
           stories,
           total: items.length,
           emptyText: localize(spec.emptyKey, ""),
+          canReply: spec.id === "messages",
+          replyPlaceholder: localize("LPH.Apps.ReplyPlaceholder", "Reply..."),
+          sendLabel: localize("LPH.Apps.ReplySend", "Send"),
         },
       );
     },
@@ -88,6 +142,35 @@ function createContentApp(spec) {
             event.preventDefault();
             toggle();
           });
+      });
+
+      // Responder: a resposta entra no mesmo thread, endereçada ao próprio
+      // personagem, para sobreviver ao reload como qualquer outra mensagem.
+      body.querySelectorAll("[data-lph-reply]").forEach((form) => {
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          const input = form.querySelector('input[name="body"]');
+          const text = String(input?.value ?? "").trim();
+          if (!text) return;
+          const actorUuid = actorUuidOf(shell);
+          if (!actorUuid) return;
+          try {
+            await PhoneController.createNotification({
+              app: "messages",
+              thread: form.dataset.lphThreadId,
+              targetActorUuid: actorUuid,
+              sender: ownCharacterName(),
+              title: "",
+              body: text,
+            });
+            input.value = "";
+            notifyGamemaster(ownCharacterName(), text);
+            await shell.render(true);
+          } catch (error) {
+            Logger.error("Falha ao enviar resposta:", error);
+          }
+        });
       });
 
       // Recibo de leitura: abrir o app limpa o badge daquele app. Solto de

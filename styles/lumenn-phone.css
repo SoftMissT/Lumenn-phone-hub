@@ -1210,4 +1210,79 @@
   color: var(--lph-accent);
 }
 
+/* Avatar de contato: a inicial do nome num círculo com cor derivada do nome. */
+.lph-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 50%;
+  background: hsl(var(--lph-avatar-hue, 220) 45% 38%);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.lph-avatar-img {
+  object-fit: cover;
+  background: var(--lph-surface-elevated);
+}
+
+/* A própria mensagem fica à direita, como em qualquer app de conversa. */
+.lph-bubble-mine {
+  align-self: flex-end;
+  background: var(--lph-accent);
+}
+
+.lph-bubble-mine .lph-bubble-title,
+.lph-bubble-mine .lph-bubble-body {
+  color: #ffffff;
+}
+
+/* Responder dentro do thread. */
+.lph-reply {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.lph-reply input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 9px 12px;
+  border: 1px solid var(--lph-border);
+  border-radius: 999px;
+  background: var(--lph-surface-elevated);
+  color: var(--lph-text-primary);
+  font-size: 14px;
+}
+
+.lph-reply input:focus-visible {
+  outline: 2px solid var(--lph-accent);
+  outline-offset: 1px;
+}
+
+.lph-reply button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--lph-accent);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.lph-reply button:hover {
+  filter: brightness(1.12);
+}
+
 

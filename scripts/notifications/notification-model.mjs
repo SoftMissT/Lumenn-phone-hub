@@ -62,6 +62,9 @@ export function normalizeNotification(input = {}, options = {}) {
     ),
     icon: typeof input.icon === "string" && input.icon ? input.icon : null,
     image: normalizeImage(input.image),
+    // Foto de perfil de quem enviou (o "contato" do app de mensagens). Sem ela,
+    // a interface desenha a inicial do nome em um círculo colorido.
+    avatar: normalizeImage(input.avatar),
     app: typeof input.app === "string" && input.app ? input.app : "system",
     // Agrupa itens em conversa. Mensagens usam um thread por NPC; os outros
     // apps deixam nulo e cada item vira sua própria linha.

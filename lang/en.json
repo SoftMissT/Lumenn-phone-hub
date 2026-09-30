@@ -116,29 +116,32 @@
       "ResetWallpaper": "Reset wallpaper",
       "ResetPinConfirm": "Remove the PIN of {name}?",
       "ResetWallpaperConfirm": "Reset the wallpaper of {name}?",
-    "App": "App",
-    "AppSystem": "System (notification only)",
-    "Image": "Image (optional)",
-    "Done": "Done."
-  },
-  "Notifications": {
-    "Open": "Open"
-  },
-  "Apps": {
-    "Settings": "Settings",
-    "Messages": "Messages",
-    "MessagesEmpty": "No conversations yet.",
-    "Instagram": "Instagram",
-    "InstagramEmpty": "No posts yet.",
-    "Photos": "Photos",
-    "PhotosEmpty": "No photos yet.",
-    "Bank": "Bank",
-    "BankEmpty": "No transactions yet.",
-    "News": "News",
-    "NewsEmpty": "No news yet.",
-    "Spotify": "Spotify",
-    "SpotifyEmpty": "Nothing playing."
-  },
+      "App": "App",
+      "AppSystem": "System (notification only)",
+      "Image": "Image (optional)",
+      "Done": "Done."
+    },
+    "Notifications": {
+      "Open": "Open"
+    },
+    "Apps": {
+      "Settings": "Settings",
+      "Messages": "Messages",
+      "MessagesEmpty": "No conversations yet.",
+      "Instagram": "Instagram",
+      "InstagramEmpty": "No posts yet.",
+      "Photos": "Photos",
+      "PhotosEmpty": "No photos yet.",
+      "Bank": "Bank",
+      "BankEmpty": "No transactions yet.",
+      "News": "News",
+      "NewsEmpty": "No news yet.",
+      "Spotify": "Spotify",
+      "SpotifyEmpty": "Nothing playing.",
+      "ReplyPlaceholder": "Reply...",
+      "ReplySend": "Send",
+      "ReplySent": "Sent"
+    },
     "Errors": {
       "LPH_NO_CHARACTER": "No character is assigned to you.",
       "LPH_NO_AUTHORITY": "No GM is available for synchronization.",

@@ -4,7 +4,11 @@ import {
   groupByThread,
   listByApp,
 } from "../scripts/notifications/notification-store.mjs";
-import { buildStories } from "../scripts/apps/content/content-app.mjs";
+import {
+  avatarHue,
+  avatarInitial,
+  buildStories,
+} from "../scripts/apps/content/content-app.mjs";
 
 const ACTOR = "Actor.abc";
 
@@ -110,4 +114,19 @@ test("buildStories ignora itens sem imagem e lida com lista vazia", () => {
   assert.deepEqual(buildStories([]), []);
   assert.deepEqual(buildStories(), []);
   assert.equal(buildStories([{ id: "a", sender: "x", image: null }]).length, 0);
+});
+
+test("avatarInitial usa a primeira letra e tolera nome vazio", () => {
+  assert.equal(avatarInitial("kael"), "K");
+  assert.equal(avatarInitial("  mira"), "M");
+  assert.equal(avatarInitial("Átila"), "Á");
+  assert.equal(avatarInitial(""), "?");
+  assert.equal(avatarInitial(null), "?");
+});
+
+test("avatarHue é estável, fica na faixa de matiz e separa nomes diferentes", () => {
+  assert.equal(avatarHue("Kael"), avatarHue("Kael"));
+  assert.ok(avatarHue("Kael") >= 0 && avatarHue("Kael") < 360);
+  assert.notEqual(avatarHue("Kael"), avatarHue("Mira"));
+  assert.equal(avatarHue(""), 0);
 });

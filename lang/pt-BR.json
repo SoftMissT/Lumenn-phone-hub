@@ -116,29 +116,32 @@
       "ResetWallpaper": "Redefinir wallpaper",
       "ResetPinConfirm": "Remover o PIN de {name}?",
       "ResetWallpaperConfirm": "Redefinir o wallpaper de {name}?",
-    "App": "Aplicativo",
-    "AppSystem": "Sistema (só notificação)",
-    "Image": "Imagem (opcional)",
-    "Done": "Feito."
-  },
-  "Notifications": {
-    "Open": "Abrir"
-  },
-  "Apps": {
-    "Settings": "Ajustes",
-    "Messages": "Mensagens",
-    "MessagesEmpty": "Nenhuma conversa ainda.",
-    "Instagram": "Instagram",
-    "InstagramEmpty": "Nenhum post ainda.",
-    "Photos": "Fotos",
-    "PhotosEmpty": "Nenhuma foto ainda.",
-    "Bank": "Banco",
-    "BankEmpty": "Nenhuma movimentação ainda.",
-    "News": "Notícias",
-    "NewsEmpty": "Nenhuma notícia ainda.",
-    "Spotify": "Spotify",
-    "SpotifyEmpty": "Nada tocando."
-  },
+      "App": "Aplicativo",
+      "AppSystem": "Sistema (só notificação)",
+      "Image": "Imagem (opcional)",
+      "Done": "Feito."
+    },
+    "Notifications": {
+      "Open": "Abrir"
+    },
+    "Apps": {
+      "Settings": "Ajustes",
+      "Messages": "Mensagens",
+      "MessagesEmpty": "Nenhuma conversa ainda.",
+      "Instagram": "Instagram",
+      "InstagramEmpty": "Nenhum post ainda.",
+      "Photos": "Fotos",
+      "PhotosEmpty": "Nenhuma foto ainda.",
+      "Bank": "Banco",
+      "BankEmpty": "Nenhuma movimentação ainda.",
+      "News": "Notícias",
+      "NewsEmpty": "Nenhuma notícia ainda.",
+      "Spotify": "Spotify",
+      "SpotifyEmpty": "Nada tocando.",
+      "ReplyPlaceholder": "Responder...",
+      "ReplySend": "Enviar",
+      "ReplySent": "Enviado"
+    },
     "Errors": {
       "LPH_NO_CHARACTER": "Nenhum personagem atribuído a você.",
       "LPH_NO_AUTHORITY": "Sem GM disponível para sincronização.",

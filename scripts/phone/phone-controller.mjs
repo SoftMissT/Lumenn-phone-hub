@@ -33,4 +33,9 @@ export const PhoneController = {
     if (isGM()) return LumennRepository.dismissNotification(actorUuid, ids);
     return socketRequest("lph-dismiss", { actorUuid, ids });
   },
+
+  async createNotification(data) {
+    if (isGM()) return LumennRepository.createNotification(data);
+    return socketRequest("lph-create-notification", data);
+  },
 };
