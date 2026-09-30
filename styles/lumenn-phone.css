@@ -177,9 +177,12 @@
 .lph-screen-viewport {
   position: relative;
   width: 100%;
-  height: 100%;
+  /* flex em vez de height:100%: com height o viewport brigava com a barra home
+     no mesmo flex e sobrava faixa morta no rodapé. */
+  flex: 1 1 auto;
+  min-height: 0;
   padding-top: 48px;
-  padding-bottom: 24px;
+  padding-bottom: 0;
   display: flex;
   flex-direction: column;
   z-index: var(--lph-z-content);
@@ -435,8 +438,14 @@
 
 /* Home Indicator Bar (Swipe Bar) */
 .lph-home-bar-container {
+  /* Absoluta: em fluxo ela roubava 18px da altura da tela. Por cima, como no
+     celular de verdade - o indicador flutua sobre o conteúdo. */
+  position: absolute;
+  bottom: 0;
+  left: 0;
   width: 100%;
-  height: 18px;
+  height: 22px;
+  z-index: var(--lph-z-notch);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -463,33 +472,66 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  padding: 10px;
+  padding: 0;
 }
 
+/* Barra do app: voltar à esquerda, título centralizado, como num celular.
+   O botão de voltar herdava .lph-pin-btn (72x72, do teclado do PIN), e era por
+   isso que o cabeçalho comia 104px de altura. */
 .lph-app-header {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
-  margin-bottom: 12px;
+  height: 52px;
+  padding: 0 12px;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--lph-border);
+  background: var(--lph-surface);
+}
+
+.lph-pin-btn.fn-btn {
+  width: auto;
+  height: 32px;
+  padding: 0 10px 0 4px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--lph-accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.lph-pin-btn.fn-btn:hover {
+  background: var(--lph-surface-elevated);
 }
 
 .lph-app-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  font-size: 15px;
   font-weight: 600;
 }
 
 .lph-app-spacer {
   width: 40px;
+  flex: 0 0 40px;
 }
 
+/* Tela cheia, de borda a borda: antes era um cartão arredondado flutuando com
+   10px de margem em volta, e a tela não parecia a de um celular. */
 .lph-app-body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   background: var(--lph-surface);
   backdrop-filter: var(--lph-glass-blur);
-  padding: 14px;
-  border-radius: var(--lph-border-radius-app);
+  padding: 12px 12px 26px;
+  border-radius: 0;
 }
 
 /* No-character state */
