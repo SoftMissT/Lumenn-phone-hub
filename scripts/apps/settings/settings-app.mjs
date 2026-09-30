@@ -1,4 +1,8 @@
-import { MODULE_ID, SETTINGS_KEYS, TEMPLATE_ROOT } from "../../core/constants.mjs";
+import {
+  MODULE_ID,
+  SETTINGS_KEYS,
+  TEMPLATE_ROOT,
+} from "../../core/constants.mjs";
 import { isLumennError, toUserMessage } from "../../core/errors.mjs";
 import { Logger } from "../../core/logger.mjs";
 import { renderTemplate } from "../../compat/foundry-compat.mjs";
@@ -7,25 +11,24 @@ import {
   applyWallpaperFromSource,
   getResolvedWallpaper,
   pickWallpaperFromFoundry,
-  resetWallpaper
+  resetWallpaper,
 } from "../../wallpaper/wallpaper-service.mjs";
 import { createPinRecord, verifyPin } from "../../lock/pin-kdf.mjs";
 import { PhoneController } from "../../phone/phone-controller.mjs";
+import {
+  isFeatureEnabled,
+  resolveSoundEnabled,
+  resolveTheme,
+} from "../../core/preferences.mjs";
 
 const THEMES = ["light", "dark"];
 
 function localize(key, fallback) {
   const i18n = globalThis.game?.i18n;
   const value = i18n?.localize?.(key);
-  return typeof value === "string" && value && value !== key ? value : (fallback ?? key);
-}
-
-function getClientSetting(key, fallback) {
-  try {
-    return globalThis.game?.settings?.get(MODULE_ID, key) ?? fallback;
-  } catch {
-    return fallback;
-  }
+  return typeof value === "string" && value && value !== key
+    ? value
+    : (fallback ?? key);
 }
 
 async function setClientSetting(key, value) {
@@ -74,12 +77,13 @@ export const settingsApp = {
     const phoneState = shell?.phoneState ?? null;
     const resolved = getResolvedWallpaper(phoneState);
     return renderTemplate(`${TEMPLATE_ROOT}/apps/settings.hbs`, {
-      theme: getClientSetting(SETTINGS_KEYS.THEME, "dark"),
-      soundEnabled: getClientSetting(SETTINGS_KEYS.NOTIFICATION_SOUND, true),
+      theme: resolveTheme(),
+      soundEnabled: resolveSoundEnabled(),
+      canUploadWallpaper: isFeatureEnabled("playerWallpaperUpload"),
       hasCustomWallpaper: Boolean(phoneState?.wallpaper?.url),
       wallpaperSource: resolved ?? "",
       hasPin: Boolean(phoneState?.pinVerifier),
-      version: globalThis.game?.modules?.get(MODULE_ID)?.version ?? "0.0.0"
+      version: globalThis.game?.modules?.get(MODULE_ID)?.version ?? "0.0.0",
     });
   },
 
@@ -98,34 +102,54 @@ export const settingsApp = {
 
     const sound = root.querySelector("[data-lph-sound]");
     sound?.addEventListener("change", async (event) => {
-      await setClientSetting(SETTINGS_KEYS.NOTIFICATION_SOUND, event.currentTarget.checked === true);
+      await setClientSetting(
+        SETTINGS_KEYS.NOTIFICATION_SOUND,
+        event.currentTarget.checked === true ? "on" : "off",
+      );
     });
 
     const fileInput = root.querySelector("[data-lph-wallpaper-file]");
 
-    root.querySelector('[data-lph-wallpaper="browse"]')?.addEventListener("click", () => {
-      runWallpaperAction(shell, () => pickWallpaperFromFoundry(actorUuidOf(shell), getResolvedWallpaper(shell?.phoneState)));
-    });
+    root
+      .querySelector('[data-lph-wallpaper="browse"]')
+      ?.addEventListener("click", () => {
+        runWallpaperAction(shell, () =>
+          pickWallpaperFromFoundry(
+            actorUuidOf(shell),
+            getResolvedWallpaper(shell?.phoneState),
+          ),
+        );
+      });
 
-    root.querySelector('[data-lph-wallpaper="upload"]')?.addEventListener("click", () => fileInput?.click());
+    root
+      .querySelector('[data-lph-wallpaper="upload"]')
+      ?.addEventListener("click", () => fileInput?.click());
 
     fileInput?.addEventListener("change", (event) => {
       const file = event.currentTarget.files?.[0];
       if (!file) return;
-      runWallpaperAction(shell, () => applyWallpaperFromFile(actorUuidOf(shell), file));
+      runWallpaperAction(shell, () =>
+        applyWallpaperFromFile(actorUuidOf(shell), file),
+      );
       event.currentTarget.value = "";
     });
 
-    root.querySelector('[data-lph-wallpaper="url"]')?.addEventListener("click", () => {
-      const input = root.querySelector("[data-lph-wallpaper-url]");
-      const value = input?.value?.trim();
-      if (!value) return;
-      runWallpaperAction(shell, () => applyWallpaperFromSource(actorUuidOf(shell), value));
-    });
+    root
+      .querySelector('[data-lph-wallpaper="url"]')
+      ?.addEventListener("click", () => {
+        const input = root.querySelector("[data-lph-wallpaper-url]");
+        const value = input?.value?.trim();
+        if (!value) return;
+        runWallpaperAction(shell, () =>
+          applyWallpaperFromSource(actorUuidOf(shell), value),
+        );
+      });
 
-    root.querySelector('[data-lph-wallpaper="default"]')?.addEventListener("click", () => {
-      runWallpaperAction(shell, () => resetWallpaper(actorUuidOf(shell)));
-    });
+    root
+      .querySelector('[data-lph-wallpaper="default"]')
+      ?.addEventListener("click", () => {
+        runWallpaperAction(shell, () => resetWallpaper(actorUuidOf(shell)));
+      });
 
     const pinForm = root.querySelector("[data-lph-pin-form]");
     const pinStatus = root.querySelector("[data-lph-pin-status]");
@@ -142,15 +166,19 @@ export const settingsApp = {
       pinMode = mode;
       pinForm.hidden = false;
       pinForm.reset();
-      pinForm.querySelector("[data-lph-pin-current]").hidden = mode === "create";
+      pinForm.querySelector("[data-lph-pin-current]").hidden =
+        mode === "create";
       pinForm.querySelector("[data-lph-pin-new]").hidden = mode === "remove";
-      pinForm.querySelector("[data-lph-pin-confirm]").hidden = mode === "remove";
+      pinForm.querySelector("[data-lph-pin-confirm]").hidden =
+        mode === "remove";
       setPinStatus("");
       pinForm.querySelector("input:not([hidden])")?.focus?.();
     };
 
     root.querySelectorAll("[data-lph-pin-action]").forEach((button) => {
-      button.addEventListener("click", () => showPinForm(button.dataset.lphPinAction));
+      button.addEventListener("click", () =>
+        showPinForm(button.dataset.lphPinAction),
+      );
     });
 
     pinForm?.addEventListener("submit", async (event) => {
@@ -192,15 +220,24 @@ export const settingsApp = {
         setPinStatus(localize("LPH.Settings.PinWorking"));
         const record = await createPinRecord(next);
         await PhoneController.patchPhone(actorUuid, { pinVerifier: record });
-        setPinStatus(localize(pinMode === "create" ? "LPH.Settings.PinCreated" : "LPH.Settings.PinChanged"), "ok");
+        setPinStatus(
+          localize(
+            pinMode === "create"
+              ? "LPH.Settings.PinCreated"
+              : "LPH.Settings.PinChanged",
+          ),
+          "ok",
+        );
         await shell.render(true);
       } catch (error) {
         Logger.debug("Falha na operação de PIN:", error);
         setPinStatus(
-          isLumennError(error) ? toUserMessage(error.code, error.message) : (error?.message ?? "Erro"),
-          "error"
+          isLumennError(error)
+            ? toUserMessage(error.code, error.message)
+            : (error?.message ?? "Erro"),
+          "error",
         );
       }
     });
-  }
+  },
 };

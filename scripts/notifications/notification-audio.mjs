@@ -1,9 +1,10 @@
-import { MODULE_ID, NOTIFICATION_SOUND_PATH, SETTINGS_KEYS } from "../core/constants.mjs";
+import { NOTIFICATION_SOUND_PATH } from "../core/constants.mjs";
+import { resolveSoundEnabled } from "../core/preferences.mjs";
 import { preloadSound, playSound } from "../compat/foundry-compat.mjs";
 
 export function isNotificationSoundEnabled() {
   try {
-    return game.settings.get(MODULE_ID, SETTINGS_KEYS.NOTIFICATION_SOUND) !== false;
+    return resolveSoundEnabled();
   } catch {
     return true;
   }

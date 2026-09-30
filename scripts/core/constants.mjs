@@ -6,7 +6,7 @@ export const TEMPLATE_PARTIALS = Object.freeze([
   `${TEMPLATE_ROOT}/phone/status-bar.hbs`,
   `${TEMPLATE_ROOT}/phone/lock-screen.hbs`,
   `${TEMPLATE_ROOT}/phone/pin-pad.hbs`,
-  `${TEMPLATE_ROOT}/phone/home-screen.hbs`
+  `${TEMPLATE_ROOT}/phone/home-screen.hbs`,
 ]);
 export const CONTROL_GROUP_ID = "lumennPhone";
 export const CONTROL_TOOL_ID = "openPhone";
@@ -36,6 +36,11 @@ export const WALLPAPER_DIRECTORY = "lumenn-phone-hub";
 
 export const WORLD_CLOCK_ERA_MAX = 32;
 
+export const LIMIT_RANGES = Object.freeze({
+  store: Object.freeze({ min: 10, max: 2000, step: 10 }),
+  ttlDays: Object.freeze({ min: 0, max: 365, step: 1 }),
+});
+
 export const SOCKET_TIMEOUT_MS = 5000;
 export const SOCKET_ENVELOPE_MAX_BYTES = 64 * 1024;
 export const SOCKET_RATE_LIMIT_PER_SECOND = 10;
@@ -55,7 +60,7 @@ export const ERROR_CODES = Object.freeze({
   INVALID_APP: "LPH_INVALID_APP",
   INVALID_ARGUMENT: "LPH_INVALID_ARGUMENT",
   CONTROLS_UNAVAILABLE: "LPH_CONTROLS_UNAVAILABLE",
-  NOT_IMPLEMENTED: "LPH_NOT_IMPLEMENTED"
+  NOT_IMPLEMENTED: "LPH_NOT_IMPLEMENTED",
 });
 
 export const HOOKS = Object.freeze({
@@ -64,7 +69,7 @@ export const HOOKS = Object.freeze({
   NOTIFICATION_RECEIVED: "lumennNotificationReceived",
   APP_REGISTERED: "lumennAppRegistered",
   PHONE_OPENED: "lumennPhoneOpened",
-  PHONE_CLOSED: "lumennPhoneClosed"
+  PHONE_CLOSED: "lumennPhoneClosed",
 });
 
 export const SETTINGS_KEYS = Object.freeze({
@@ -76,5 +81,15 @@ export const SETTINGS_KEYS = Object.freeze({
   TIMEZONE: "timezone",
   DISPLAY_YEAR: "displayYear",
   ERA: "era",
-  DEFAULT_WALLPAPER: "defaultWallpaper"
+  DEFAULT_WALLPAPER: "defaultWallpaper",
+  DEFAULT_THEME: "defaultTheme",
+  DEFAULT_NOTIFICATION_SOUND: "defaultNotificationSound",
+  LIMIT_STORE: "limitNotificationStore",
+  LIMIT_TTL_DAYS: "limitNotificationTtlDays",
+  FLAG_KEYPRESS_SOUND: "flagKeypressSound",
+  FLAG_NOTIFICATION_BANNER: "flagNotificationBanner",
+  FLAG_PLAYER_WALLPAPER_UPLOAD: "flagPlayerWallpaperUpload",
+  ENABLED_APPS: "enabledApps",
 });
+
+export const THEMES = Object.freeze(["light", "dark"]);

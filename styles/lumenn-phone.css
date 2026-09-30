@@ -3,6 +3,8 @@
   --lph-control-size: 48px;
   --lph-border-radius-phone: 42px;
   --lph-border-radius-app: 18px;
+  /* Espaço reservado no rodapé para a hotbar do Foundry (PDR: não cobrir a hotbar) */
+  --lph-reserve-bottom: 96px;
   
   /* Z-Index Hierarchy */
   --lph-z-wallpaper: 0;
@@ -42,6 +44,10 @@
 .lumenn-phone-window {
   width: 360px;
   height: 720px;
+  /* Responsividade (PDR): mínimo legível e teto que não alcança a hotbar */
+  min-width: 280px;
+  min-height: 560px;
+  max-height: calc(100vh - var(--lph-reserve-bottom, 96px));
   border-radius: var(--lph-border-radius-phone);
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65), 0 0 0 8px #1a1a1e, 0 0 0 10px rgba(255, 255, 255, 0.08);

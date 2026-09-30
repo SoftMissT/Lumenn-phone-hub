@@ -1,6 +1,16 @@
-import { HOOKS, MODULE_ID, PIN_LENGTH, SETTINGS_KEYS, TEMPLATE_PARTIALS } from "../core/constants.mjs";
+import {
+  HOOKS,
+  MODULE_ID,
+  PIN_LENGTH,
+  SETTINGS_KEYS,
+  TEMPLATE_PARTIALS,
+} from "../core/constants.mjs";
 import { Logger } from "../core/logger.mjs";
-import { confirmDialog, getApplicationBase, isGM } from "../compat/foundry-compat.mjs";
+import {
+  confirmDialog,
+  getApplicationBase,
+  isGM,
+} from "../compat/foundry-compat.mjs";
 import { preloadTemplates } from "../compat/application-compat.mjs";
 import { LumennRepository } from "../persistence/repository.mjs";
 import { verifyPin } from "../lock/pin-kdf.mjs";
@@ -12,11 +22,20 @@ import { NOTIFICATION_STATUS } from "../notifications/notification-model.mjs";
 import { syncUnreadBadge } from "../notifications/notification-service.mjs";
 import { PhoneController } from "./phone-controller.mjs";
 import { gmResetPin, gmResetWallpaper } from "../gm/gm-phone-inspector.mjs";
+import { isAppEnabled, resolveTheme } from "../core/preferences.mjs";
 import { playKeypressSound } from "../ui/keypress-audio.mjs";
 
 const AppBase = getApplicationBase();
 
-const VIEWS = Object.freeze({ LOCK: "lock", PIN: "pin", HOME: "home", APP: "app" });
+const VIEWS = Object.freeze({
+  LOCK: "lock",
+  PIN: "pin",
+  HOME: "home",
+  APP: "app",
+});
+
+const PHONE_ASPECT = 360 / 720;
+const PHONE_MIN_WIDTH = 280;
 
 function localize(key, fallback) {
   return globalThis.game?.i18n?.localize(key) ?? fallback ?? key;
@@ -31,7 +50,8 @@ export class PhoneShell extends AppBase {
 
   constructor(options = {}) {
     super(options);
-    this.actorUuid = options.actorUuid ?? globalThis.game?.user?.character?.uuid ?? null;
+    this.actorUuid =
+      options.actorUuid ?? globalThis.game?.user?.character?.uuid ?? null;
     this.currentView = VIEWS.LOCK;
     this.pinBuffer = "";
     this.errorMessage = "";
@@ -60,7 +80,7 @@ export class PhoneShell extends AppBase {
       positioned: true,
       title: "LPH.Title",
       icon: "fas fa-mobile-alt",
-      resizable: false
+      resizable: true
     },
     position: { width: 360, height: 720 },
     actions: {
@@ -68,17 +88,39 @@ export class PhoneShell extends AppBase {
       "cancel-pin": PhoneShell.#onCancelPin,
       "backspace-pin": PhoneShell.#onBackspacePin,
       "go-home": PhoneShell.#onGoHome,
-      "launch-app": PhoneShell.#onLaunchApp
-    }
+      "launch-app": PhoneShell.#onLaunchApp,
+    },
   };
 
   static PARTS = {
-    main: { template: `modules/${MODULE_ID}/templates/phone/phone-shell.hbs` }
+    main: { template: `modules/${MODULE_ID}/templates/phone/phone-shell.hbs` },
   };
 
   async _preFirstRender(context, options) {
     await super._preFirstRender?.(context, options);
     await preloadTemplates(TEMPLATE_PARTIALS);
+  }
+
+  _onPosition(position) {
+    super._onPosition?.(position);
+    this.#lockPortraitRatio(position);
+  }
+
+  #lockPortraitRatio(position) {
+    if (this._applyingRatio) return;
+    const height = Math.round(Number(position?.height ?? 0));
+    const width = Math.round(Number(position?.width ?? 0));
+    if (!height || !width) return;
+
+    const target = Math.max(PHONE_MIN_WIDTH, Math.round(height * PHONE_ASPECT));
+    if (Math.abs(target - width) < 2) return;
+
+    this._applyingRatio = true;
+    try {
+      this.setPosition({ ...this.position, width: target });
+    } finally {
+      this._applyingRatio = false;
+    }
   }
 
   open() {
@@ -109,12 +151,19 @@ export class PhoneShell extends AppBase {
 
   async _prepareContext(options) {
     const context = (await super._prepareContext?.(options)) ?? {};
-    if (!this.actorUuid) this.actorUuid = globalThis.game?.user?.character?.uuid ?? null;
+    if (!this.actorUuid)
+      this.actorUuid = globalThis.game?.user?.character?.uuid ?? null;
 
     if (this.actorUuid) {
       this.phoneState = await LumennRepository.getPhone(this.actorUuid);
-      this.notifications = await LumennRepository.listNotifications(this.actorUuid);
-      syncUnreadBadge(this.notifications.filter((entry) => entry.status === NOTIFICATION_STATUS.UNREAD).length);
+      this.notifications = await LumennRepository.listNotifications(
+        this.actorUuid,
+      );
+      syncUnreadBadge(
+        this.notifications.filter(
+          (entry) => entry.status === NOTIFICATION_STATUS.UNREAD,
+        ).length,
+      );
     } else {
       this.phoneState = null;
       this.notifications = [];
@@ -136,7 +185,8 @@ export class PhoneShell extends AppBase {
       yearLabel: formatYearLabel(clock.year),
       era: clock.era,
       wallpaperUrl: getResolvedWallpaper(this.phoneState),
-      isBlurWallpaper: this.currentView === VIEWS.PIN || this.currentView === VIEWS.APP,
+      isBlurWallpaper:
+        this.currentView === VIEWS.PIN || this.currentView === VIEWS.APP,
       pinLength: this.pinBuffer.length,
       errorMessage: this.errorMessage,
       isLocked: lockout.isLocked,
@@ -145,15 +195,22 @@ export class PhoneShell extends AppBase {
       apps: this.#mapApps({ includeGm: true }),
       dockApps: this.#mapApps({ dockEligible: true }),
       gmMode: this.gmMode,
-      gmModeLabel: this.gmMode ? format("LPH.GM.Mode", { name: this.gmCharacterName }) : "",
+      gmModeLabel: this.gmMode
+        ? format("LPH.GM.Mode", { name: this.gmCharacterName })
+        : "",
       activeApp: this.activeApp,
-      activeAppTitle: this.activeApp ? localize(this.activeApp.name, this.activeApp.id) : "",
-      activeAppContent: this.activeAppContent
+      activeAppTitle: this.activeApp
+        ? localize(this.activeApp.name, this.activeApp.id)
+        : "",
+      activeAppContent: this.activeAppContent,
     };
 
     if (this.currentView === VIEWS.APP && this.activeApp?.render) {
       try {
-        this.activeAppContent = await this.activeApp.render({ shell: this, context: base });
+        this.activeAppContent = await this.activeApp.render({
+          shell: this,
+          context: base,
+        });
       } catch (error) {
         Logger.error("Falha ao renderizar conteúdo do app:", error);
         this.activeAppContent = "";
@@ -170,23 +227,31 @@ export class PhoneShell extends AppBase {
     if (!root) return;
 
     this._renderAbort?.abort();
-    const signal = typeof AbortController === "function"
-      ? (this._renderAbort = new AbortController()).signal
-      : undefined;
+    const signal =
+      typeof AbortController === "function"
+        ? (this._renderAbort = new AbortController()).signal
+        : undefined;
     const listen = (element, type, handler) => {
       element?.addEventListener(type, handler, signal ? { signal } : undefined);
     };
 
     root.querySelectorAll(".lph-pin-btn[data-key]").forEach((button) => {
-      listen(button, "click", (event) => this.#handlePinInput(event.currentTarget.dataset.key));
+      listen(button, "click", (event) =>
+        this.#handlePinInput(event.currentTarget.dataset.key),
+      );
     });
 
     root.querySelectorAll("[data-action]").forEach((element) => {
       if (element.tagName === "BUTTON") return;
       element.setAttribute("role", "button");
-      if (!element.hasAttribute("tabindex")) element.setAttribute("tabindex", "0");
+      if (!element.hasAttribute("tabindex"))
+        element.setAttribute("tabindex", "0");
       listen(element, "keydown", (event) => {
-        if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+        if (
+          event.key === "Enter" ||
+          event.key === " " ||
+          event.key === "Spacebar"
+        ) {
           event.preventDefault();
           element.click();
         }
@@ -201,9 +266,13 @@ export class PhoneShell extends AppBase {
       });
     });
 
-    root.querySelectorAll('input[type="text"], input[type="url"], input[type="password"], input[type="search"], textarea').forEach((field) => {
-      listen(field, "input", () => playKeypressSound());
-    });
+    root
+      .querySelectorAll(
+        'input[type="text"], input[type="url"], input[type="password"], input[type="search"], textarea',
+      )
+      .forEach((field) => {
+        listen(field, "input", () => playKeypressSound());
+      });
 
     listen(root, "keydown", (event) => this.#handleKeydown(event));
 
@@ -251,7 +320,7 @@ export class PhoneShell extends AppBase {
     if (!this.gmMode || !this.actorUuid) return;
     const confirmed = await confirmDialog({
       title: localize("LPH.GM.ResetPin"),
-      content: format("LPH.GM.ResetPinConfirm", { name: this.gmCharacterName })
+      content: format("LPH.GM.ResetPinConfirm", { name: this.gmCharacterName }),
     });
     if (!confirmed) return;
     try {
@@ -266,7 +335,9 @@ export class PhoneShell extends AppBase {
     if (!this.gmMode || !this.actorUuid) return;
     const confirmed = await confirmDialog({
       title: localize("LPH.GM.ResetWallpaper"),
-      content: format("LPH.GM.ResetWallpaperConfirm", { name: this.gmCharacterName })
+      content: format("LPH.GM.ResetWallpaperConfirm", {
+        name: this.gmCharacterName,
+      }),
     });
     if (!confirmed) return;
     try {
@@ -296,13 +367,7 @@ export class PhoneShell extends AppBase {
   }
 
   #themeClass() {
-    let theme = "dark";
-    try {
-      theme = globalThis.game?.settings?.get(MODULE_ID, SETTINGS_KEYS.THEME) ?? "dark";
-    } catch {
-      theme = "dark";
-    }
-    return theme === "light" ? "lph-theme-light" : "lph-theme-dark";
+    return resolveTheme() === "light" ? "lph-theme-light" : "lph-theme-dark";
   }
 
   #mapApps(filter = {}) {
@@ -313,10 +378,11 @@ export class PhoneShell extends AppBase {
         if (app.playerVisible) return true;
         return Boolean(filter.includeGm) && app.gmPanel && gm;
       })
+      .filter((app) => !app.playerVisible || isAppEnabled(app.id))
       .map((app) => ({
         id: app.id,
         icon: app.icon,
-        title: localize(app.name, app.id)
+        title: localize(app.name, app.id),
       }));
   }
 
@@ -378,7 +444,9 @@ export class PhoneShell extends AppBase {
 
   static #onLaunchApp(event, target) {
     const shell = PhoneShell.instance;
-    const appId = target?.dataset?.appId ?? target?.closest?.("[data-app-id]")?.dataset?.appId;
+    const appId =
+      target?.dataset?.appId ??
+      target?.closest?.("[data-app-id]")?.dataset?.appId;
     const app = AppRegistry.get(appId);
     if (!app) return;
     shell.currentView = VIEWS.APP;
@@ -387,14 +455,17 @@ export class PhoneShell extends AppBase {
   }
 
   async #handlePinInput(digit) {
-    if (this.pinBuffer.length >= PIN_LENGTH || !/^\d$/.test(String(digit))) return;
+    if (this.pinBuffer.length >= PIN_LENGTH || !/^\d$/.test(String(digit)))
+      return;
 
     playKeypressSound();
 
     if (this.actorUuid) {
       const lockout = LockoutService.getLockoutState(this.actorUuid);
       if (lockout.isLocked) {
-        this.errorMessage = format("LPH.Phone.TryAgainIn", { seconds: Math.ceil(lockout.remainingMs / 1000) });
+        this.errorMessage = format("LPH.Phone.TryAgainIn", {
+          seconds: Math.ceil(lockout.remainingMs / 1000),
+        });
         this.render(true);
         return;
       }
@@ -431,7 +502,9 @@ export class PhoneShell extends AppBase {
     } else if (this.actorUuid) {
       const lockout = LockoutService.recordFailure(this.actorUuid);
       this.errorMessage = lockout.isLocked
-        ? format("LPH.Phone.TryAgainIn", { seconds: Math.ceil(lockout.remainingMs / 1000) })
+        ? format("LPH.Phone.TryAgainIn", {
+            seconds: Math.ceil(lockout.remainingMs / 1000),
+          })
         : localize("LPH.Phone.IncorrectPin");
     } else {
       this.errorMessage = localize("LPH.Phone.IncorrectPin");
@@ -444,7 +517,10 @@ Hooks.on(HOOKS.NOTIFICATION_RECEIVED, (notification) => {
   const shell = PhoneShell._instance;
   if (!shell?.rendered) return;
   const actorUuid = globalThis.game?.user?.character?.uuid ?? null;
-  if (notification?.targetActorUuid === "all" || notification?.targetActorUuid === actorUuid) {
+  if (
+    notification?.targetActorUuid === "all" ||
+    notification?.targetActorUuid === actorUuid
+  ) {
     shell.render(true);
   }
 });

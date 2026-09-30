@@ -1,9 +1,16 @@
 import { HOOKS, MODULE_ID } from "../core/constants.mjs";
 import { Logger } from "../core/logger.mjs";
-import { getUnreadNotifications, setUnreadNotifications } from "../core/runtime-state.mjs";
+import {
+  getUnreadNotifications,
+  setUnreadNotifications,
+} from "../core/runtime-state.mjs";
 import { isAddressedTo } from "./notification-model.mjs";
 import { showBanner } from "./notification-banner.mjs";
-import { playNotificationSound, preloadNotificationAudio } from "./notification-audio.mjs";
+import { isFeatureEnabled } from "../core/preferences.mjs";
+import {
+  playNotificationSound,
+  preloadNotificationAudio,
+} from "./notification-audio.mjs";
 
 let initialized = false;
 let lastBadge = -1;
@@ -53,9 +60,13 @@ function handleReceived(notification) {
   const actorUuid = globalThis.game?.user?.character?.uuid ?? null;
   if (!isAddressedTo(notification, actorUuid)) return;
   syncUnreadBadge(getUnreadNotifications() + 1);
-  showBanner(notification, { onOpen: openPhoneFromNotification });
+  if (isFeatureEnabled("notificationBanner")) {
+    showBanner(notification, { onOpen: openPhoneFromNotification });
+  }
   playNotificationSound();
-  announceNotification(`${notification?.sender ? `${notification.sender}: ` : ""}${notification?.title ?? ""}`);
+  announceNotification(
+    `${notification?.sender ? `${notification.sender}: ` : ""}${notification?.title ?? ""}`,
+  );
 }
 
 export function initNotifications() {
