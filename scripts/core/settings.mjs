@@ -1,4 +1,5 @@
 import {
+  DEFAULT_DEVICE_MODEL,
   LIMIT_RANGES,
   MODULE_ID,
   NOTIFICATION_DEFAULT_TTL_MS,
@@ -200,5 +201,22 @@ export function registerSettings() {
     config: false,
     type: Object,
     default: {},
+  });
+
+  // Modelo do aparelho: só aparência da casca.
+  game.settings.register(MODULE_ID, SETTINGS_KEYS.DEVICE_MODEL, {
+    name: "LPH.Settings.DeviceModel",
+    hint: "LPH.Settings.DeviceModelHint",
+    scope: "world",
+    config: true,
+    type: String,
+    choices: {
+      pearphone: "LPH.Devices.PearPhone",
+      xiaomi: "LPH.Devices.Xiaomi",
+      oppo: "LPH.Devices.Oppo",
+      samsung: "LPH.Devices.Samsung",
+      nokiaflip: "LPH.Devices.NokiaFlip",
+    },
+    default: DEFAULT_DEVICE_MODEL,
   });
 }

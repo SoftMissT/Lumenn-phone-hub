@@ -25,6 +25,13 @@
       "Wifi": "Wi-Fi",
       "Battery": "Battery"
     },
+    "Devices": {
+      "PearPhone": "PearPhone",
+      "Xiaomi": "Xiaomi",
+      "Oppo": "Oppo",
+      "Samsung": "Samsung",
+      "NokiaFlip": "Nokia Flip"
+    },
     "Settings": {
       "StoreRef": "Store Reference",
       "StoreRefHint": "Reference to the hidden JournalEntry used as the narrative database.",
@@ -32,6 +39,8 @@
       "ThemeHint": "Switches between light and dark mode on the smartphone interface.",
       "ThemeLight": "Light",
       "ThemeDark": "Dark",
+      "DeviceModel": "Device model",
+      "DeviceModelHint": "Changes only the phone shell: screen cutout, camera and frame. The Nokia Flip does not fold.",
       "Wallpaper": "Wallpaper",
       "WallpaperCustom": "Custom wallpaper",
       "WallpaperDefault": "Using the world default wallpaper",

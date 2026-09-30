@@ -1,4 +1,7 @@
 import {
+  DEFAULT_DEVICE_MODEL,
+  DEVICE_MODELS,
+  FLIP_KEYS,
   HOOKS,
   MODULE_ID,
   PIN_LENGTH,
@@ -153,6 +156,9 @@ export class PhoneShell extends AppBase {
     const base = {
       ...context,
       themeClass: this.#themeClass(),
+      deviceClass: `lph-device-${this.#deviceModel()}`,
+      isFlip: this.#deviceModel() === "nokiaflip",
+      flipKeys: FLIP_KEYS,
       hasCharacter: Boolean(this.actorUuid),
       noCharacterMessage: localize("LPH.Phone.NoCharacter"),
       currentView: this.currentView,
@@ -344,6 +350,11 @@ export class PhoneShell extends AppBase {
 
   #themeClass() {
     return resolveTheme() === "light" ? "lph-theme-light" : "lph-theme-dark";
+  }
+
+  #deviceModel() {
+    const value = game?.settings?.get(MODULE_ID, SETTINGS_KEYS.DEVICE_MODEL);
+    return DEVICE_MODELS.includes(value) ? value : DEFAULT_DEVICE_MODEL;
   }
 
   #mapApps(filter = {}) {

@@ -1,4 +1,4 @@
-<div class="lumenn-phone-window {{themeClass}}">
+<div class="lumenn-phone-window {{themeClass}} {{deviceClass}}">
     {{#if wallpaperUrl}}
     <div class="lph-wallpaper-layer {{#if isBlurWallpaper}}lph-wallpaper-blur{{/if}}"
          style="background-image: url('{{wallpaperUrl}}');">
@@ -48,6 +48,12 @@
             {{/if}}
         {{/unless}}
     </div>
+
+    {{#if isFlip}}
+    <div class="lph-flip-keypad" aria-hidden="true">
+        {{#each flipKeys}}<span class="lph-flip-key">{{this}}</span>{{/each}}
+    </div>
+    {{/if}}
 
     <div class="lph-home-bar-container" data-action="go-home" role="button" tabindex="0">
         <div class="lph-home-bar"></div>

@@ -25,6 +25,13 @@
       "Wifi": "Wi-Fi",
       "Battery": "Bateria"
     },
+    "Devices": {
+      "PearPhone": "PearPhone",
+      "Xiaomi": "Xiaomi",
+      "Oppo": "Oppo",
+      "Samsung": "Samsung",
+      "NokiaFlip": "Nokia Flip"
+    },
     "Settings": {
       "StoreRef": "Referência do Store",
       "StoreRefHint": "Referência ao JournalEntry oculto usado como banco de dados narrativo.",
@@ -32,6 +39,8 @@
       "ThemeHint": "Alterna entre modo Claro e Escuro na interface do smartphone.",
       "ThemeLight": "Claro",
       "ThemeDark": "Escuro",
+      "DeviceModel": "Modelo do aparelho",
+      "DeviceModelHint": "Muda só a carcaça do celular: recorte da tela, câmera e moldura. O Nokia Flip não dobra.",
       "Wallpaper": "Wallpaper",
       "WallpaperCustom": "Wallpaper personalizado",
       "WallpaperDefault": "Usando o wallpaper padrão do mundo",

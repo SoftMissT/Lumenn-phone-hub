@@ -1717,4 +1717,97 @@
   color: var(--lph-debit);
 }
 
+/* ============================================================
+   Modelos de aparelho (world setting deviceModel).
+   So casca: recorte da tela, camera, moldura e, no flip, teclado.
+   Nenhum deles dobra - o Flip e a concha aberta, parada.
+   ============================================================ */
+
+/* PearPhone: a placa padrao com cantos bem mais redondos. */
+.lph-device-pearphone {
+  --lph-border-radius-phone: 48px;
+}
+
+/* Xiaomi / Oppo: furinho de camera central, bezel fino. */
+.lph-device-xiaomi,
+.lph-device-oppo {
+  --lph-border-radius-phone: 34px;
+}
+
+/* Samsung: canto mais quadrado, o furinho do Galaxy e menor. */
+.lph-device-samsung {
+  --lph-border-radius-phone: 24px;
+}
+
+/* Recorte: das tres placas com furo, o notch vira um circulo central. */
+.lph-device-xiaomi .lph-notch-container,
+.lph-device-oppo .lph-notch-container,
+.lph-device-samsung .lph-notch-container {
+  top: 14px;
+  width: 13px;
+  height: 13px;
+  padding: 0;
+  border-radius: 50%;
+  box-shadow: none;
+  justify-content: center;
+}
+
+.lph-device-xiaomi .lph-speaker-grill,
+.lph-device-oppo .lph-speaker-grill,
+.lph-device-samsung .lph-speaker-grill {
+  display: none;
+}
+
+.lph-device-xiaomi .lph-camera-lens,
+.lph-device-oppo .lph-camera-lens,
+.lph-device-samsung .lph-camera-lens {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.lph-device-samsung .lph-notch-container {
+  top: 16px;
+  width: 10px;
+  height: 10px;
+}
+
+/* Nokia Flip: concha aberta. Corpo caixa, sem notch e teclado embaixo. */
+.lph-device-nokiaflip {
+  --lph-border-radius-phone: 20px;
+  --lph-flip-keypad-h: 172px;
+}
+
+.lph-device-nokiaflip .lph-notch-container {
+  display: none;
+}
+
+.lph-flip-keypad {
+  flex: 0 0 auto;
+  height: var(--lph-flip-keypad-h);
+  padding: 12px 22px 34px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  background: linear-gradient(180deg, #1c1c22, #131317);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: var(--lph-z-notch);
+}
+
+.lph-flip-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.55);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* O indicador home sobe por cima do teclado - no flip ele fica sobre a tela. */
+.lph-device-nokiaflip .lph-home-bar-container {
+  bottom: var(--lph-flip-keypad-h);
+}
+
 
