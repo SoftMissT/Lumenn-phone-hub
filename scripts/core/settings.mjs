@@ -20,7 +20,7 @@ export function registerSettings() {
     name: "LPH.Settings.Theme",
     hint: "LPH.Settings.ThemeHint",
     scope: "client",
-    config: false,
+    config: true,
     type: String,
     choices: {
       "": "LPH.Settings.ThemeWorldDefault",
@@ -34,7 +34,7 @@ export function registerSettings() {
     name: "LPH.Settings.NotificationSound",
     hint: "LPH.Settings.NotificationSoundHint",
     scope: "client",
-    config: false,
+    config: true,
     type: String,
     choices: {
       "": "LPH.Settings.SoundWorldDefault",
@@ -48,7 +48,7 @@ export function registerSettings() {
     name: "LPH.Settings.ReducedEffects",
     hint: "LPH.Settings.ReducedEffectsHint",
     scope: "client",
-    config: false,
+    config: true,
     type: Boolean,
     default: false,
   });
