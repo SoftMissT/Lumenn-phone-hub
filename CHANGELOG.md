@@ -4,6 +4,24 @@ Todas as mudanças relevantes deste módulo são documentadas aqui.
 
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adere a [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.0.4] — 2026-09-30
+
+**Correção de posicionamento da janela.** O celular quebrava a HUD do Foundry e não ficava centralizado.
+
+### Corrigido
+
+- **A janela era renderizada fora da interface e encolhia a HUD.** Com `window.frame: false`, o core **não adiciona a classe `application`** ao elemento raiz — e é essa classe que carrega `position` no `foundry2.css`. Sem ela, o elemento caía no layout flex do `body.game`, virava sibling da `#interface` (que perdia os 360px da janela), ancorava no canto superior-direito e **ignorava o `left/top` centralizado que o próprio Foundry calculava**.
+  - Medido em runtime no v14.367, viewport 1920×945: a janela abria em `x=1560, y=0` e a `#interface` caía de 1920 para 1560px.
+  - Correção: uma regra para `.lumenn-phone-app-window` com `position: fixed` e `z-index: var(--z-index-window)`. **Sem JS** — o `_updatePosition` do core já calcula o centro; faltava o elemento ter `position` para o `left/top` valer.
+  - Depois da correção: `x=780, y=113` (centro exato) e `#interface` intacta em 1920px.
+
+### Removido
+
+- **Código morto da trava de proporção** — o `_onPosition`, o método privado da trava 1:2 e as constantes — e o `resizable: true`. Com `frame: false` o core **nunca insere o handle de resize**; redimensionamento por arrasto é impossível nesse modo e a trava jamais executava.
+
+> [!NOTE]
+> **Este defeito existe desde o `0.0.1`.** O `0.0.2` "funcionou" no sentido de que o telefone passou a abrir; o posicionamento nunca foi exercitado porque o QA em runtime estava pendente. A afirmação de "janela redimensionável" publicada no `0.0.3` era incorreta e foi corrigida na entrada daquela versão.
+
 ## [0.0.3] — 2026-09-29
 
 **Configuração do GM e responsividade.**
@@ -18,9 +36,9 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o 
 
 **Responsividade** — conforme o PDR:
 
-- A janela agora é **redimensionável**, mantendo a proporção retrato (trava de 1:2).
-- **Tamanho mínimo legível** de `280 × 560`.
+- A janela mantém o formato retrato e o **min/max** de tamanho legível (`280 × 560` como mínimo).
 - **Teto de altura** que impede a janela de alcançar a hotbar.
+- **Aviso:** o redimensionamento pelo usuário **não** está disponível — o handle de resize do Foundry exige `window.frame: true`, e o shell é frameless de propósito. `resizable` é no-op nesse modo e não é prometido.
 
 ### Alterado
 
@@ -117,6 +135,7 @@ Primeiro release. **Fase 1 — fundação, shell e ferramentas de GM.**
 - **PIN:** é um lock de privacidade diegético entre jogadores. Não é autenticação forte, não criptografa dados e não protege contra o GM ou o DevTools do navegador.
 - **Fora do escopo da Fase 1:** Mensagens, redes sociais, Banco, Notícias, Spotify, IA para NPCs, adaptadores por sistema, criptografia ponta-a-ponta e push fora do Foundry. A arquitetura já os acomoda via App Registry.
 
+[0.0.4]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.4
 [0.0.3]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.3
 [0.0.2]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.2
 [0.0.1]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.1

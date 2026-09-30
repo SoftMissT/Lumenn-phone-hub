@@ -34,9 +34,6 @@ const VIEWS = Object.freeze({
   APP: "app",
 });
 
-const PHONE_ASPECT = 360 / 720;
-const PHONE_MIN_WIDTH = 280;
-
 function localize(key, fallback) {
   return globalThis.game?.i18n?.localize(key) ?? fallback ?? key;
 }
@@ -80,7 +77,7 @@ export class PhoneShell extends AppBase {
       positioned: true,
       title: "LPH.Title",
       icon: "fas fa-mobile-alt",
-      resizable: true
+      resizable: false,
     },
     position: { width: 360, height: 720 },
     actions: {
@@ -99,28 +96,6 @@ export class PhoneShell extends AppBase {
   async _preFirstRender(context, options) {
     await super._preFirstRender?.(context, options);
     await preloadTemplates(TEMPLATE_PARTIALS);
-  }
-
-  _onPosition(position) {
-    super._onPosition?.(position);
-    this.#lockPortraitRatio(position);
-  }
-
-  #lockPortraitRatio(position) {
-    if (this._applyingRatio) return;
-    const height = Math.round(Number(position?.height ?? 0));
-    const width = Math.round(Number(position?.width ?? 0));
-    if (!height || !width) return;
-
-    const target = Math.max(PHONE_MIN_WIDTH, Math.round(height * PHONE_ASPECT));
-    if (Math.abs(target - width) < 2) return;
-
-    this._applyingRatio = true;
-    try {
-      this.setPosition({ ...this.position, width: target });
-    } finally {
-      this._applyingRatio = false;
-    }
   }
 
   open() {

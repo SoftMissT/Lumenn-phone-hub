@@ -40,6 +40,16 @@
   --lph-glass-blur: blur(16px);
 }
 
+/* Raiz do shell. Sem window.frame o Foundry não adiciona a classe .application
+   (que traz o position do core) — este shell é frameless de propósito, então o
+   posicionamento vem daqui. fixed em vez do absolute do core: independe de
+   contexto de posicionamento do ancestral. left/top inline são calculados e
+   gravados pelo _updatePosition do próprio Foundry (centralizado na viewport). */
+.lumenn-phone-app-window {
+  position: fixed;
+  z-index: var(--z-index-window);
+}
+
 /* Base Phone Window Container */
 .lumenn-phone-window {
   width: 360px;
