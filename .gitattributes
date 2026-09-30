@@ -1,0 +1,7 @@
+# O pacote de release (`git archive`) não leva arquivo de desenvolvimento.
+# Sem isso o zip publica a suíte de testes, o gate e os planos junto do módulo.
+/docs      export-ignore
+/tests     export-ignore
+/tools     export-ignore
+/AGENTS.md export-ignore
+/CLAUDE.md export-ignore
