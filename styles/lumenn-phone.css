@@ -1071,6 +1071,10 @@
 /* Instagram: stories no topo, feed de mídia 4:5, tab bar fixa no pé. */
 .lph-ig {
   gap: 14px;
+  /* A tab bar é sticky no pé e cobre a última fileira de ações do feed quando o
+     conteúdo é mais alto que a área visível. Este espaço deixa o post rolar
+     para fora de baixo dela - sem isso o coração fica inclicável. */
+  padding-bottom: 56px;
 }
 
 .lph-ig-stories {
