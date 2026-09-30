@@ -4,12 +4,23 @@
         <input id="lph-gm-sender" type="text" name="sender" maxlength="80" autocomplete="off">
     </div>
     <div class="lph-gm-field">
+        <label for="lph-gm-image">{{localize "LPH.GM.Image"}}</label>
+        <input id="lph-gm-image" type="file" name="image" accept="image/png,image/jpeg,image/webp,image/avif" data-lph-gm-image>
+    </div>
+    <div class="lph-gm-field">
         <label for="lph-gm-title">{{localize "LPH.GM.TitleLabel"}}</label>
         <input id="lph-gm-title" type="text" name="title" maxlength="80" required>
     </div>
     <div class="lph-gm-field">
         <label for="lph-gm-body">{{localize "LPH.GM.Body"}}</label>
         <textarea id="lph-gm-body" name="body" rows="4" maxlength="500"></textarea>
+    </div>
+    <div class="lph-gm-field">
+        <label for="lph-gm-app">{{localize "LPH.GM.App"}}</label>
+        <select id="lph-gm-app" name="app">
+            <option value="system">{{localize "LPH.GM.AppSystem"}}</option>
+            {{#each apps}}<option value="{{this.id}}">{{this.label}}</option>{{/each}}
+        </select>
     </div>
     <div class="lph-gm-field">
         <label for="lph-gm-target-mode">{{localize "LPH.GM.Targets"}}</label>

@@ -44,4 +44,20 @@ assert.strictEqual(AppRegistry.has("messages"), false);
 AppRegistry.clear();
 assert.strictEqual(AppRegistry.count(), 0);
 
+// Regressão: normalizeAppDefinition é uma whitelist que descarta em silêncio
+// qualquer campo fora de APP_CONTRACT_FIELDS — se "brand"/"tile" saírem da
+// lista, o ladrilho some da UI sem nenhum erro.
+const branded = AppRegistry.register({
+  id: "instagram",
+  brand: "fa-brands fa-instagram",
+  tile: "#1DB954"
+});
+assert.strictEqual(branded.brand, "fa-brands fa-instagram");
+assert.strictEqual(branded.tile, "#1DB954");
+assert.strictEqual(
+  AppRegistry.register({ id: "plain", icon: "fas fa-cog" }).brand,
+  "fas fa-cog"
+);
+assert.strictEqual(AppRegistry.register({ id: "bare" }).tile, null);
+
 console.log("✅ App Registry: todos os testes passaram.");

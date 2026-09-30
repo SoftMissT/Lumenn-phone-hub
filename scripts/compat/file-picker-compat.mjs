@@ -1,5 +1,6 @@
 import { ERROR_CODES } from "../core/constants.mjs";
 import { fail, LumennError } from "../core/errors.mjs";
+import { randomId } from "../validation/ids.mjs";
 
 export function getFilePickerClass() {
   const f = globalThis.foundry ?? {};
@@ -93,5 +94,11 @@ export function uploadFile({
       fail(ERROR_CODES.INVALID_ARGUMENT, "Arquivo inválido para upload."),
     );
   }
-  return target.upload(source, path, file, {}, { notify });
+  // O Foundry grava usando o nome do arquivo: dois uploads de "foto.jpg" se
+  // sobrescrevem, e o segundo GM apagaria a imagem do primeiro sem aviso. O
+  // prefixo aleatório torna cada caminho único; o nome legível continua ali.
+  const unique = new globalThis.File([file], `${randomId(8)}-${file.name}`, {
+    type: file.type,
+  });
+  return target.upload(source, path, unique, {}, { notify });
 }

@@ -1,10 +1,17 @@
-import { TEMPLATE_ROOT } from "../../core/constants.mjs";
+import { TEMPLATE_ROOT, WALLPAPER_DIRECTORY } from "../../core/constants.mjs";
 import { Logger } from "../../core/logger.mjs";
-import { isGM, renderTemplate } from "../../compat/foundry-compat.mjs";
+import {
+  canUploadFiles,
+  isGM,
+  renderTemplate,
+  uploadFile,
+} from "../../compat/foundry-compat.mjs";
+import { validateFile } from "../../wallpaper/wallpaper-service.mjs";
 import {
   listGmAddressableCharacters,
   sendNotificationAsGM,
 } from "../../gm/gm-notification-service.mjs";
+import { CONTENT_APPS } from "../content/content-catalog.mjs";
 
 function localize(key, fallback) {
   const i18n = globalThis.game?.i18n;
@@ -12,10 +19,20 @@ function localize(key, fallback) {
   return typeof value === "string" && value && value !== key ? value : fallback;
 }
 
+// O GM escolhe o app de destino: é o campo que decide em qual dos seis a
+// mensagem aparece. "system" só dispara a notificação, sem caixa de entrada.
+function appChoices() {
+  return CONTENT_APPS.map((app) => ({
+    id: app.id,
+    label: localize(app.name, app.id),
+  }));
+}
+
 async function render() {
   if (!isGM()) return "";
   return renderTemplate(`${TEMPLATE_ROOT}/gm/control-center.hbs`, {
     characters: listGmAddressableCharacters(),
+    apps: appChoices(),
   });
 }
 
@@ -29,8 +46,14 @@ function buildPreview(form) {
       ? localize("LPH.GM.TargetAll", "All")
       : (form.elements.targetActorUuid?.selectedOptions?.[0]?.textContent ??
         "");
+  const appId = String(form.elements.app?.value ?? "system");
+  const appLabel =
+    appId === "system"
+      ? localize("LPH.GM.AppSystem", "System")
+      : (form.elements.app?.selectedOptions?.[0]?.textContent ?? appId);
   return [
     `${localize("LPH.GM.Sender", "Sender")}: ${sender || ""}`,
+    `${localize("LPH.GM.App", "App")}: ${appLabel}`,
     `${localize("LPH.GM.Targets", "Recipients")}: ${target}`,
     `${localize("LPH.GM.TitleLabel", "Title")}: ${title || ""}`,
     body,
@@ -45,6 +68,8 @@ function onOpen(shell) {
   const status = form.querySelector("[data-lph-gm-central-status]");
   const preview = form.querySelector("[data-lph-gm-preview]");
   const singleField = form.querySelector("[data-lph-gm-single]");
+  const imageInput = form.querySelector("[data-lph-gm-image]");
+  let imageUrl = "";
 
   const setStatus = (text, kind = "") => {
     if (!status) return;
@@ -67,6 +92,31 @@ function onOpen(shell) {
     refreshPreview();
   });
 
+  imageInput?.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const validation = await validateFile(file);
+      if (!validation.valid) throw new Error(validation.reason);
+      if (!canUploadFiles())
+        throw new Error("Você não tem permissão para enviar arquivos.");
+      const response = await uploadFile({
+        source: "data",
+        path: WALLPAPER_DIRECTORY,
+        file,
+        notify: false,
+      });
+      imageUrl = response?.path ?? response?.url ?? "";
+      if (!imageUrl) throw new Error("O upload não retornou um caminho.");
+      setStatus("", "");
+      refreshPreview();
+    } catch (error) {
+      imageUrl = "";
+      event.target.value = "";
+      setStatus(error.message ?? "Erro", "error");
+    }
+  });
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const title = String(form.elements.title?.value ?? "").trim();
@@ -79,6 +129,8 @@ function onOpen(shell) {
       sender: String(form.elements.sender?.value ?? "").trim(),
       title,
       body: String(form.elements.body?.value ?? "").trim(),
+      app: String(form.elements.app?.value ?? "system"),
+      image: imageUrl,
       targetActorUuid:
         targetMode === "single"
           ? String(form.elements.targetActorUuid?.value ?? "all")
@@ -88,6 +140,7 @@ function onOpen(shell) {
       await sendNotificationAsGM(payload);
       setStatus(localize("LPH.GM.Sent", "Notification sent."), "ok");
       form.reset();
+      imageUrl = "";
       syncTargetVisibility();
       refreshPreview();
     } catch (error) {

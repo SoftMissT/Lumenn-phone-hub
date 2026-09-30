@@ -7,6 +7,8 @@ export const APP_CONTRACT_FIELDS = Object.freeze([
   "id",
   "name",
   "icon",
+  "brand",
+  "tile",
   "order",
   "dockEligible",
   "playerVisible",
@@ -35,6 +37,9 @@ export function normalizeAppDefinition(input) {
     name: typeof input.name === "string" && input.name ? input.name : input.id,
     icon:
       typeof input.icon === "string" && input.icon ? input.icon : "fas fa-cube",
+    brand:
+      typeof input.brand === "string" && input.brand ? input.brand : input.icon,
+    tile: typeof input.tile === "string" && input.tile ? input.tile : null,
     order: Number.isFinite(input.order) ? Math.trunc(input.order) : 100,
     dockEligible: input.dockEligible === true,
     playerVisible: input.playerVisible !== false,

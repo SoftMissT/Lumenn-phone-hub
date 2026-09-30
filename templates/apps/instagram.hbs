@@ -1,0 +1,44 @@
+<div class="lph-content-app lph-ig" data-lph-content="{{appId}}">
+    {{#if total}}
+        {{#if stories}}
+        <div class="lph-ig-stories">
+            {{#each stories}}
+            <button class="lph-ig-story" type="button" data-lph-story>
+                <span class="lph-ig-story-ring">
+                    <img src="{{this.image}}" alt="" loading="lazy">
+                </span>
+                <span class="lph-ig-story-name">{{this.sender}}</span>
+            </button>
+            {{/each}}
+        </div>
+        {{/if}}
+
+        {{#each items}}
+        <article class="lph-ig-post">
+            <header class="lph-ig-post-head">
+                <span class="lph-ig-avatar">{{#if this.image}}<img src="{{this.image}}" alt="" loading="lazy">{{else}}<i class="fas fa-user" aria-hidden="true"></i>{{/if}}</span>
+                <span class="lph-ig-user">{{#if this.sender}}{{this.sender}}{{else}}lumenn{{/if}}</span>
+            </header>
+            {{#if this.image}}<img class="lph-ig-media" src="{{this.image}}" alt="" loading="lazy">{{/if}}
+            <div class="lph-ig-actions">
+                <i class="far fa-heart" aria-hidden="true"></i>
+                <i class="far fa-comment" aria-hidden="true"></i>
+                <i class="far fa-paper-plane" aria-hidden="true"></i>
+                <i class="far fa-bookmark" aria-hidden="true"></i>
+            </div>
+            {{#if this.title}}<p class="lph-ig-caption"><strong>{{this.sender}}</strong> {{this.title}}</p>{{/if}}
+            {{#if this.body}}<p class="lph-ig-body">{{this.body}}</p>{{/if}}
+        </article>
+        {{/each}}
+
+        <nav class="lph-ig-tabs" aria-hidden="true">
+            <i class="fas fa-house"></i>
+            <i class="fas fa-film"></i>
+            <i class="fas fa-comment"></i>
+            <i class="fas fa-magnifying-glass"></i>
+            <i class="fas fa-user"></i>
+        </nav>
+    {{else}}
+        <p class="lph-content-empty">{{emptyText}}</p>
+    {{/if}}
+</div>

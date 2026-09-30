@@ -399,6 +399,16 @@
   transition: transform 0.15s ease;
 }
 
+.lph-app-glyph.lph-app-tile {
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.lph-app-tile i {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
 .lph-app-icon:hover .lph-app-glyph {
   transform: scale(1.08);
 }
@@ -587,6 +597,135 @@
    Accessibility
    ============================================================ */
 
+/* Apps de conteúdo (Mensagens, Instagram, Fotos, Banco, Notícias, Spotify).
+   Todos compartilham estas classes — a diferença entre eles é só o agrupamento
+   por conversa, que alterna .lph-thread e .lph-card. */
+.lph-content-app {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0 12px;
+}
+
+.lph-content-empty {
+  margin: 0;
+  padding: 32px 16px;
+  color: var(--lph-text-secondary);
+  font-size: 14px;
+  text-align: center;
+}
+
+.lph-thread {
+  border: 1px solid var(--lph-border);
+  border-radius: var(--lph-border-radius-app);
+  background: var(--lph-surface);
+  overflow: hidden;
+}
+
+.lph-thread-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  color: var(--lph-text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lph-thread-head:hover {
+  background: var(--lph-surface-elevated);
+}
+
+.lph-thread-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lph-thread-count {
+  flex: 0 0 auto;
+  min-width: 20px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--lph-accent);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.lph-thread-body {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 14px 14px;
+}
+
+.lph-thread.is-open .lph-thread-body {
+  display: flex;
+}
+
+.lph-bubble {
+  max-width: 86%;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: var(--lph-surface-elevated);
+}
+
+.lph-bubble-title {
+  margin: 0 0 2px;
+  color: var(--lph-text-secondary);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lph-bubble-body {
+  margin: 0;
+  color: var(--lph-text-primary);
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.lph-card {
+  padding: 12px 14px;
+  border: 1px solid var(--lph-border);
+  border-radius: var(--lph-border-radius-app);
+  background: var(--lph-surface);
+}
+
+.lph-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.lph-card-sender {
+  color: var(--lph-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lph-card-title {
+  margin: 0 0 4px;
+  color: var(--lph-text-primary);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.lph-card-body {
+  margin: 0;
+  color: var(--lph-text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
 /* Focus visibility */
 .lph-pin-btn:focus-visible,
 .lph-unlock-hint:focus-visible,
@@ -701,6 +840,41 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Banner de notificação do Foundry. Ele vive no container de notificações do
+   core, fora do escopo de tema do módulo — por isso cores literais em vez das
+   variáveis --lph-*. O ciano é a cor de interação do sistema. */
+.lph-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lph-banner-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.lph-banner-open {
+  flex: 0 0 auto;
+  padding: 2px 10px;
+  border: 1px solid #00d4f5;
+  border-radius: 999px;
+  background: transparent;
+  color: #00d4f5;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.lph-banner-open:hover,
+.lph-banner-open:focus-visible {
+  background: #00d4f5;
+  color: #0a0a0a;
 }
 
 /* GM mode banner inside the phone */
@@ -834,6 +1008,206 @@
 
 .lph-gm-status[data-kind="error"] {
   color: var(--lph-danger);
+}
+
+/* Imagem nos cards dos apps de conteúdo (Fotos, Notícias, Spotify, Instagram). */
+.lph-card-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  background: var(--lph-surface-elevated);
+}
+
+/* Fotos: grade de 3 colunas, só a imagem, como um rolo de câmera. */
+[data-lph-content="photos"] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+[data-lph-content="photos"] .lph-card {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+[data-lph-content="photos"] .lph-card-head,
+[data-lph-content="photos"] .lph-card-title,
+[data-lph-content="photos"] .lph-card-body {
+  display: none;
+}
+
+[data-lph-content="photos"] .lph-card-image {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  margin-bottom: 0;
+}
+
+/* Spotify: capa quadrada ao lado do texto, como uma faixa "tocando agora". */
+[data-lph-content="spotify"] .lph-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+[data-lph-content="spotify"] .lph-card-image {
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  margin-bottom: 0;
+}
+
+[data-lph-content="spotify"] .lph-card-head,
+[data-lph-content="spotify"] .lph-card-title,
+[data-lph-content="spotify"] .lph-card-body {
+  min-width: 0;
+}
+
+/* Instagram: stories no topo, feed de mídia 4:5, tab bar fixa no pé. */
+.lph-ig {
+  gap: 14px;
+}
+
+.lph-ig-stories {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+
+.lph-ig-story {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.lph-ig-story-ring {
+  display: block;
+  width: 56px;
+  height: 56px;
+  padding: 2px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #f09433, #dc2743, #bc1888);
+}
+
+.lph-ig-story-ring img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid var(--lph-surface);
+  box-sizing: border-box;
+}
+
+.lph-ig-story-name {
+  max-width: 56px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  color: var(--lph-text-secondary);
+}
+
+.lph-ig-post {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lph-ig-post-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lph-ig-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--lph-surface-elevated);
+  color: var(--lph-text-secondary);
+}
+
+.lph-ig-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lph-ig-user {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lph-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lph-ig-media {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--lph-surface-elevated);
+}
+
+.lph-ig-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 18px;
+  color: var(--lph-text-primary);
+}
+
+.lph-ig-actions i:last-child {
+  margin-left: auto;
+}
+
+.lph-ig-caption,
+.lph-ig-body {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--lph-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.lph-ig-body {
+  color: var(--lph-text-secondary);
+}
+
+.lph-ig-tabs {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  background: var(--lph-surface);
+  border-top: 1px solid var(--lph-border);
+  font-size: 16px;
+  color: var(--lph-text-secondary);
+}
+
+.lph-ig-tabs i:first-child {
+  color: var(--lph-accent);
 }
 
 

@@ -2,7 +2,7 @@
     <div class="lph-app-grid">
         {{#each apps}}
         <div class="lph-app-icon" data-app-id="{{this.id}}" data-action="launch-app" role="button" tabindex="0" aria-label="{{this.title}}">
-            <div class="lph-app-glyph">
+            <div class="lph-app-glyph{{#if this.tile}} lph-app-tile{{/if}}"{{#if this.tile}} style="background:{{this.tile}}"{{/if}}>
                 <i class="{{this.icon}}" aria-hidden="true"></i>
             </div>
             <span class="lph-app-label">{{this.title}}</span>
@@ -13,7 +13,7 @@
     <div class="lph-dock-container">
         {{#each dockApps}}
         <div class="lph-app-icon" data-app-id="{{this.id}}" data-action="launch-app" role="button" tabindex="0" aria-label="{{this.title}}">
-            <div class="lph-app-glyph">
+            <div class="lph-app-glyph{{#if this.tile}} lph-app-tile{{/if}}"{{#if this.tile}} style="background:{{this.tile}}"{{/if}}>
                 <i class="{{this.icon}}" aria-hidden="true"></i>
             </div>
         </div>

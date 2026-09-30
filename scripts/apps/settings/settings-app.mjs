@@ -68,6 +68,8 @@ export const settingsApp = {
   id: "settings",
   name: "LPH.Apps.Settings",
   icon: "fas fa-cog",
+  brand: "fas fa-cog",
+  tile: "#6B7280",
   order: 10,
   dockEligible: true,
   playerVisible: true,

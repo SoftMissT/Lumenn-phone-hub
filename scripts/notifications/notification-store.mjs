@@ -68,3 +68,36 @@ export function pruneToLimit(notifications, limit = storeLimit()) {
     .slice(0, limit);
   return Object.fromEntries(entries);
 }
+
+// Um app é uma visão recortada do mesmo store: nada é duplicado por app.
+export function listByApp(
+  notifications,
+  actorUuid,
+  appId,
+  state = {},
+  options = {},
+) {
+  return listForActor(notifications, actorUuid, state, options).filter(
+    (notification) => notification.app === appId,
+  );
+}
+
+// Agrupa em conversas. Itens sem thread ficam sozinhos; a ordem é do mais
+// recente para o mais antigo, e dentro do thread do mais antigo para o mais
+// novo, que é como uma conversa se lê.
+export function groupByThread(items = []) {
+  const groups = new Map();
+  for (const item of items) {
+    const key = item.thread ?? item.id;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(item);
+  }
+  return [...groups.entries()]
+    .map(([id, messages]) => {
+      const ordered = [...messages].sort(
+        (a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0),
+      );
+      return { id, messages: ordered, last: ordered[ordered.length - 1] };
+    })
+    .sort((a, b) => (b.last?.createdAt ?? 0) - (a.last?.createdAt ?? 0));
+}

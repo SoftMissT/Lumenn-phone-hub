@@ -357,7 +357,8 @@ export class PhoneShell extends AppBase {
       .filter((app) => !app.playerVisible || isAppEnabled(app.id))
       .map((app) => ({
         id: app.id,
-        icon: app.icon,
+        icon: app.brand ?? app.icon,
+        tile: app.tile ?? null,
         title: localize(app.name, app.id),
       }));
   }
