@@ -93,7 +93,9 @@
       "FlagPlayerWallpaperUpload": "Upload de wallpaper pelo jogador",
       "FlagPlayerWallpaperUploadHint": "Permite que o jogador envie uma imagem do próprio computador.",
       "EnabledApps": "Apps habilitados",
-      "EnabledAppsHint": "Uso interno. Ainda não há interface."
+      "EnabledAppsHint": "Uso interno. Ainda não há interface.",
+      "CurrencySymbol": "Símbolo da moeda",
+      "CurrencySymbolHint": "Símbolo usado nos valores do app Banco (ex.: R$). Em branco formata sem símbolo."
     },
     "GM": {
       "Central": "Central do GM",
@@ -142,8 +144,11 @@
       "ReplySend": "Enviar",
       "ReplySent": "Enviado",
     "AddPhoto": "Adicionar foto",
+    "AddPhotoLocked": "Peça ao GM para liberar o acesso a arquivos.",
     "Like": "Curtir",
-    "LikedPosts": "Publicações curtidas"
+    "LikedPosts": "Publicações curtidas",
+    "Balance": "Saldo",
+    "NewBadge": "NOVA"
     },
     "Errors": {
       "LPH_NO_CHARACTER": "Nenhum personagem atribuído a você.",

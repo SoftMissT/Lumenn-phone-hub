@@ -72,6 +72,10 @@ export function normalizeNotification(input = {}, options = {}) {
       typeof input.thread === "string" && input.thread
         ? input.thread.slice(0, 64)
         : null,
+    // Valor monetário do app Banco. Crédito positivo, débito negativo. Só
+    // número finito entra; ausente ou inválido vira null e a linha aparece
+    // sem valor em vez de mostrar um "0" que ninguém lançou.
+    amount: Number.isFinite(input.amount) ? input.amount : null,
     createdAt: now,
     status: STATUS_VALUES.includes(input.status)
       ? input.status

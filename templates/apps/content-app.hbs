@@ -5,6 +5,12 @@
             <i class="fas fa-plus" aria-hidden="true"></i>
         </button>
     </div>
+    {{else if photosNeedsPermission}}
+    <div class="lph-media-bar">
+        <button type="button" class="lph-add-photo lph-add-photo-locked" disabled title="{{addPhotoHint}}" aria-label="{{addPhotoHint}}">
+            <i class="fas fa-lock" aria-hidden="true"></i>
+        </button>
+    </div>
     {{/if}}
     {{#if total}}
         {{#if threaded}}
@@ -36,6 +42,35 @@
                     </form>
                     {{/if}}
                 </div>
+            </article>
+            {{/each}}
+        {{else if isBank}}
+            {{#if balanceText}}
+            <div class="lph-bank-balance">
+                <span class="lph-bank-balance-label">{{balanceLabel}}</span>
+                <span class="lph-bank-balance-value">{{balanceText}}</span>
+            </div>
+            {{/if}}
+            {{#each items}}
+            <article class="lph-card lph-bank-row" data-lph-expand role="button" tabindex="0" aria-expanded="false">
+                <div class="lph-bank-row-head">
+                    {{#if this.sender}}<span class="lph-card-sender">{{this.sender}}</span>{{/if}}
+                    {{#if this.amountText}}<span class="lph-bank-amount {{#if this.credit}}is-credit{{else}}is-debit{{/if}}">{{this.amountText}}</span>{{/if}}
+                </div>
+                {{#if this.title}}<h4 class="lph-card-title">{{this.title}}</h4>{{/if}}
+                {{#if this.body}}<div class="lph-bank-detail"><p class="lph-card-body">{{this.body}}</p></div>{{/if}}
+            </article>
+            {{/each}}
+        {{else if isNews}}
+            {{#each items}}
+            <article class="lph-card lph-news-item" data-lph-expand role="button" tabindex="0" aria-expanded="false">
+                <div class="lph-card-head">
+                    {{#if this.sender}}<span class="lph-card-sender">{{this.sender}}</span>{{/if}}
+                    {{#if this.unread}}<span class="lph-news-badge">{{../newBadge}}</span>{{/if}}
+                </div>
+                {{#if this.title}}<h4 class="lph-news-title">{{this.title}}</h4>{{/if}}
+                {{#if this.body}}<p class="lph-news-excerpt">{{this.excerpt}}</p>{{/if}}
+                {{#if this.body}}<div class="lph-news-body"><p class="lph-card-body">{{this.body}}</p></div>{{/if}}
             </article>
             {{/each}}
         {{else}}

@@ -92,6 +92,7 @@ export const SETTINGS_KEYS = Object.freeze({
   FLAG_PLAYER_WALLPAPER_UPLOAD: "flagPlayerWallpaperUpload",
     LIKED_POSTS: "likedPosts",
     ENABLED_APPS: "enabledApps",
+    CURRENCY_SYMBOL: "currencySymbol",
   });
 
 export const THEMES = Object.freeze(["light", "dark"]);

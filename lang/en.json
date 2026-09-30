@@ -93,7 +93,9 @@
       "FlagPlayerWallpaperUpload": "Player wallpaper upload",
       "FlagPlayerWallpaperUploadHint": "Lets the player upload an image from their own computer.",
       "EnabledApps": "Enabled apps",
-      "EnabledAppsHint": "Internal use. No interface yet."
+      "EnabledAppsHint": "Internal use. No interface yet.",
+      "CurrencySymbol": "Currency symbol",
+      "CurrencySymbolHint": "Symbol used for the Bank app amounts (e.g. $). Empty formats without a symbol."
     },
     "GM": {
       "Central": "GM Control Center",
@@ -142,8 +144,11 @@
       "ReplySend": "Send",
       "ReplySent": "Sent",
     "AddPhoto": "Add photo",
+    "AddPhotoLocked": "Ask the GM to allow file browsing.",
     "Like": "Like",
-    "LikedPosts": "Liked posts"
+    "LikedPosts": "Liked posts",
+    "Balance": "Balance",
+    "NewBadge": "NEW"
     },
     "Errors": {
       "LPH_NO_CHARACTER": "No character is assigned to you.",

@@ -1,8 +1,12 @@
-import { TEMPLATE_ROOT } from "../../core/constants.mjs";
+import { SETTINGS_KEYS, TEMPLATE_ROOT } from "../../core/constants.mjs";
 import { Logger } from "../../core/logger.mjs";
 import { escapeHTML, renderTemplate } from "../../compat/application-compat.mjs";
-import { openFilePicker } from "../../compat/foundry-compat.mjs";
-import { getLikedPosts, toggleLikedPost } from "../../core/preferences.mjs";
+import { canBrowseFiles, openFilePicker } from "../../compat/foundry-compat.mjs";
+import {
+  getLikedPosts,
+  getLimit,
+  toggleLikedPost,
+} from "../../core/preferences.mjs";
 import { LumennRepository } from "../../persistence/repository.mjs";
 import { PhoneController } from "../../phone/phone-controller.mjs";
 import { groupByThread } from "../../notifications/notification-store.mjs";
@@ -57,6 +61,57 @@ export function avatarHue(name) {
   return hash;
 }
 
+// Valor do extrato: sinal sempre ("+" crédito, "-" débito, "±" zero), símbolo
+// só quando o mundo define um. Não-número vira "" e a linha fica sem valor.
+export function formatAmount(amount, symbol = "", locale) {
+  if (!Number.isFinite(amount)) return "";
+  const sign = amount > 0 ? "+" : amount < 0 ? "-" : "±";
+  const number = new Intl.NumberFormat(
+    locale ?? globalThis.game?.i18n?.lang,
+    { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+  ).format(Math.abs(amount));
+  return `${sign}${typeof symbol === "string" ? symbol : ""}${number}`;
+}
+
+export function isCredit(amount) {
+  return Number.isFinite(amount) && amount > 0;
+}
+
+// Saldo do extrato: soma só os amounts finitos. Sem nenhum valor, null — a
+// interface não mostra saldo nenhum (nem um "0" que ninguém lançou).
+export function computeBalance(items) {
+  let total = 0;
+  let found = false;
+  for (const item of items ?? []) {
+    if (!Number.isFinite(item?.amount)) continue;
+    found = true;
+    total += item.amount;
+  }
+  if (!found) return null;
+  const rounded = Math.round(total * 100) / 100;
+  return rounded === 0 ? 0 : rounded;
+}
+
+// Trecho de uma linha para a lista de manchetes: corta na palavra inteira
+// anterior ao limite e marca com "…". O corpo completo segue intacto no item.
+export function headlineExcerpt(body, max = 140) {
+  const limit = Number.isFinite(max) ? Math.trunc(max) : 140;
+  const text = String(body ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!text || limit <= 0) return "";
+  const chars = [...text];
+  if (chars.length <= limit) return text;
+  const head = chars.slice(0, limit).join("");
+  const space = head.lastIndexOf(" ");
+  return `${(space > 0 ? head.slice(0, space) : head).trimEnd()}…`;
+}
+
+function currencySymbolOf() {
+  const value = getLimit(SETTINGS_KEYS.CURRENCY_SYMBOL, "");
+  return typeof value === "string" ? value : "";
+}
+
 function ownCharacterName() {
   return globalThis.game?.user?.character?.name ?? "";
 }
@@ -104,9 +159,21 @@ function createContentApp(spec) {
     async render({ shell } = {}) {
       const items = await loadItems(actorUuidOf(shell), spec.id);
       const liked = getLikedPosts();
+      const isBank = spec.id === "bank";
+      const isNews = spec.id === "news";
+      const currencySymbol = isBank ? currencySymbolOf() : "";
+      const balance = isBank ? computeBalance(items) : null;
       const decorated = items.map((item) => ({
         ...item,
         liked: Boolean(liked[item.id]),
+        ...(isBank && {
+          credit: isCredit(item.amount),
+          amountText: formatAmount(item.amount, currencySymbol),
+        }),
+        ...(isNews && {
+          excerpt: headlineExcerpt(item.body),
+          unread: item.status === "unread",
+        }),
       }));
       const threads = spec.threaded
         ? decorateThreads(groupByThread(decorated), ownCharacterName())
@@ -126,8 +193,19 @@ function createContentApp(spec) {
           canReply: spec.id === "messages",
           replyPlaceholder: localize("LPH.Apps.ReplyPlaceholder", "Reply..."),
           sendLabel: localize("LPH.Apps.ReplySend", "Send"),
-          canAddPhoto: spec.id === "photos",
+          canAddPhoto: spec.id === "photos" && canBrowseFiles(),
           addPhotoLabel: localize("LPH.Apps.AddPhoto", "Add photo"),
+          addPhotoHint: localize(
+            "LPH.Apps.AddPhotoLocked",
+            "Peça ao GM para liberar o acesso a arquivos.",
+          ),
+          photosNeedsPermission: spec.id === "photos" && !canBrowseFiles(),
+          isBank,
+          isNews,
+          balanceText:
+            balance === null ? "" : formatAmount(balance, currencySymbol),
+          balanceLabel: localize("LPH.Apps.Balance", "Balance"),
+          newBadge: localize("LPH.Apps.NewBadge", "NEW"),
         },
       );
     },
@@ -151,6 +229,22 @@ function createContentApp(spec) {
             event.preventDefault();
             toggle();
           });
+      });
+
+      // Notícias e Banco: tocar no card abre o corpo completo ali mesmo, sem
+      // trocar de tela. O estado vive só no DOM, como nos threads — o próximo
+      // render fecha tudo de novo.
+      body.querySelectorAll("[data-lph-expand]").forEach((node) => {
+        const toggle = () => {
+          const open = node.classList.toggle("is-open");
+          node.setAttribute("aria-expanded", open ? "true" : "false");
+        };
+        node.addEventListener("click", toggle);
+        node.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          toggle();
+        });
       });
 
       // Curtir: alterna no lugar, sem re-renderizar - re-render perderia a

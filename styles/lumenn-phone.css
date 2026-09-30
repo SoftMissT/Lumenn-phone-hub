@@ -1336,4 +1336,135 @@
   color: var(--lph-accent);
 }
 
+/* Sem FILES_BROWSE o seletor do Foundry nem abre. Botão travado com o motivo
+   visível é melhor que um botão que não faz nada sem explicar. */
+.lph-add-photo-locked,
+.lph-add-photo-locked:hover {
+  border-color: var(--lph-border);
+  color: var(--lph-text-secondary);
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Notícias: manchetes que abrem o artigo no mesmo lugar, sem trocar de tela. */
+.lph-news-item,
+.lph-bank-row {
+  cursor: pointer;
+}
+
+.lph-news-badge {
+  flex: 0 0 auto;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--lph-accent);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.lph-news-title {
+  margin: 0 0 4px;
+  color: var(--lph-text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+/* O trecho fechado é cortado visualmente em 2 linhas; o corpo completo
+   continua inteiro no DOM e aparece no toque. */
+.lph-news-excerpt {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  color: var(--lph-text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.lph-news-item .lph-news-body,
+.lph-bank-row .lph-bank-detail {
+  display: none;
+}
+
+.lph-news-item.is-open .lph-news-body,
+.lph-bank-row.is-open .lph-bank-detail {
+  display: block;
+}
+
+.lph-news-item.is-open .lph-news-excerpt {
+  display: none;
+}
+
+.lph-news-item.is-open .lph-news-body .lph-card-body {
+  color: var(--lph-text-primary);
+}
+
+.lph-bank-row.is-open .lph-bank-detail {
+  margin-top: 6px;
+}
+
+/* Banco: saldo no topo e valor com sinal em cada linha. */
+.lph-bank-balance {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--lph-border);
+  border-radius: var(--lph-border-radius-app);
+  background: var(--lph-surface-elevated);
+}
+
+.lph-bank-balance-label {
+  color: var(--lph-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.lph-bank-balance-value {
+  color: var(--lph-text-primary);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.lph-bank-row-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.lph-bank-amount {
+  flex: 0 0 auto;
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Crédito/débito são a exceção literal às variáveis do tema (como o #ed4956 do
+   Instagram): cada tema escolhe o tom que fica legível no próprio fundo. */
+[data-lph-content="bank"] {
+  --lph-credit: #1a7f37;
+  --lph-debit: #c53030;
+}
+
+.lph-theme-dark [data-lph-content="bank"] {
+  --lph-credit: #3fb950;
+  --lph-debit: #ed4956;
+}
+
+.lph-bank-amount.is-credit {
+  color: var(--lph-credit);
+}
+
+.lph-bank-amount.is-debit {
+  color: var(--lph-debit);
+}
+
 

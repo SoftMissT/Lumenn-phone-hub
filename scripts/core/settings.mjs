@@ -183,6 +183,16 @@ export function registerSettings() {
     },
   );
 
+  // Símbolo da moeda do app Banco. Vazio formata os valores sem símbolo.
+  game.settings.register(MODULE_ID, SETTINGS_KEYS.CURRENCY_SYMBOL, {
+    name: "LPH.Settings.CurrencySymbol",
+    hint: "LPH.Settings.CurrencySymbolHint",
+    scope: "world",
+    config: true,
+    type: String,
+    default: "",
+  });
+
   game.settings.register(MODULE_ID, SETTINGS_KEYS.ENABLED_APPS, {
     name: "LPH.Settings.EnabledApps",
     hint: "LPH.Settings.EnabledAppsHint",
