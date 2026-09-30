@@ -23,8 +23,16 @@ export function openFilePicker(options = {}) {
     );
   }
 
+  // Versões que expõem a fábrica estática: caminho mais simples.
   if (typeof Picker.pick === "function") {
     return Picker.pick(options);
+  }
+
+  // O FilePicker do Foundry (v13/v14) recusa abrir sem FILES_BROWSE e volta
+  // sem renderizar, sem callback e sem evento de close — a Promise ficaria
+  // pendente para sempre (o defeito original). Mesma checagem do core.
+  if (globalThis.game?.user?.can?.("FILES_BROWSE") === false) {
+    return Promise.resolve(null);
   }
 
   return new Promise((resolve, reject) => {
@@ -34,25 +42,60 @@ export function openFilePicker(options = {}) {
       settled = true;
       resolve(value);
     };
+    const failPicker = (error) => {
+      if (settled) return;
+      settled = true;
+      reject(
+        error instanceof LumennError
+          ? error
+          : new LumennError(
+              ERROR_CODES.NOT_IMPLEMENTED,
+              error?.message ||
+                "Não foi possível abrir o seletor de arquivos.",
+              { cause: error },
+            ),
+      );
+    };
+
+    let picker;
     try {
-      const picker = new Picker({
+      picker = new Picker({
         type: options.type ?? "any",
         current: options.current ?? "",
-        request: options.current ?? "",
         callback: (path) => {
-          settle(path);
-          picker.close();
+          settle(path ?? null);
+          picker?.close?.();
         },
       });
+    } catch (error) {
+      failPicker(error);
+      return;
+    }
+
+    // Fechar sem escolher também precisa liquidar a Promise.
+    try {
       picker.addEventListener?.("close", () => settle(null));
-      picker.render(true);
     } catch {
-      reject(
-        new LumennError(
-          ERROR_CODES.NOT_IMPLEMENTED,
-          "FilePicker indisponível nesta versão do Foundry.",
-        ),
-      );
+      // Emissores que não suportam o evento: segue sem o atalho de close.
+    }
+
+    // `browse()` é o caminho do próprio core no v13/v14: carrega o diretório
+    // e força o primeiro render. Sem ele, o render antigo — sempre com um
+    // objeto de opções, nunca booleano — tenta abrir mesmo assim.
+    let opening;
+    try {
+      opening =
+        typeof picker.browse === "function"
+          ? picker.browse()
+          : picker.render({ force: true });
+    } catch (error) {
+      failPicker(error);
+      return;
+    }
+    // Falha de render/browse (socket, enquadramento, permissão) precisa
+    // rejeitar a Promise em vez de deixá-la pendente para sempre.
+    if (opening && typeof opening.catch === "function") {
+      opening.catch((error) => failPicker(error));
     }
   });
 }
@@ -62,6 +105,18 @@ export function canUploadFiles() {
   if (typeof user?.can !== "function") return false;
   try {
     return user.can("FILES_UPLOAD") === true;
+  } catch {
+    return false;
+  }
+}
+
+// Sem esta permissão o FilePicker do Foundry nem abre para o usuário - ele
+// retorna cedo e em silêncio. Melhor saber antes de oferecer o botão.
+export function canBrowseFiles() {
+  const user = globalThis.game?.user;
+  if (typeof user?.can !== "function") return false;
+  try {
+    return user.can("FILES_BROWSE") === true;
   } catch {
     return false;
   }

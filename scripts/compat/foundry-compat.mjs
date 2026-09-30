@@ -20,6 +20,7 @@ export {
   getFilePickerClass,
   uploadFile,
   canUploadFiles,
+  canBrowseFiles,
 } from "./file-picker-compat.mjs";
 
 export function getFoundryVersionInfo() {

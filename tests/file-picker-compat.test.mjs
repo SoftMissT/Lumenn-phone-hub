@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
-import { uploadFile } from "../scripts/compat/file-picker-compat.mjs";
+import {
+  openFilePicker,
+  uploadFile,
+} from "../scripts/compat/file-picker-compat.mjs";
 
 const originalFoundry = globalThis.foundry;
 const originalFile = globalThis.File;
@@ -123,4 +126,193 @@ test("uploadFile propaga o erro do próprio upload", async () => {
 test("uploadFile recusa arquivo que não é File", async () => {
   stubFoundry();
   await assert.rejects(() => uploadFile({ path: "x", file: { name: "a.png" } }));
+});
+
+// ---------------------------------------------------------------------------
+// openFilePicker - o seletor nunca abria e a Promise nunca liquidava no
+// Foundry 14: `FilePicker.pick` não existe, o render precisa de browse() e
+// qualquer falha assíncrona era engolida, deixando a Promise pendente.
+// ---------------------------------------------------------------------------
+
+class FakeFilePicker {
+  static instances = [];
+
+  constructor(options = {}) {
+    this.options = options;
+    this.callback = options.callback ?? null;
+    this.browseCalls = 0;
+    this.renderArgs = [];
+    this.closeListeners = new Set();
+    FakeFilePicker.instances.push(this);
+  }
+
+  addEventListener(type, listener) {
+    if (type !== "close") {
+      throw new Error(`"${type}" não é um evento suportado`);
+    }
+    this.closeListeners.add(listener);
+  }
+
+  // Espelha o FilePicker v13/v14: o primeiro browse carrega o diretório e
+  // delega para o render com { force }.
+  browse() {
+    this.browseCalls += 1;
+    return this.render({ force: true });
+  }
+
+  render(options) {
+    this.renderArgs.push(options);
+    return this;
+  }
+
+  choose(path) {
+    this.callback?.(path, this);
+  }
+
+  close() {
+    for (const listener of this.closeListeners) listener({ type: "close" });
+  }
+}
+
+function stubPickerClass(PickerClass) {
+  globalThis.foundry = {
+    applications: { apps: { FilePicker: { implementation: PickerClass } } },
+  };
+}
+
+test("openFilePicker abre pelo browse() do core e renderiza com objeto de opções", async () => {
+  FakeFilePicker.instances = [];
+  stubPickerClass(FakeFilePicker);
+
+  const promise = openFilePicker({ type: "image", current: "" });
+  const picker = FakeFilePicker.instances[0];
+
+  assert.equal(picker.browseCalls, 1, "não usou o caminho do core (browse)");
+  assert.equal(picker.renderArgs.length, 1);
+  // O bug real: render recebia um booleano; o ApplicationV2 espera um objeto
+  // de opções. `render(true)` só é coagido por acidente e não é contrato.
+  assert.deepEqual(picker.renderArgs[0], { force: true });
+  assert.notEqual(picker.renderArgs[0], true);
+  assert.equal(picker.options.type, "image");
+  assert.equal(typeof picker.options.callback, "function");
+
+  picker.choose("worlds/x/foto.png");
+  assert.equal(await promise, "worlds/x/foto.png");
+});
+
+test("openFilePicker resolve com o caminho escolhido no callback", async () => {
+  FakeFilePicker.instances = [];
+  stubPickerClass(FakeFilePicker);
+
+  const promise = openFilePicker({ type: "image" });
+  FakeFilePicker.instances[0].choose("worlds/x/foto.png");
+
+  assert.equal(await promise, "worlds/x/foto.png");
+});
+
+test("openFilePicker resolve com null quando o picker fecha sem escolha", async () => {
+  FakeFilePicker.instances = [];
+  stubPickerClass(FakeFilePicker);
+
+  const promise = openFilePicker({ type: "image" });
+  FakeFilePicker.instances[0].close();
+
+  assert.equal(await promise, null);
+});
+
+test("openFilePicker rejeita quando o FilePicker não existe no ambiente", async () => {
+  globalThis.foundry = {};
+  await assert.rejects(
+    () => openFilePicker({ type: "image" }),
+    /FilePicker indisponível/,
+  );
+});
+
+test("openFilePicker rejeita (não fica pendente) quando render/browse falha", async () => {
+  class FailingPicker extends FakeFilePicker {
+    browse() {
+      return Promise.reject(new Error("manageFiles falhou"));
+    }
+  }
+  stubPickerClass(FailingPicker);
+
+  await assert.rejects(
+    () => openFilePicker({ type: "image" }),
+    /manageFiles falhou/,
+  );
+});
+
+test("openFilePicker rejeita (não fica pendente) quando o construtor lança", async () => {
+  class ExplodingPicker {
+    constructor() {
+      throw new Error("construtor quebrou");
+    }
+  }
+  stubPickerClass(ExplodingPicker);
+
+  await assert.rejects(
+    () => openFilePicker({ type: "image" }),
+    /construtor quebrou/,
+  );
+});
+
+test("openFilePicker usa render({ force: true }) quando não existe browse (caminho antigo)", async () => {
+  class LegacyPicker {
+    static instances = [];
+
+    constructor(options = {}) {
+      this.options = options;
+      LegacyPicker.instances.push(this);
+    }
+
+    addEventListener() {}
+
+    render(options) {
+      this.renderArgs = [options];
+      return this;
+    }
+
+    choose(path) {
+      this.options.callback?.(path, this);
+    }
+  }
+  stubPickerClass(LegacyPicker);
+
+  const promise = openFilePicker({ type: "audio" });
+  const picker = LegacyPicker.instances[0];
+
+  assert.deepEqual(picker.renderArgs, [{ force: true }]);
+  assert.notEqual(picker.renderArgs[0], true);
+
+  picker.choose("audio/tema.ogg");
+  assert.equal(await promise, "audio/tema.ogg");
+});
+
+test("openFilePicker usa a fábrica estática pick quando ela existe", async () => {
+  const calls = [];
+  class PickPicker {
+    static pick(options) {
+      calls.push(options);
+      return Promise.resolve("worlds/x/foto.png");
+    }
+  }
+  stubPickerClass(PickPicker);
+
+  const picked = await openFilePicker({ type: "image", current: "x" });
+
+  assert.equal(picked, "worlds/x/foto.png");
+  assert.deepEqual(calls, [{ type: "image", current: "x" }]);
+});
+
+test("openFilePicker resolve null sem abrir quando o usuário não pode navegar", async () => {
+  FakeFilePicker.instances = [];
+  stubPickerClass(FakeFilePicker);
+  globalThis.game = { user: { can: () => false } };
+
+  assert.equal(await openFilePicker({ type: "image" }), null);
+  assert.equal(
+    FakeFilePicker.instances.length,
+    0,
+    "instanciou o picker mesmo sem permissão de navegação",
+  );
 });
