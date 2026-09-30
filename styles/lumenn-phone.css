@@ -146,6 +146,33 @@
   gap: 6px;
 }
 
+/* Fechar a janela. O shell é frameless, então o Foundry não desenha botão de
+   janela nenhum — sem isto o celular não tinha como ser fechado depois de
+   aberto. */
+.lph-status-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  padding: 0;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--lph-text-secondary, #86868b);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.lph-status-close:hover,
+.lph-status-close:focus-visible {
+  background: var(--lph-surface, rgba(255, 255, 255, 0.75));
+  color: var(--lph-text-primary, #1d1d1f);
+}
+
 /* Main Screen Viewport */
 .lph-screen-viewport {
   position: relative;

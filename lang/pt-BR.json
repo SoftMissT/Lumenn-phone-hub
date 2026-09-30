@@ -14,7 +14,8 @@
       "NoCharacter": "Nenhum personagem atribuído a você.",
       "Back": "Início",
       "Backspace": "Apagar dígito",
-      "Cancel": "Voltar"
+      "Cancel": "Voltar",
+      "Close": "Fechar o celular"
     },
     "Clock": {
       "Year": "Ano {year}"

@@ -4,6 +4,21 @@ Todas as mudanças relevantes deste módulo são documentadas aqui.
 
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adere a [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.0.5] — 2026-09-30
+
+**Correções de runtime.** Quatro defeitos relatados no QA real.
+
+### Corrigido
+
+- **Não havia como fechar o celular.** O shell é frameless, então o Foundry não desenha botão de janela nenhum — e nenhuma das ações do telefone fechava a janela. Adicionado um botão de fechar no canto direito da barra de status, visível em todas as telas (bloqueio, início e app).
+- **O som de digitação empilhava e não parava.** Duas causas somadas: o asset `keyboard.mp3` tem **22,7 segundos** (um clique deveria ter ~80 ms), e o `playSound` passava `onlyOnce: false`, o que faz o Foundry **guardar** cada instância. Agora a instância anterior é parada antes de a nova tocar, o que impede o empilhamento com qualquer asset. A troca do arquivo por um clique curto segue recomendada.
+- **`onlyOnce` vazava para dentro do objeto de áudio** do Foundry (o espalhamento de `options` o levava junto). Agora é separado da carga útil.
+- **Link de página do Imgur/Pinterest era rejeitado com mensagem genérica.** O validador exige extensão de imagem, o que está correto — o navegador baixaria HTML. Agora ele **reconhece link de página** e diz exatamente o que fazer: copiar o endereço direto da imagem (`i.imgur.com/...`, `i.pinimg.com/...`).
+
+### Alterado
+
+- `compatibility.maximum` passa a ser `"14.999"`. Sem ele, o Foundry acusava risco de compatibilidade em qualquer versão acima da verificada. O `verified` continua `14.356`.
+
 ## [0.0.4] — 2026-09-30
 
 **Correção de posicionamento da janela.** O celular quebrava a HUD do Foundry e não ficava centralizado.
@@ -135,6 +150,7 @@ Primeiro release. **Fase 1 — fundação, shell e ferramentas de GM.**
 - **PIN:** é um lock de privacidade diegético entre jogadores. Não é autenticação forte, não criptografa dados e não protege contra o GM ou o DevTools do navegador.
 - **Fora do escopo da Fase 1:** Mensagens, redes sociais, Banco, Notícias, Spotify, IA para NPCs, adaptadores por sistema, criptografia ponta-a-ponta e push fora do Foundry. A arquitetura já os acomoda via App Registry.
 
+[0.0.5]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.5
 [0.0.4]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.4
 [0.0.3]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.3
 [0.0.2]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.2

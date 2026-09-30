@@ -20,20 +20,19 @@ export async function preloadSound(src) {
 
 export function playSound(src, options = {}) {
   const helper = audioHelper();
-  if (typeof helper?.play !== "function" || !src) return Promise.resolve(false);
+  if (typeof helper?.play !== "function" || !src) return Promise.resolve(null);
+  const { onlyOnce = true, ...data } = options;
   try {
     const result = helper.play(
-      { src, volume: 0.35, autoplay: true, loop: false, ...options },
-      options.onlyOnce ?? true,
+      { src, volume: 0.35, autoplay: true, loop: false, ...data },
+      onlyOnce,
     );
-    return Promise.resolve(result)
-      .then(() => true)
-      .catch((error) => {
-        Logger.warn("Playback de som bloqueado ou indisponível:", error);
-        return false;
-      });
+    return Promise.resolve(result).catch((error) => {
+      Logger.warn("Playback de som bloqueado ou indisponível:", error);
+      return null;
+    });
   } catch (error) {
     Logger.warn("Playback de som bloqueado ou indisponível:", error);
-    return Promise.resolve(false);
+    return Promise.resolve(null);
   }
 }

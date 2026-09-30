@@ -86,6 +86,7 @@ export class PhoneShell extends AppBase {
       "backspace-pin": PhoneShell.#onBackspacePin,
       "go-home": PhoneShell.#onGoHome,
       "launch-app": PhoneShell.#onLaunchApp,
+      "close-phone": PhoneShell.#onClosePhone,
     },
   };
 
@@ -415,6 +416,10 @@ export class PhoneShell extends AppBase {
     shell.activeApp = null;
     shell.activeAppContent = "";
     shell.render(true);
+  }
+
+  static #onClosePhone() {
+    PhoneShell.instance.close();
   }
 
   static #onLaunchApp(event, target) {

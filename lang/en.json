@@ -14,7 +14,8 @@
       "NoCharacter": "No character is assigned to you.",
       "Back": "Home",
       "Backspace": "Delete digit",
-      "Cancel": "Cancel"
+      "Cancel": "Cancel",
+      "Close": "Close the phone"
     },
     "Clock": {
       "Year": "Year {year}"

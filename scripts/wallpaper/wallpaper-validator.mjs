@@ -169,12 +169,44 @@ export function validateSourceUrl(source) {
   }
   if (!isAllowedWallpaperUrl(value))
     return { valid: false, reason: "Caminho ou URL não permitido." };
+
+  // Link de página não é imagem: o navegador baixaria HTML e o wallpaper
+  // falharia. Dizer isso explicitamente evita a caça ao tesouro.
+  const pageHint = describePageLink(value);
+  if (pageHint) return { valid: false, reason: pageHint };
+
   const ext = extensionOf(value);
   if (!ALLOWED_EXTENSIONS.includes(ext))
-    return { valid: false, reason: "Extensão de imagem não permitida." };
+    return {
+      valid: false,
+      reason:
+        "Use o endereço direto da imagem (termina em .png, .jpg, .webp ou .avif).",
+    };
   if (ext === "avif" && !avifSupported)
     return { valid: false, reason: "AVIF não disponível neste navegador." };
   return { valid: true, reason: "", format: normalizeFormat(ext) };
+}
+
+const PAGE_LINK_PATTERNS = Object.freeze([
+  {
+    test: /^https?:\/\/(?:www\.|m\.)?imgur\.com\/(?:gallery\/|a\/)?[\w-]+\/?$/i,
+    hint: "Esse é o link da página do Imgur, não da imagem. Abra a imagem, clique com o botão direito e copie o endereço dela — começa com i.imgur.com e termina em .jpg/.png.",
+  },
+  {
+    test: /^https?:\/\/(?:[\w-]+\.)?pinterest\.[a-z.]+\/pin\//i,
+    hint: "Esse é o link da página do Pinterest, não da imagem. Clique com o botão direito na imagem e copie o endereço dela — começa com i.pinimg.com.",
+  },
+  {
+    test: /^https?:\/\/pin\.it\//i,
+    hint: "Link encurtado do Pinterest abre a página, não a imagem. Copie o endereço direto da imagem (i.pinimg.com).",
+  },
+]);
+
+function describePageLink(value) {
+  for (const pattern of PAGE_LINK_PATTERNS) {
+    if (pattern.test.test(value)) return pattern.hint;
+  }
+  return "";
 }
 
 export function sanitizeFilename(name) {
