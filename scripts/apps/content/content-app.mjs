@@ -133,6 +133,10 @@ function decorateThreads(threads, ownName) {
     ...thread,
     initial: avatarInitial(thread.last?.sender),
     avatarHue: avatarHue(thread.last?.sender),
+    // Numa lista de conversas o que importa é a última linha e quantas não
+    // lidas. O total de mensagens não diz nada e polui a linha.
+    preview: headlineExcerpt(thread.last?.body, 60),
+    unread: thread.messages.filter((m) => m.status === "unread").length,
     messages: thread.messages.map((message) => ({
       ...message,
       mine: Boolean(ownName) && message.sender === ownName,
@@ -238,6 +242,7 @@ function createContentApp(spec) {
             "LPH.Apps.ComposePlaceholder",
             "Write a message...",
           ),
+          backLabel: localize("LPH.Apps.Back", "Back"),
           canPost,
           postLocked: spec.id === "instagram" && !canBrowse,
           postLabel: localize("LPH.Apps.NewPost", "New post"),
@@ -265,16 +270,41 @@ function createContentApp(spec) {
       const body = root.querySelector(`[data-lph-content="${spec.id}"]`);
       if (!body) return;
 
-      // Abrir um thread revela as mensagens; o título do thread é o rótulo.
+      // Mensagens em dois níveis, como qualquer messenger: a lista de conversas
+      // mostra prévia e não-lidas; tocar entra na conversa com o histórico
+      // inteiro e o campo de texto; a seta volta. Antes tudo era um acordeão
+      // fechado, então a tela parecia uma lista de nomes sem nenhum histórico.
       body.querySelectorAll("[data-lph-thread]").forEach((node) => {
-        const toggle = () => node.classList.toggle("is-open");
+        const enter = () => {
+          body.classList.add("is-in-conversation");
+          node.classList.add("is-active");
+          // Guarda no shell, não só no DOM: responder dispara re-render, que
+          // recria os nós e expulsaria de volta para a lista de conversas.
+          shell.lphActiveThread = node.dataset.lphThread;
+        };
+        const leave = (event) => {
+          event?.preventDefault();
+          event?.stopPropagation();
+          body.classList.remove("is-in-conversation");
+          node.classList.remove("is-active");
+          shell.lphActiveThread = null;
+        };
         const head = node.querySelector("[data-lph-thread-head]");
-        bindOnce(head, "click", toggle);
+        bindOnce(head, "click", enter);
         bindOnce(head, "keydown", (event) => {
           if (event.key !== "Enter" && event.key !== " ") return;
           event.preventDefault();
-          toggle();
+          enter();
         });
+        bindOnce(node.querySelector("[data-lph-thread-back]"), "click", leave);
+        // Reabre a conversa que estava aberta antes do último render.
+        if (
+          shell.lphActiveThread &&
+          shell.lphActiveThread === node.dataset.lphThread
+        ) {
+          body.classList.add("is-in-conversation");
+          node.classList.add("is-active");
+        }
       });
 
       // Notícias e Banco: tocar no card abre o corpo completo ali mesmo, sem

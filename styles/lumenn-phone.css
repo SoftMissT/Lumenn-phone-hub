@@ -638,7 +638,6 @@
 }
 
 .lph-thread-name {
-  flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -664,8 +663,70 @@
   padding: 0 14px 14px;
 }
 
-.lph-thread.is-open .lph-thread-body {
+/* Nível 2: conversa aberta. A lista some, só a conversa ativa fica, com o
+   histórico inteiro e o campo de resposta. Antes isto era um acordeão: como
+   tudo nascia fechado, a tela virava uma lista de nomes sem histórico nenhum. */
+.lph-content-app.is-in-conversation .lph-thread {
+  display: none;
+}
+
+.lph-content-app.is-in-conversation .lph-thread.is-active {
+  display: block;
+  border: 0;
+  background: transparent;
+}
+
+.lph-content-app.is-in-conversation .lph-thread.is-active .lph-thread-body {
   display: flex;
+}
+
+.lph-content-app.is-in-conversation .lph-thread.is-active .lph-thread-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  border-bottom: 1px solid var(--lph-border);
+  background: var(--lph-surface);
+}
+
+.lph-content-app.is-in-conversation .lph-thread.is-active .lph-thread-preview {
+  display: none;
+}
+
+/* Nome em cima, prévia embaixo: a linha de lista de conversa de sempre. */
+.lph-thread-meta {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lph-thread-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--lph-text-secondary);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.lph-thread-back {
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--lph-accent);
+  cursor: pointer;
+}
+
+.lph-content-app.is-in-conversation .lph-thread.is-active .lph-thread-back {
+  display: inline-flex;
 }
 
 .lph-bubble {

@@ -32,13 +32,19 @@
             {{#each threads}}
             <article class="lph-thread" data-lph-thread="{{this.id}}">
                 <header class="lph-thread-head" data-lph-thread-head role="button" tabindex="0">
+                    <button type="button" class="lph-thread-back" data-lph-thread-back aria-label="{{../backLabel}}">
+                        <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                    </button>
                     {{#if this.last.avatar}}
                     <img class="lph-avatar lph-avatar-img" src="{{this.last.avatar}}" alt="" loading="lazy">
                     {{else}}
                     <span class="lph-avatar" style="--lph-avatar-hue: {{this.avatarHue}}">{{this.initial}}</span>
                     {{/if}}
-                    <span class="lph-thread-name">{{this.last.sender}}</span>
-                    <span class="lph-thread-count">{{this.messages.length}}</span>
+                    <span class="lph-thread-meta">
+                        <span class="lph-thread-name">{{this.last.sender}}</span>
+                        <span class="lph-thread-preview">{{this.preview}}</span>
+                    </span>
+                    {{#if this.unread}}<span class="lph-thread-count">{{this.unread}}</span>{{/if}}
                 </header>
                 <div class="lph-thread-body">
                     {{#each this.messages}}
@@ -47,11 +53,11 @@
                         {{#if this.body}}<p class="lph-bubble-body">{{this.body}}</p>{{/if}}
                     </div>
                     {{/each}}
-                    {{#if ../../canReply}}
+                    {{#if ../canReply}}
                     <form class="lph-reply" data-lph-reply data-lph-thread-id="{{this.id}}">
                         <input type="text" name="body" maxlength="500" autocomplete="off"
-                               placeholder="{{../../replyPlaceholder}}" aria-label="{{../../replyPlaceholder}}">
-                        <button type="submit" aria-label="{{../../sendLabel}}">
+                               placeholder="{{../replyPlaceholder}}" aria-label="{{../replyPlaceholder}}">
+                        <button type="submit" aria-label="{{../sendLabel}}">
                             <i class="fas fa-paper-plane" aria-hidden="true"></i>
                         </button>
                     </form>
