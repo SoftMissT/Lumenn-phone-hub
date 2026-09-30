@@ -140,7 +140,10 @@
       "SpotifyEmpty": "Nada tocando.",
       "ReplyPlaceholder": "Responder...",
       "ReplySend": "Enviar",
-      "ReplySent": "Enviado"
+      "ReplySent": "Enviado",
+    "AddPhoto": "Adicionar foto",
+    "Like": "Curtir",
+    "LikedPosts": "Publicações curtidas"
     },
     "Errors": {
       "LPH_NO_CHARACTER": "Nenhum personagem atribuído a você.",

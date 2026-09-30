@@ -140,7 +140,10 @@
       "SpotifyEmpty": "Nothing playing.",
       "ReplyPlaceholder": "Reply...",
       "ReplySend": "Send",
-      "ReplySent": "Sent"
+      "ReplySent": "Sent",
+    "AddPhoto": "Add photo",
+    "Like": "Like",
+    "LikedPosts": "Liked posts"
     },
     "Errors": {
       "LPH_NO_CHARACTER": "No character is assigned to you.",

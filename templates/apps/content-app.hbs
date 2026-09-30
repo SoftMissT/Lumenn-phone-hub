@@ -1,4 +1,11 @@
 <div class="lph-content-app" data-lph-content="{{appId}}">
+    {{#if canAddPhoto}}
+    <div class="lph-media-bar">
+        <button type="button" class="lph-add-photo" data-lph-add-photo aria-label="{{addPhotoLabel}}">
+            <i class="fas fa-plus" aria-hidden="true"></i>
+        </button>
+    </div>
+    {{/if}}
     {{#if total}}
         {{#if threaded}}
             {{#each threads}}

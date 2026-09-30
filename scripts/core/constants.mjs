@@ -90,7 +90,8 @@ export const SETTINGS_KEYS = Object.freeze({
   FLAG_KEYPRESS_SOUND: "flagKeypressSound",
   FLAG_NOTIFICATION_BANNER: "flagNotificationBanner",
   FLAG_PLAYER_WALLPAPER_UPLOAD: "flagPlayerWallpaperUpload",
-  ENABLED_APPS: "enabledApps",
-});
+    LIKED_POSTS: "likedPosts",
+    ENABLED_APPS: "enabledApps",
+  });
 
 export const THEMES = Object.freeze(["light", "dark"]);

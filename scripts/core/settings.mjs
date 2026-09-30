@@ -53,6 +53,16 @@ export function registerSettings() {
     default: false,
   });
 
+  // Curtidas do Instagram. Estado do jogador no cliente: cada um curte o que
+  // quiser, sem virar dado do mundo nem do personagem.
+  game.settings.register(MODULE_ID, SETTINGS_KEYS.LIKED_POSTS, {
+    name: "LPH.Apps.LikedPosts",
+    scope: "client",
+    config: false,
+    type: Object,
+    default: {},
+  });
+
   game.settings.register(MODULE_ID, SETTINGS_KEYS.DEBUG_LOGGING, {
     name: "LPH.Settings.DebugLogging",
     hint: "LPH.Settings.DebugLoggingHint",

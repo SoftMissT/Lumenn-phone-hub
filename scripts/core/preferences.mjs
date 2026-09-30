@@ -50,3 +50,33 @@ export function isAppEnabled(id) {
 export function getLimit(key, fallback) {
   return read(key, fallback);
 }
+
+async function write(key, value) {
+  try {
+    await globalThis.game?.settings?.set(MODULE_ID, key, value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Puro de propósito: a regra de curtir é testável sem Foundry.
+export function toggleLikedMap(liked, id) {
+  const next = { ...(liked ?? {}) };
+  const isLiked = !next[id];
+  if (isLiked) next[id] = true;
+  else delete next[id];
+  return { liked: next, isLiked };
+}
+
+export function getLikedPosts() {
+  const value = read(SETTINGS_KEYS.LIKED_POSTS, {});
+  return value && typeof value === "object" ? value : {};
+}
+
+export async function toggleLikedPost(id) {
+  if (!id) return false;
+  const { liked, isLiked } = toggleLikedMap(getLikedPosts(), id);
+  await write(SETTINGS_KEYS.LIKED_POSTS, liked);
+  return isLiked;
+}

@@ -21,7 +21,9 @@
             </header>
             {{#if this.image}}<img class="lph-ig-media" src="{{this.image}}" alt="" loading="lazy">{{/if}}
             <div class="lph-ig-actions">
-                <i class="far fa-heart" aria-hidden="true"></i>
+                <button type="button" class="lph-ig-like{{#if this.liked}} is-liked{{/if}}" data-lph-like="{{this.id}}" aria-pressed="{{#if this.liked}}true{{else}}false{{/if}}" aria-label="{{../likeLabel}}">
+                    <i class="{{#if this.liked}}fas{{else}}far{{/if}} fa-heart" aria-hidden="true"></i>
+                </button>
                 <i class="far fa-comment" aria-hidden="true"></i>
                 <i class="far fa-paper-plane" aria-hidden="true"></i>
                 <i class="far fa-bookmark" aria-hidden="true"></i>

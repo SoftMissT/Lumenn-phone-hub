@@ -1,6 +1,8 @@
 import { TEMPLATE_ROOT } from "../../core/constants.mjs";
 import { Logger } from "../../core/logger.mjs";
 import { escapeHTML, renderTemplate } from "../../compat/application-compat.mjs";
+import { openFilePicker } from "../../compat/foundry-compat.mjs";
+import { getLikedPosts, toggleLikedPost } from "../../core/preferences.mjs";
 import { LumennRepository } from "../../persistence/repository.mjs";
 import { PhoneController } from "../../phone/phone-controller.mjs";
 import { groupByThread } from "../../notifications/notification-store.mjs";
@@ -101,10 +103,15 @@ function createContentApp(spec) {
 
     async render({ shell } = {}) {
       const items = await loadItems(actorUuidOf(shell), spec.id);
+      const liked = getLikedPosts();
+      const decorated = items.map((item) => ({
+        ...item,
+        liked: Boolean(liked[item.id]),
+      }));
       const threads = spec.threaded
-        ? decorateThreads(groupByThread(items), ownCharacterName())
+        ? decorateThreads(groupByThread(decorated), ownCharacterName())
         : null;
-      const stories = spec.stories ? buildStories(items) : null;
+      const stories = spec.stories ? buildStories(decorated) : null;
       return renderTemplate(
         `${TEMPLATE_ROOT}/${spec.template ?? "apps/content-app.hbs"}`,
         {
@@ -112,13 +119,15 @@ function createContentApp(spec) {
           appLabel: localize(spec.name, spec.id),
           threaded: spec.threaded,
           threads,
-          items,
+          items: decorated,
           stories,
-          total: items.length,
+          total: decorated.length,
           emptyText: localize(spec.emptyKey, ""),
           canReply: spec.id === "messages",
           replyPlaceholder: localize("LPH.Apps.ReplyPlaceholder", "Reply..."),
           sendLabel: localize("LPH.Apps.ReplySend", "Send"),
+          canAddPhoto: spec.id === "photos",
+          addPhotoLabel: localize("LPH.Apps.AddPhoto", "Add photo"),
         },
       );
     },
@@ -143,6 +152,50 @@ function createContentApp(spec) {
             toggle();
           });
       });
+
+      // Curtir: alterna no lugar, sem re-renderizar - re-render perderia a
+      // posição de rolagem do feed no meio da leitura.
+      body.querySelectorAll("[data-lph-like]").forEach((button) => {
+        button.addEventListener("click", async (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          const id = button.dataset.lphLike;
+          if (!id) return;
+          try {
+            const isLiked = await toggleLikedPost(id);
+            button.classList.toggle("is-liked", isLiked);
+            button.setAttribute("aria-pressed", isLiked ? "true" : "false");
+            const glyph = button.querySelector("i");
+            if (glyph) glyph.className = `${isLiked ? "fas" : "far"} fa-heart`;
+          } catch (error) {
+            Logger.debug("Falha ao curtir:", error);
+          }
+        });
+      });
+
+      // Adicionar foto: o seletor do próprio Foundry. Quem pode enviar arquivo
+      // vê o botão de upload nele; quem não pode, escolhe do que já existe.
+      body
+        .querySelector("[data-lph-add-photo]")
+        ?.addEventListener("click", async () => {
+          const actorUuid = actorUuidOf(shell);
+          if (!actorUuid) return;
+          try {
+            const picked = await openFilePicker({ type: "image", current: "" });
+            if (!picked) return;
+            await PhoneController.createNotification({
+              app: "photos",
+              targetActorUuid: actorUuid,
+              sender: ownCharacterName(),
+              title: "",
+              body: "",
+              image: picked,
+            });
+            await shell.render(true);
+          } catch (error) {
+            Logger.error("Falha ao adicionar foto:", error);
+          }
+        });
 
       // Responder: a resposta entra no mesmo thread, endereçada ao próprio
       // personagem, para sobreviver ao reload como qualquer outra mensagem.
