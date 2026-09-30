@@ -4,6 +4,36 @@ Todas as mudanças relevantes deste módulo são documentadas aqui.
 
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adere a [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.0.3] — 2026-09-29
+
+**Configuração do GM e responsividade.**
+
+### Adicionado
+
+**Configuração do GM** — o mundo passa de 5 para **12 opções**, na tela nativa do Foundry (*Configurações → Configurar Definições → Lumenn Phone Hub*):
+
+- **Tema padrão do mundo** e **som padrão do mundo** — valem para quem ainda não escolheu o seu; a escolha do jogador continua prevalecendo.
+- **Máximo de notificações** (10–2000) e **retenção em dias** (0–365) — controlam o crescimento do estado do mundo.
+- **Som de digitação**, **banner de notificação** e **upload de wallpaper pelo jogador** — flags por mundo.
+
+**Responsividade** — conforme o PDR:
+
+- A janela agora é **redimensionável**, mantendo a proporção retrato (trava de 1:2).
+- **Tamanho mínimo legível** de `280 × 560`.
+- **Teto de altura** que impede a janela de alcançar a hotbar.
+
+### Alterado
+
+- `theme` e `notificationSoundEnabled` viraram **tri-state**: vazio significa "seguir o padrão do mundo".
+- `scripts/core/preferences.mjs` concentra a resolução de preferências.
+- O texto do PIN em Ajustes agora diz que a senha não protege também **contra quem administra o servidor**.
+- Formatação do repositório passada por prettier, sem mudança de comportamento.
+
+### Corrigido
+
+- **`RF-023`**: apps desabilitados pelo GM agora saem da grade e do dock de todos os celulares. O filtro estava na spec desde o Blueprint, mas não existia no código.
+- Os limites de notificação e as flags passaram a ter **efeito real** — nenhum controle da tela do GM é decorativo.
+
 ## [0.0.2] — 2026-09-29
 
 **Correção de runtime.** O `0.0.1` não abria o telefone.
@@ -87,5 +117,6 @@ Primeiro release. **Fase 1 — fundação, shell e ferramentas de GM.**
 - **PIN:** é um lock de privacidade diegético entre jogadores. Não é autenticação forte, não criptografa dados e não protege contra o GM ou o DevTools do navegador.
 - **Fora do escopo da Fase 1:** Mensagens, redes sociais, Banco, Notícias, Spotify, IA para NPCs, adaptadores por sistema, criptografia ponta-a-ponta e push fora do Foundry. A arquitetura já os acomoda via App Registry.
 
+[0.0.3]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.3
 [0.0.2]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.2
 [0.0.1]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.1
