@@ -62,7 +62,11 @@ export const CONTENT_APPS = Object.freeze([
     id: "spotify",
     name: "LPH.Apps.Spotify",
     icon: "fas fa-music",
-    brand: "fa-brands fa-spotify",
+    // Sem player embutido: o YouTube exige 200x200 minimos e o app tem 312 de
+    // largura - um 16:9 caberia com 176 de altura, abaixo do minimo. Entao este
+    // app e um cartao "tocando agora" alimentado por notificacao, como todos os
+    // outros. A musica da mesa e assunto do modulo de jukebox, nao daqui.
+    brand: "fas fa-music",
     tile: "#1DB954",
     order: 25,
     threaded: false,

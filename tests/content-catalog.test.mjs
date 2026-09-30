@@ -13,10 +13,16 @@ test("os seis apps têm glifo de marca e cor de ladrilho", () => {
   }
 });
 
-test("Instagram e Spotify usam o pacote de marcas do Foundry", () => {
+test("Instagram usa o pacote de marcas; musica usa glifo generico", () => {
   const byId = (id) => CONTENT_APPS.find((app) => app.id === id);
+  // Instagram continua sendo Instagram, entao usa o pacote de marcas.
   assert.equal(byId("instagram").brand, "fa-brands fa-instagram");
-  assert.equal(byId("spotify").brand, "fa-brands fa-spotify");
+  // Musica nao e integracao Spotify: nao existe login, nem player, nem
+  // reproducao - e um cartao "tocando agora" alimentado por notificacao.
+  // Manter o logo da Spotify prometeria uma integracao inexistente e usaria
+  // marca de terceiro sem uso real.
+  assert.equal(byId("spotify").brand, "fas fa-music");
+  assert.doesNotMatch(byId("spotify").brand, /fa-brands/);
 });
 
 test("nenhum ladrilho é branco ou cinza claro (glifo branco sumiria)", () => {
