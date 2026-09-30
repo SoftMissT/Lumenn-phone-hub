@@ -2,6 +2,12 @@ export const MODULE_ID = "lumenn-phone-hub";
 export const MODULE_TITLE = "Lumenn Phone Hub";
 export const SOCKET_NAMESPACE = `module.${MODULE_ID}`;
 export const TEMPLATE_ROOT = `modules/${MODULE_ID}/templates`;
+export const TEMPLATE_PARTIALS = Object.freeze([
+  `${TEMPLATE_ROOT}/phone/status-bar.hbs`,
+  `${TEMPLATE_ROOT}/phone/lock-screen.hbs`,
+  `${TEMPLATE_ROOT}/phone/pin-pad.hbs`,
+  `${TEMPLATE_ROOT}/phone/home-screen.hbs`
+]);
 export const CONTROL_GROUP_ID = "lumennPhone";
 export const CONTROL_TOOL_ID = "openPhone";
 export const LOG_PREFIX = "[Lumenn]";

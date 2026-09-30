@@ -1,7 +1,8 @@
-import { HOOKS, MODULE_ID, SETTINGS_KEYS } from "./constants.mjs";
+import { HOOKS, MODULE_ID, SETTINGS_KEYS, TEMPLATE_PARTIALS } from "./constants.mjs";
 import { Logger } from "./logger.mjs";
 import { registerSettings } from "./settings.mjs";
 import { exposePublicApi } from "./public-api.mjs";
+import { preloadTemplates } from "../compat/application-compat.mjs";
 import { installControlsEntry, verifyControlsEntry } from "../compat/controls-compat.mjs";
 import { registerBuiltinApps } from "../apps/register-builtin-apps.mjs";
 import { initSocket } from "../socket/socket-runtime.mjs";
@@ -32,11 +33,12 @@ function applyDebugSetting() {
 }
 
 export function registerLifecycle() {
-  Hooks.once("init", () => {
+  Hooks.once("init", async () => {
     Logger.info("init");
     registerSettings();
     registerBuiltinApps();
     installControlsEntry();
+    await runStep("templates", () => preloadTemplates(TEMPLATE_PARTIALS));
   });
 
   Hooks.once("setup", () => {

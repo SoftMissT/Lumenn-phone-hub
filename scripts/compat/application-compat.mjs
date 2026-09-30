@@ -37,6 +37,41 @@ export async function renderTemplate(path, context = {}) {
   fail(ERROR_CODES.UNSUPPORTED_VERSION, "renderTemplate indisponível nesta versão do Foundry.");
 }
 
+let partialPreload = null;
+
+export function preloadTemplates(paths = []) {
+  if (partialPreload) return partialPreload;
+
+  const list = (Array.isArray(paths) ? paths : []).filter(
+    (path) => typeof path === "string" && path.length > 0
+  );
+  if (!list.length) return Promise.resolve(false);
+
+  const f = globalThis.foundry ?? {};
+  const modern = f.applications?.handlebars?.loadTemplates;
+  const loader = typeof modern === "function"
+    ? modern
+    : (features().legacyLoadTemplates ? globalThis.loadTemplates : null);
+
+  if (typeof loader !== "function") {
+    Logger.error("loadTemplates indisponível; os partials não serão pré-carregados.");
+    return Promise.resolve(false);
+  }
+
+  partialPreload = Promise.resolve(loader(list))
+    .then(() => {
+      Logger.debug(`Partials pré-carregados: ${list.length}.`);
+      return true;
+    })
+    .catch((error) => {
+      Logger.error("Falha ao pré-carregar partials:", error);
+      partialPreload = null;
+      return false;
+    });
+
+  return partialPreload;
+}
+
 export function mergeObject(original, other, options = {}) {
   const utils = globalThis.foundry?.utils;
   if (typeof utils?.mergeObject === "function") return utils.mergeObject(original, other, options);

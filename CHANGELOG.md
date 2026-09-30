@@ -4,6 +4,21 @@ Todas as mudanças relevantes deste módulo são documentadas aqui.
 
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adere a [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.0.2] — 2026-09-29
+
+**Correção de runtime.** O `0.0.1` não abria o telefone.
+
+### Corrigido
+
+- **O telefone não renderizava.** `phone-shell.hbs` inclui quatro partials (`status-bar`, `lock-screen`, `pin-pad`, `home-screen`) com `{{> "caminho"}}`, mas nada no módulo chamava `loadTemplates()` — resultando em `The partial modules/lumenn-phone-hub/templates/phone/status-bar.hbs could not be found`.
+  - O `ApplicationV2` carrega automaticamente **apenas** os templates declarados em `PARTS`. Partials referenciados dentro deles exigem registro explícito.
+  - `TEMPLATE_PARTIALS` centraliza a lista dos partials em `constants.mjs`.
+  - `preloadTemplates()` na camada de compatibilidade: memoizado, com fallback para o `loadTemplates` global e erro contido para nunca rejeitar.
+  - Pré-carga no hook `init` (aquece o cache em paralelo ao boot) e garantia em `_preFirstRender` do shell — determinístico, sem depender de timing.
+
+> [!NOTE]
+> O gate local (`node --test`, 12 suítes) **não** cobre carregamento de template: as suítes rodam em Node puro, sem Foundry, sem Handlebars. Verde local não é evidência de que o módulo abre — só o QA em runtime é.
+
 ## [0.0.1] — 2026-09-29
 
 Primeiro release. **Fase 1 — fundação, shell e ferramentas de GM.**
@@ -72,4 +87,5 @@ Primeiro release. **Fase 1 — fundação, shell e ferramentas de GM.**
 - **PIN:** é um lock de privacidade diegético entre jogadores. Não é autenticação forte, não criptografa dados e não protege contra o GM ou o DevTools do navegador.
 - **Fora do escopo da Fase 1:** Mensagens, redes sociais, Banco, Notícias, Spotify, IA para NPCs, adaptadores por sistema, criptografia ponta-a-ponta e push fora do Foundry. A arquitetura já os acomoda via App Registry.
 
+[0.0.2]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.2
 [0.0.1]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.1

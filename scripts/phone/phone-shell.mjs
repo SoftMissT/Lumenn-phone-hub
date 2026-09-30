@@ -1,6 +1,7 @@
-import { HOOKS, MODULE_ID, PIN_LENGTH, SETTINGS_KEYS } from "../core/constants.mjs";
+import { HOOKS, MODULE_ID, PIN_LENGTH, SETTINGS_KEYS, TEMPLATE_PARTIALS } from "../core/constants.mjs";
 import { Logger } from "../core/logger.mjs";
 import { confirmDialog, getApplicationBase, isGM } from "../compat/foundry-compat.mjs";
+import { preloadTemplates } from "../compat/application-compat.mjs";
 import { LumennRepository } from "../persistence/repository.mjs";
 import { verifyPin } from "../lock/pin-kdf.mjs";
 import { LockoutService } from "../lock/lockout-service.mjs";
@@ -74,6 +75,11 @@ export class PhoneShell extends AppBase {
   static PARTS = {
     main: { template: `modules/${MODULE_ID}/templates/phone/phone-shell.hbs` }
   };
+
+  async _preFirstRender(context, options) {
+    await super._preFirstRender?.(context, options);
+    await preloadTemplates(TEMPLATE_PARTIALS);
+  }
 
   open() {
     if (this.gmMode) {
