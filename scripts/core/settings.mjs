@@ -218,5 +218,7 @@ export function registerSettings() {
       nokiaflip: "LPH.Devices.NokiaFlip",
     },
     default: DEFAULT_DEVICE_MODEL,
+    onChange: (value) =>
+      globalThis.Hooks?.callAll?.("lumennPhoneDeviceModelChanged", value),
   });
 }

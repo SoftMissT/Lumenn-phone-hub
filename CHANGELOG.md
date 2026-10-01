@@ -4,6 +4,27 @@ Todas as mudanças relevantes deste módulo são documentadas aqui.
 
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adere a [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.0.9] — 2026-10-01
+
+**Refino visual e correção do fluxo de Mensagens.**
+
+### Alterado
+
+- Home com perfis visuais distintos para PearPhone, Xiaomi, Samsung, Oppo e Nokia Flip.
+- Shell com tipografia de sistema, safe-area visual, superfícies mais discretas, contraste e alvos de toque maiores.
+- Cabeçalho de apps e Ajustes alinhados ao padrão de navegação iOS, preservando Handlebars/CSS puro e a arquitetura do Foundry.
+
+### Corrigido
+
+- Mensagens não usa mais uma linha `role="button"` contendo outro botão; abrir conversa e voltar agora são controles nativos separados para clique e teclado.
+- Apps do dock não aparecem duplicados na grade.
+- Modelo do aparelho no Ajustes é aplicado imediatamente aos shells abertos quando alterado pelo GM.
+
+### Validação
+
+- Gate local: 60/60 testes.
+- QA visual/runtime do Foundry fica para o operador; esta release não declara essa validação.
+
 ## [0.0.5] — 2026-09-30
 
 **Correções de runtime.** Quatro defeitos relatados no QA real.
@@ -150,6 +171,10 @@ Primeiro release. **Fase 1 — fundação, shell e ferramentas de GM.**
 - **PIN:** é um lock de privacidade diegético entre jogadores. Não é autenticação forte, não criptografa dados e não protege contra o GM ou o DevTools do navegador.
 - **Fora do escopo da Fase 1:** Mensagens, redes sociais, Banco, Notícias, Spotify, IA para NPCs, adaptadores por sistema, criptografia ponta-a-ponta e push fora do Foundry. A arquitetura já os acomoda via App Registry.
 
+[0.0.9]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.9
+[0.0.8]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.8
+[0.0.7]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.7
+[0.0.6]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.6
 [0.0.5]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.5
 [0.0.4]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.4
 [0.0.3]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.3

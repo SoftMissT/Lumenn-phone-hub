@@ -174,7 +174,7 @@ export class PhoneShell extends AppBase {
       isLocked: lockout.isLocked,
       lockoutRemaining: Math.ceil(lockout.remainingMs / 1000),
       notifications: this.notifications,
-      apps: this.#mapApps({ includeGm: true }),
+      apps: this.#mapApps({ includeGm: true, excludeDock: true }),
       dockApps: this.#mapApps({ dockEligible: true }),
       gmMode: this.gmMode,
       gmModeLabel: this.gmMode
@@ -353,8 +353,15 @@ export class PhoneShell extends AppBase {
   }
 
   #deviceModel() {
-    const value = game?.settings?.get(MODULE_ID, SETTINGS_KEYS.DEVICE_MODEL);
-    return DEVICE_MODELS.includes(value) ? value : DEFAULT_DEVICE_MODEL;
+    try {
+      const value = globalThis.game?.settings?.get(
+        MODULE_ID,
+        SETTINGS_KEYS.DEVICE_MODEL,
+      );
+      return DEVICE_MODELS.includes(value) ? value : DEFAULT_DEVICE_MODEL;
+    } catch {
+      return DEFAULT_DEVICE_MODEL;
+    }
   }
 
   #mapApps(filter = {}) {
@@ -362,6 +369,7 @@ export class PhoneShell extends AppBase {
     return AppRegistry.list({})
       .filter((app) => {
         if (filter.dockEligible === true && !app.dockEligible) return false;
+        if (filter.excludeDock === true && app.dockEligible) return false;
         if (app.playerVisible) return true;
         return Boolean(filter.includeGm) && app.gmPanel && gm;
       })
@@ -518,4 +526,9 @@ Hooks.on(HOOKS.NOTIFICATION_RECEIVED, (notification) => {
   ) {
     shell.render(true);
   }
+});
+
+Hooks.on(HOOKS.DEVICE_MODEL_CHANGED, () => {
+  const shell = PhoneShell._instance;
+  if (shell?.rendered) void shell.render(true);
 });

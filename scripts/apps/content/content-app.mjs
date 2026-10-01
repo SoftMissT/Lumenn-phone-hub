@@ -350,13 +350,7 @@ function createContentApp(spec) {
           node.classList.remove("is-active");
           shell.lphActiveThread = null;
         };
-        const head = node.querySelector("[data-lph-thread-head]");
-        bindOnce(head, "click", open);
-        bindOnce(head, "keydown", (event) => {
-          if (event.key !== "Enter" && event.key !== " ") return;
-          event.preventDefault();
-          open();
-        });
+        bindOnce(node.querySelector("[data-lph-thread-open]"), "click", open);
         bindOnce(node.querySelector("[data-lph-thread-back]"), "click", leave);
         // Reabre a conversa que estava aberta antes do último render.
         if (

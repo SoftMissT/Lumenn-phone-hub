@@ -1,4 +1,6 @@
 import {
+  DEFAULT_DEVICE_MODEL,
+  DEVICE_MODELS,
   MODULE_ID,
   SETTINGS_KEYS,
   TEMPLATE_ROOT,
@@ -23,6 +25,14 @@ import {
 
 const THEMES = ["light", "dark"];
 
+const DEVICE_LABELS = Object.freeze({
+  pearphone: "LPH.Devices.PearPhone",
+  xiaomi: "LPH.Devices.Xiaomi",
+  oppo: "LPH.Devices.Oppo",
+  samsung: "LPH.Devices.Samsung",
+  nokiaflip: "LPH.Devices.NokiaFlip",
+});
+
 function localize(key, fallback) {
   const i18n = globalThis.game?.i18n;
   const value = i18n?.localize?.(key);
@@ -43,6 +53,18 @@ async function setClientSetting(key, value) {
 
 function actorUuidOf(shell) {
   return shell?.actorUuid ?? globalThis.game?.user?.character?.uuid ?? null;
+}
+
+function deviceModel() {
+  try {
+    const value = globalThis.game?.settings?.get(
+      MODULE_ID,
+      SETTINGS_KEYS.DEVICE_MODEL,
+    );
+    return DEVICE_MODELS.includes(value) ? value : DEFAULT_DEVICE_MODEL;
+  } catch {
+    return DEFAULT_DEVICE_MODEL;
+  }
 }
 
 function setWallpaperError(shell, message) {
@@ -80,6 +102,12 @@ export const settingsApp = {
     const resolved = getResolvedWallpaper(phoneState);
     return renderTemplate(`${TEMPLATE_ROOT}/apps/settings.hbs`, {
       theme: resolveTheme(),
+      deviceModel: deviceModel(),
+      deviceOptions: DEVICE_MODELS.map((id) => ({
+        id,
+        label: localize(DEVICE_LABELS[id], id),
+      })),
+      canChangeDevice: globalThis.game?.user?.isGM === true,
       soundEnabled: resolveSoundEnabled(),
       canUploadWallpaper: isFeatureEnabled("playerWallpaperUpload"),
       hasCustomWallpaper: Boolean(phoneState?.wallpaper?.url),
@@ -101,6 +129,24 @@ export const settingsApp = {
         await shell.render(true);
       });
     });
+
+    root
+      .querySelector("[data-lph-device-model]")
+      ?.addEventListener("change", async (event) => {
+        if (globalThis.game?.user?.isGM !== true) return;
+        const value = String(event.currentTarget.value ?? "");
+        if (!DEVICE_MODELS.includes(value)) return;
+        try {
+          await globalThis.game.settings.set(
+            MODULE_ID,
+            SETTINGS_KEYS.DEVICE_MODEL,
+            value,
+          );
+          await shell.render(true);
+        } catch (error) {
+          Logger.warn("Falha ao trocar modelo do aparelho:", error);
+        }
+      });
 
     const sound = root.querySelector("[data-lph-sound]");
     sound?.addEventListener("change", async (event) => {

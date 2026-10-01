@@ -31,7 +31,7 @@
             {{else if (eq currentView "pin")}}
                 {{> "modules/lumenn-phone-hub/templates/phone/pin-pad.hbs" pinLength=pinLength errorMessage=errorMessage isLocked=isLocked}}
             {{else if (eq currentView "home")}}
-                {{> "modules/lumenn-phone-hub/templates/phone/home-screen.hbs" apps=apps dockApps=dockApps}}
+                {{> "modules/lumenn-phone-hub/templates/phone/home-screen.hbs" apps=apps dockApps=dockApps time=time date=date}}
             {{else if (eq currentView "app")}}
                 <div class="lph-app-container">
                     <div class="lph-app-header">

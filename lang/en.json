@@ -40,7 +40,7 @@
       "ThemeLight": "Light",
       "ThemeDark": "Dark",
       "DeviceModel": "Device model",
-      "DeviceModelHint": "Changes only the phone shell: screen cutout, camera and frame. The Nokia Flip does not fold.",
+      "DeviceModelHint": "Changes the phone shell immediately. The Nokia Flip does not fold.",
       "Wallpaper": "Wallpaper",
       "WallpaperCustom": "Custom wallpaper",
       "WallpaperDefault": "Using the world default wallpaper",

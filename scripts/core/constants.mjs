@@ -71,6 +71,7 @@ export const HOOKS = Object.freeze({
   APP_REGISTERED: "lumennAppRegistered",
   PHONE_OPENED: "lumennPhoneOpened",
   PHONE_CLOSED: "lumennPhoneClosed",
+  DEVICE_MODEL_CHANGED: "lumennPhoneDeviceModelChanged",
 });
 
 export const SETTINGS_KEYS = Object.freeze({

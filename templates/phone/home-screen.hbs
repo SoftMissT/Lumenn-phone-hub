@@ -1,4 +1,16 @@
 <div class="lph-home-screen">
+    <div class="lph-home-widget" aria-hidden="true">
+        <span class="lph-home-widget-time">{{time}}</span>
+        <span class="lph-home-widget-date">{{date}}</span>
+        <i class="fas fa-cloud-sun"></i>
+    </div>
+
+    <div class="lph-home-search" aria-hidden="true">
+        <i class="fas fa-magnifying-glass"></i>
+        <span></span>
+        <i class="fas fa-microphone"></i>
+    </div>
+
     <div class="lph-app-grid">
         {{#each apps}}
         <div class="lph-app-icon" data-app-id="{{this.id}}" data-action="launch-app" role="button" tabindex="0" aria-label="{{this.title}}">

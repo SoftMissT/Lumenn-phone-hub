@@ -13,6 +13,16 @@
     </div>
 
     <div class="lph-settings-block">
+        <span class="lph-settings-label">{{localize "LPH.Settings.DeviceModel"}}</span>
+        <p class="lph-settings-note">{{localize "LPH.Settings.DeviceModelHint"}}</p>
+        <select data-lph-device-model {{#unless canChangeDevice}}disabled{{/unless}} aria-label="{{localize 'LPH.Settings.DeviceModel'}}">
+            {{#each deviceOptions}}
+            <option value="{{this.id}}" {{#if (eq this.id ../deviceModel)}}selected{{/if}}>{{this.label}}</option>
+            {{/each}}
+        </select>
+    </div>
+
+    <div class="lph-settings-block">
         <span class="lph-settings-label">{{localize "LPH.Settings.Wallpaper"}}</span>
         <p class="lph-settings-state">
             {{#if hasCustomWallpaper}}{{localize "LPH.Settings.WallpaperCustom"}}{{else}}{{localize "LPH.Settings.WallpaperDefault"}}{{/if}}

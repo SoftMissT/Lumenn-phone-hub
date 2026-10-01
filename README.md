@@ -16,21 +16,21 @@ Sem adaptadores por sistema. Sem backend. Sem dependências externas. Tudo vive 
 
 ## Status
 
-**Fase 1 completa em código e publicada em `v0.0.1`.** QA em runtime ainda pendente.
+**Versão `v0.0.9` pronta para instalação.** O gate estático está verde; o QA visual/runtime deve ser feito no Foundry pelo operador.
 
 |                |                                              |
 | -------------- | -------------------------------------------- |
-| **Versão**     | `0.0.1`                                      |
+| **Versão**     | `0.0.9`                                      |
 | **Foundry**    | mínimo `13.350`                              |
 | **Sistemas**   | qualquer (system-agnostic)                   |
 | **Permissões** | jogador usa o próprio celular · GM usa todos |
 | **Licença**    | MIT                                          |
 
 > [!IMPORTANT]
-> Este é o primeiro release. Os apps de conteúdo (Mensagens, Banco, Notícias, Redes) **ainda não existem** veja [O que ainda não existe](#o-que-ainda-não-existe) antes de contar com eles.
+> Mensagens, Banco, Notícias, Fotos, Instagram e Música estão disponíveis no App Registry. O conteúdo depende das notificações e permissões configuradas no mundo.
 
 > [!WARNING]
-> O módulo declara `verified: 14.356` no manifesto, mas isso **ainda não foi validado em runtime** por nenhum teste ao vivo. Trate o v14 como esperado-funcional, não como confirmado.
+> O manifesto declara `verified: 14.367`; a validação visual/runtime desta release fica a cargo do operador no Foundry.
 
 ---
 

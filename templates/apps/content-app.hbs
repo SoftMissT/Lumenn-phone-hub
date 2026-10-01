@@ -31,10 +31,11 @@
         {{#if threaded}}
             {{#each threads}}
             <article class="lph-thread" data-lph-thread="{{this.id}}">
-                <header class="lph-thread-head" data-lph-thread-head role="button" tabindex="0">
+                <header class="lph-thread-head">
                     <button type="button" class="lph-thread-back" data-lph-thread-back aria-label="{{../backLabel}}">
                         <i class="fas fa-chevron-left" aria-hidden="true"></i>
                     </button>
+                    <button type="button" class="lph-thread-open" data-lph-thread-open aria-label="{{this.last.sender}}">
                     {{#if this.last.avatar}}
                     <img class="lph-avatar lph-avatar-img" src="{{this.last.avatar}}" alt="" loading="lazy">
                     {{else}}
@@ -45,6 +46,7 @@
                         <span class="lph-thread-preview">{{this.preview}}</span>
                     </span>
                     {{#if this.unread}}<span class="lph-thread-count">{{this.unread}}</span>{{/if}}
+                    </button>
                 </header>
                 <div class="lph-thread-body">
                     {{#each this.lines}}
