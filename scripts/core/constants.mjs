@@ -99,23 +99,13 @@ export const SETTINGS_KEYS = Object.freeze({
 
 export const THEMES = Object.freeze(["light", "dark"]);
 
-// Modelos de aparelho. É só aparência: muda recorte de tela, câmera, moldura e,
-// no caso do flip, o teclado embaixo. Nenhum deles dobra - o Flip é a concha
-// aberta, parada.
+// Modelos reais de aparelho. A configuração só muda a moldura; o wallpaper e
+// a tela dos apps continuam sendo os mesmos em todos os perfis.
 export const DEVICE_MODELS = Object.freeze([
-  "pearphone",
+  "iphone",
   "xiaomi",
   "oppo",
   "samsung",
-  "nokiaflip",
 ]);
 
-export const DEFAULT_DEVICE_MODEL = "pearphone";
-
-// Teclado do flip: decorativo, mas sem ele o aparelho não lê como concha.
-export const FLIP_KEYS = Object.freeze([
-  "1", "2", "3",
-  "4", "5", "6",
-  "7", "8", "9",
-  "*", "0", "#",
-]);
+export const DEFAULT_DEVICE_MODEL = "iphone";

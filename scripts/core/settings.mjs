@@ -211,11 +211,10 @@ export function registerSettings() {
     config: true,
     type: String,
     choices: {
-      pearphone: "LPH.Devices.PearPhone",
+      iphone: "LPH.Devices.IPhone",
       xiaomi: "LPH.Devices.Xiaomi",
       oppo: "LPH.Devices.Oppo",
       samsung: "LPH.Devices.Samsung",
-      nokiaflip: "LPH.Devices.NokiaFlip",
     },
     default: DEFAULT_DEVICE_MODEL,
     onChange: (value) =>

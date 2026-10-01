@@ -26,11 +26,10 @@ import {
 const THEMES = ["light", "dark"];
 
 const DEVICE_LABELS = Object.freeze({
-  pearphone: "LPH.Devices.PearPhone",
+  iphone: "LPH.Devices.IPhone",
   xiaomi: "LPH.Devices.Xiaomi",
   oppo: "LPH.Devices.Oppo",
   samsung: "LPH.Devices.Samsung",
-  nokiaflip: "LPH.Devices.NokiaFlip",
 });
 
 function localize(key, fallback) {

@@ -1,4 +1,11 @@
 <div class="lph-content-app lph-ig" data-lph-content="{{appId}}">
+    <header class="lph-ig-header">
+        <span class="lph-ig-wordmark">Instagram</span>
+        <span class="lph-ig-header-actions" aria-hidden="true">
+            <i class="far fa-heart"></i>
+            <i class="far fa-paper-plane"></i>
+        </span>
+    </header>
     {{#if canPost}}
     <div class="lph-ig-compose">
         <input type="text" class="lph-ig-caption" data-lph-post-caption maxlength="500"
@@ -14,8 +21,7 @@
         </button>
     </div>
     {{/if}}
-    {{#if total}}
-        {{#if stories}}
+    {{#if stories}}
         <div class="lph-ig-stories">
             {{#each stories}}
             <button class="lph-ig-story" type="button" data-lph-story>
@@ -26,8 +32,16 @@
             </button>
             {{/each}}
         </div>
-        {{/if}}
+    {{else}}
+        <div class="lph-ig-stories lph-ig-stories-empty">
+            <button class="lph-ig-story" type="button" disabled>
+                <span class="lph-ig-story-ring lph-ig-story-placeholder"><i class="fas fa-plus"></i></span>
+                <span class="lph-ig-story-name">Seu story</span>
+            </button>
+        </div>
+    {{/if}}
 
+    {{#if total}}
         {{#each items}}
         <article class="lph-ig-post">
             <header class="lph-ig-post-head">
@@ -47,15 +61,18 @@
             {{#if this.body}}<p class="lph-ig-body">{{this.body}}</p>{{/if}}
         </article>
         {{/each}}
-
-        <nav class="lph-ig-tabs" aria-hidden="true">
-            <i class="fas fa-house"></i>
-            <i class="fas fa-film"></i>
-            <i class="fas fa-comment"></i>
-            <i class="fas fa-magnifying-glass"></i>
-            <i class="fas fa-user"></i>
-        </nav>
     {{else}}
-        <p class="lph-content-empty">{{emptyText}}</p>
+        <div class="lph-ig-empty">
+            <span class="lph-ig-empty-icon"><i class="fa-brands fa-instagram"></i></span>
+            <strong>{{emptyText}}</strong>
+            <span>As publicações dos personagens aparecerão aqui.</span>
+        </div>
     {{/if}}
+    <nav class="lph-ig-tabs" aria-label="Instagram">
+        <i class="fas fa-house"></i>
+        <i class="fas fa-film"></i>
+        <i class="fas fa-comment"></i>
+        <i class="fas fa-magnifying-glass"></i>
+        <i class="fas fa-user"></i>
+    </nav>
 </div>

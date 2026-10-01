@@ -26,11 +26,10 @@
       "Battery": "Bateria"
     },
     "Devices": {
-      "PearPhone": "PearPhone",
+      "IPhone": "iPhone",
       "Xiaomi": "Xiaomi",
       "Oppo": "Oppo",
-      "Samsung": "Samsung",
-      "NokiaFlip": "Nokia Flip"
+      "Samsung": "Samsung"
     },
     "Settings": {
       "StoreRef": "Referência do Store",
@@ -40,7 +39,7 @@
       "ThemeLight": "Claro",
       "ThemeDark": "Escuro",
       "DeviceModel": "Modelo do aparelho",
-      "DeviceModelHint": "Muda a carcaça do celular agora. O Nokia Flip não dobra.",
+      "DeviceModelHint": "Muda a moldura do celular sem alterar o wallpaper ou os apps.",
       "Wallpaper": "Wallpaper",
       "WallpaperCustom": "Wallpaper personalizado",
       "WallpaperDefault": "Usando o wallpaper padrão do mundo",
@@ -133,7 +132,9 @@
       "Done": "Feito."
     },
     "Notifications": {
-      "Open": "Abrir"
+      "Open": "Abrir",
+      "Dismiss": "Limpar notificação",
+      "ClearAll": "Limpar todas"
     },
     "Apps": {
       "Settings": "Ajustes",

@@ -26,11 +26,10 @@
       "Battery": "Battery"
     },
     "Devices": {
-      "PearPhone": "PearPhone",
+      "IPhone": "iPhone",
       "Xiaomi": "Xiaomi",
       "Oppo": "Oppo",
-      "Samsung": "Samsung",
-      "NokiaFlip": "Nokia Flip"
+      "Samsung": "Samsung"
     },
     "Settings": {
       "StoreRef": "Store Reference",
@@ -40,7 +39,7 @@
       "ThemeLight": "Light",
       "ThemeDark": "Dark",
       "DeviceModel": "Device model",
-      "DeviceModelHint": "Changes the phone shell immediately. The Nokia Flip does not fold.",
+      "DeviceModelHint": "Changes the phone frame without changing the wallpaper or apps.",
       "Wallpaper": "Wallpaper",
       "WallpaperCustom": "Custom wallpaper",
       "WallpaperDefault": "Using the world default wallpaper",
@@ -133,7 +132,9 @@
       "Done": "Done."
     },
     "Notifications": {
-      "Open": "Open"
+      "Open": "Open",
+      "Dismiss": "Clear notification",
+      "ClearAll": "Clear all"
     },
     "Apps": {
       "Settings": "Settings",

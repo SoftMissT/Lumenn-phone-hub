@@ -8,11 +8,18 @@
     </div>
 
     {{#if notifications.length}}
+    <div class="lph-lock-notifications-head">
+        <span>{{notifications.length}} notificações</span>
+        <button type="button" class="lph-notif-clear-all" data-lph-dismiss-all>{{notificationsClearLabel}}</button>
+    </div>
     <div class="lph-lock-notifications">
         {{#each notifications}}
         <div class="lph-notif-card" data-notification-id="{{this.id}}">
             <div class="lph-notif-header">
                 <span class="lph-notif-sender"><i class="fas fa-bell"></i> {{this.sender}}</span>
+                <button type="button" class="lph-notif-dismiss" data-lph-dismiss-notification="{{this.id}}" aria-label="{{../notificationDismissLabel}}">
+                    <i class="fas fa-xmark" aria-hidden="true"></i>
+                </button>
             </div>
             <div class="lph-notif-title">{{this.title}}</div>
             <div class="lph-notif-body">{{this.body}}</div>

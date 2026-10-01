@@ -1,7 +1,6 @@
 import {
   DEFAULT_DEVICE_MODEL,
   DEVICE_MODELS,
-  FLIP_KEYS,
   HOOKS,
   MODULE_ID,
   PIN_LENGTH,
@@ -157,8 +156,6 @@ export class PhoneShell extends AppBase {
       ...context,
       themeClass: this.#themeClass(),
       deviceClass: `lph-device-${this.#deviceModel()}`,
-      isFlip: this.#deviceModel() === "nokiaflip",
-      flipKeys: FLIP_KEYS,
       hasCharacter: Boolean(this.actorUuid),
       noCharacterMessage: localize("LPH.Phone.NoCharacter"),
       currentView: this.currentView,
@@ -174,6 +171,8 @@ export class PhoneShell extends AppBase {
       isLocked: lockout.isLocked,
       lockoutRemaining: Math.ceil(lockout.remainingMs / 1000),
       notifications: this.notifications,
+      notificationDismissLabel: localize("LPH.Notifications.Dismiss", "Limpar notificação"),
+      notificationsClearLabel: localize("LPH.Notifications.ClearAll", "Limpar todas"),
       apps: this.#mapApps({ includeGm: true, excludeDock: true }),
       dockApps: this.#mapApps({ dockEligible: true }),
       gmMode: this.gmMode,
@@ -246,6 +245,23 @@ export class PhoneShell extends AppBase {
         if (action === "reset-pin") this.#gmResetPin();
         if (action === "reset-wallpaper") this.#gmResetWallpaper();
       });
+    });
+
+    root.querySelectorAll("[data-lph-dismiss-notification]").forEach((button) => {
+      listen(button, "click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const id = button.dataset.lphDismissNotification;
+        if (id) void this.#dismissNotifications([id]);
+      });
+    });
+
+    const clearNotifications = root.querySelector("[data-lph-dismiss-all]");
+    listen(clearNotifications, "click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const ids = this.notifications.map((entry) => entry.id);
+      if (ids.length) void this.#dismissNotifications(ids);
     });
 
     root
@@ -348,6 +364,16 @@ export class PhoneShell extends AppBase {
     }
   }
 
+  async #dismissNotifications(ids) {
+    if (!this.actorUuid || !ids.length) return;
+    try {
+      await PhoneController.dismissNotifications(this.actorUuid, ids);
+      await this.render(true);
+    } catch (error) {
+      Logger.debug("Falha ao limpar notificações:", error);
+    }
+  }
+
   #themeClass() {
     return resolveTheme() === "light" ? "lph-theme-light" : "lph-theme-dark";
   }
@@ -358,6 +384,7 @@ export class PhoneShell extends AppBase {
         MODULE_ID,
         SETTINGS_KEYS.DEVICE_MODEL,
       );
+      if (value === "pearphone" || value === "nokiaflip") return DEFAULT_DEVICE_MODEL;
       return DEVICE_MODELS.includes(value) ? value : DEFAULT_DEVICE_MODEL;
     } catch {
       return DEFAULT_DEVICE_MODEL;

@@ -4,6 +4,24 @@ Todas as mudanças relevantes deste módulo são documentadas aqui.
 
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adere a [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.0.10] — 2026-10-01
+
+**Correção do shell, modelos e apps do celular.**
+
+### Corrigido
+
+- Removidos os perfis fictícios PearPhone e Nokia Flip; os modelos agora são iPhone, Xiaomi, Oppo e Samsung.
+- Wallpapers deixam de ser cobertos pelos gradientes dos perfis Oppo, Samsung e Xiaomi.
+- Mensagens passa a ocupar toda a tela útil, com histórico rolável e composer preso ao rodapé da conversa.
+- Notificações da tela de bloqueio podem ser limpas individualmente ou em lote.
+- Instagram agora mantém uma HUD reconhecível mesmo sem publicações, com cabeçalho, stories, feed vazio e navegação inferior.
+
+### Validação
+
+- Gate local: 60/60 testes.
+- `git diff --check` limpo.
+- QA visual/runtime do Foundry fica para o operador.
+
 ## [0.0.9] — 2026-10-01
 
 **Refino visual e correção do fluxo de Mensagens.**
@@ -171,6 +189,7 @@ Primeiro release. **Fase 1 — fundação, shell e ferramentas de GM.**
 - **PIN:** é um lock de privacidade diegético entre jogadores. Não é autenticação forte, não criptografa dados e não protege contra o GM ou o DevTools do navegador.
 - **Fora do escopo da Fase 1:** Mensagens, redes sociais, Banco, Notícias, Spotify, IA para NPCs, adaptadores por sistema, criptografia ponta-a-ponta e push fora do Foundry. A arquitetura já os acomoda via App Registry.
 
+[0.0.10]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.10
 [0.0.9]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.9
 [0.0.8]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.8
 [0.0.7]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.7
