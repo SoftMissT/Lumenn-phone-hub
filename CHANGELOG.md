@@ -4,6 +4,19 @@ Todas as mudanças relevantes deste módulo são documentadas aqui.
 
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adere a [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## Não lançado
+
+### Corrigido
+
+- Ícones da home agora são botões nativos e abrem os apps por um listener do shell, sem depender do dispatcher de ações do ApplicationV2.
+- Textos vazios e ações do Instagram passaram a usar as chaves de idioma corretas, incluindo o rótulo de Curtir.
+- HUD ganhou tokens compartilhados de painel/foco, moldura responsiva, scrim único de wallpaper, app body com rolagem contida e fallback para transparência reduzida.
+- Stories do Instagram agora abrem em um viewer de tela cheia com fechamento por botão ou Escape; abas indisponíveis ficam desabilitadas em vez de fingirem interação.
+- Fotos agora abre a imagem em um visualizador de tela cheia com fechamento por botão ou Escape.
+- Banco agora usa um template próprio de dashboard/extrato; a expansão das movimentações permanece acionável.
+- Notícias agora usa um template próprio de manchetes, com expansão do artigo preservada.
+- Música agora aceita áudio validado enviado pelo GM e reproduz/paralisa pelo AudioHelper do Foundry; Instagram ganhou Home, Explorar, Perfil e atalho real para Mensagens.
+
 ## [0.0.10] — 2026-10-01
 
 **Correção do shell, modelos e apps do celular.**

@@ -40,6 +40,7 @@ function buildPreview(form) {
   const sender = String(form.elements.sender?.value ?? "").trim();
   const title = String(form.elements.title?.value ?? "").trim();
   const body = String(form.elements.body?.value ?? "").trim();
+  const audio = String(form.elements.audio?.value ?? "").trim();
   const targetMode = String(form.elements.targetMode?.value ?? "all");
   const target =
     targetMode === "all"
@@ -57,6 +58,7 @@ function buildPreview(form) {
     `${localize("LPH.GM.Targets", "Recipients")}: ${target}`,
     `${localize("LPH.GM.TitleLabel", "Title")}: ${title || ""}`,
     body,
+    ...(audio ? { audio } : {}),
   ].join("\n");
 }
 
@@ -129,6 +131,7 @@ function onOpen(shell) {
       sender: String(form.elements.sender?.value ?? "").trim(),
       title,
       body: String(form.elements.body?.value ?? "").trim(),
+      audio: String(form.elements.audio?.value ?? "").trim(),
       app: String(form.elements.app?.value ?? "system"),
       image: imageUrl,
       targetActorUuid:

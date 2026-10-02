@@ -129,6 +129,7 @@
       "App": "App",
       "AppSystem": "System (notification only)",
       "Image": "Image (optional)",
+      "Audio": "Audio (mp3/ogg/wav/webm)",
       "Done": "Done."
     },
     "Notifications": {
@@ -149,7 +150,9 @@
       "News": "News",
       "NewsEmpty": "No news yet.",
     "Spotify": "Music",
-    "SpotifyEmpty": "Nothing playing.",
+      "SpotifyEmpty": "Nothing playing.",
+      "SpotifyEmptyHint": "The GM can send a track with a valid audio path.",
+      "SpotifyPlay": "Play track",
       "ReplyPlaceholder": "Reply...",
       "ReplySend": "Send",
       "ReplySent": "Sent",
@@ -161,6 +164,12 @@
     "NewPost": "Post photo",
     "CaptionPlaceholder": "Caption...",
     "Like": "Like",
+    "StoryOwn": "Your story",
+    "InstagramEmptyHint": "Character posts will appear here.",
+    "InstagramHome": "Home",
+    "InstagramVideos": "Videos",
+    "InstagramExplore": "Explore",
+    "InstagramProfile": "Profile",
     "LikedPosts": "Liked posts",
     "Balance": "Balance",
     "NewBadge": "NEW"

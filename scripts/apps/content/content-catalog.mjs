@@ -46,6 +46,7 @@ export const CONTENT_APPS = Object.freeze([
     tile: "#1A56DB",
     order: 23,
     threaded: false,
+    template: "apps/bank.hbs",
     emptyKey: "LPH.Apps.BankEmpty",
   }),
   Object.freeze({
@@ -56,6 +57,7 @@ export const CONTENT_APPS = Object.freeze([
     tile: "#E03131",
     order: 24,
     threaded: false,
+    template: "apps/news.hbs",
     emptyKey: "LPH.Apps.NewsEmpty",
   }),
   Object.freeze({
@@ -70,6 +72,7 @@ export const CONTENT_APPS = Object.freeze([
     tile: "#1DB954",
     order: 25,
     threaded: false,
+    template: "apps/spotify.hbs",
     emptyKey: "LPH.Apps.SpotifyEmpty",
   }),
 ]);

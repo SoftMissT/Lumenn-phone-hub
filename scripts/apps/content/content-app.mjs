@@ -1,7 +1,11 @@
 import { SETTINGS_KEYS, TEMPLATE_ROOT } from "../../core/constants.mjs";
 import { Logger } from "../../core/logger.mjs";
 import { escapeHTML, renderTemplate } from "../../compat/application-compat.mjs";
-import { canBrowseFiles, openFilePicker } from "../../compat/foundry-compat.mjs";
+import {
+  canBrowseFiles,
+  openFilePicker,
+  playSound,
+} from "../../compat/foundry-compat.mjs";
 import {
   getLikedPosts,
   getLimit,
@@ -11,6 +15,7 @@ import { LumennRepository } from "../../persistence/repository.mjs";
 import { PhoneController } from "../../phone/phone-controller.mjs";
 import { groupByThread } from "../../notifications/notification-store.mjs";
 import { getWorldClock } from "../../time/world-clock.mjs";
+import { AppRegistry } from "../app-registry.mjs";
 import { CONTENT_APPS } from "./content-catalog.mjs";
 
 function localize(key, fallback) {
@@ -306,6 +311,12 @@ function createContentApp(spec) {
             "LPH.Apps.CaptionPlaceholder",
             "Caption...",
           ),
+          likeLabel: localize("LPH.Apps.Like", "Curtir"),
+          storyOwnLabel: localize("LPH.Apps.StoryOwn", "Seu story"),
+          instagramEmptyHint: localize(
+            "LPH.Apps.InstagramEmptyHint",
+            "As publicações dos personagens aparecerão aqui.",
+          ),
           isBank,
           isNews,
           balanceText:
@@ -398,6 +409,149 @@ function createContentApp(spec) {
           }
         });
       });
+
+      // Stories abrem em tela cheia dentro do app. Antes os círculos pareciam
+      // botões, mas não faziam nada. O estado fica no DOM porque fechar o
+      // viewer não altera dados persistidos.
+      const storyViewer = body.querySelector("[data-lph-story-viewer]");
+      const storyImage = storyViewer?.querySelector("[data-lph-story-image]");
+      const storySender = storyViewer?.querySelector("[data-lph-story-sender]");
+      let storyTrigger = null;
+      const closeStory = () => {
+        if (!storyViewer) return;
+        storyViewer.hidden = true;
+        storyImage?.removeAttribute("src");
+        storyTrigger?.focus?.();
+        storyTrigger = null;
+      };
+      body.querySelectorAll("[data-lph-story]").forEach((button) => {
+        bindOnce(button, "click", () => {
+          const image = button.dataset.image;
+          if (!storyViewer || !storyImage || !image) return;
+          storyTrigger = button;
+          storyImage.src = image;
+          storyImage.alt = button.dataset.sender ?? "";
+          if (storySender) storySender.textContent = button.dataset.sender ?? "";
+          storyViewer.hidden = false;
+          storyViewer.focus?.();
+        });
+      });
+      bindOnce(
+        storyViewer?.querySelector("[data-lph-story-close]"),
+        "click",
+        closeStory,
+      );
+      bindOnce(storyViewer, "keydown", (event) => {
+        if (event.key !== "Escape") return;
+        event.preventDefault();
+        closeStory();
+      });
+
+      if (spec.id === "photos") {
+        const mediaViewer = body.querySelector("[data-lph-media-viewer]");
+        const mediaImage = mediaViewer?.querySelector("[data-lph-media-image]");
+        const mediaTitle = mediaViewer?.querySelector("[data-lph-media-title]");
+        let mediaTrigger = null;
+        const closeMedia = () => {
+          if (!mediaViewer) return;
+          mediaViewer.hidden = true;
+          mediaImage?.removeAttribute("src");
+          mediaTrigger?.focus?.();
+          mediaTrigger = null;
+        };
+        body.querySelectorAll("[data-lph-media-view]").forEach((image) => {
+          bindOnce(image, "click", () => {
+            const source = image.dataset.lphMediaView;
+            if (!mediaViewer || !mediaImage || !source) return;
+            mediaTrigger = image;
+            mediaImage.src = source;
+            mediaImage.alt = image.alt ?? "";
+            if (mediaTitle) {
+              mediaTitle.textContent =
+                image.closest(".lph-card")?.querySelector(".lph-card-title")?.textContent ?? "";
+            }
+            mediaViewer.hidden = false;
+            mediaViewer.focus?.();
+          });
+        });
+        bindOnce(
+          mediaViewer?.querySelector("[data-lph-media-close]"),
+          "click",
+          closeMedia,
+        );
+        bindOnce(mediaViewer, "keydown", (event) => {
+          if (event.key !== "Escape") return;
+          event.preventDefault();
+          closeMedia();
+        });
+      }
+
+      if (spec.id === "spotify") {
+        body.querySelectorAll("[data-lph-play-audio]").forEach((button) => {
+          bindOnce(button, "click", async () => {
+            const source = button.dataset.lphPlayAudio;
+            if (!source) return;
+            if (shell.lphSpotifySrc === source && shell.lphSpotifyAudio) {
+              shell.lphSpotifyAudio.stop?.();
+              shell.lphSpotifyAudio.pause?.();
+              shell.lphSpotifyAudio = null;
+              shell.lphSpotifySrc = null;
+              button.setAttribute("aria-pressed", "false");
+              button.querySelector("i")?.classList.replace("fa-pause", "fa-play");
+              return;
+            }
+            shell.lphSpotifyAudio?.stop?.();
+            shell.lphSpotifyAudio?.pause?.();
+            const audio = await playSound(source, { onlyOnce: false, volume: 0.7 });
+            if (!audio) return;
+            shell.lphSpotifyAudio = audio;
+            shell.lphSpotifySrc = source;
+            body.querySelectorAll("[data-lph-play-audio]").forEach((other) => {
+              other.setAttribute("aria-pressed", other === button ? "true" : "false");
+              other.querySelector("i")?.classList.replace("fa-pause", "fa-play");
+            });
+            button.querySelector("i")?.classList.replace("fa-play", "fa-pause");
+          });
+        });
+      }
+
+      if (spec.id === "instagram") {
+        const igRoot = body;
+        const posts = [...body.querySelectorAll("[data-lph-ig-post]")];
+        const empty = body.querySelector("[data-lph-ig-tab-empty]");
+        const ownName = ownCharacterName();
+        const selectTab = (tab) => {
+          igRoot.dataset.lphIgTab = tab;
+          const profile = tab === "profile";
+          let visible = 0;
+          posts.forEach((post) => {
+            const show = !profile || post.dataset.sender === ownName;
+            post.hidden = !show;
+            if (show) visible += 1;
+          });
+          if (empty) empty.hidden = !profile || visible > 0;
+          body.querySelectorAll("[data-lph-ig-tab]").forEach((tabButton) => {
+            const active = tabButton.dataset.lphIgTab === tab;
+            tabButton.classList.toggle("is-active", active);
+            tabButton.toggleAttribute("aria-current", active);
+          });
+        };
+        body.querySelectorAll("[data-lph-ig-tab]").forEach((button) => {
+          bindOnce(button, "click", () => {
+            const tab = button.dataset.lphIgTab;
+            if (tab === "messages") {
+              const messages = AppRegistry.get("messages");
+              if (!messages) return;
+              shell.activeApp = messages;
+              shell.activeAppContent = "";
+              void shell.render(true);
+              return;
+            }
+            selectTab(tab);
+          });
+        });
+        selectTab("home");
+      }
 
       // Adicionar foto: o seletor do próprio Foundry. Quem pode enviar arquivo
       // vê o botão de upload nele; quem não pode, escolhe do que já existe.
@@ -535,6 +689,14 @@ function createContentApp(spec) {
           );
         })
         .catch((error) => Logger.debug("Falha ao marcar como lido:", error));
+    },
+
+    onClose(shell) {
+      if (spec.id !== "spotify") return;
+      shell?.lphSpotifyAudio?.stop?.();
+      shell?.lphSpotifyAudio?.pause?.();
+      shell.lphSpotifyAudio = null;
+      shell.lphSpotifySrc = null;
     },
   };
 }

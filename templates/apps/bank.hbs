@@ -1,0 +1,30 @@
+<div class="lph-content-app lph-bank" data-lph-content="{{appId}}">
+    <header class="lph-bank-header">
+        <span class="lph-bank-mark"><i class="fas fa-landmark" aria-hidden="true"></i></span>
+        <div>
+            <strong>{{appLabel}}</strong>
+            <span>{{balanceLabel}}</span>
+        </div>
+    </header>
+    {{#if balanceText}}
+    <section class="lph-bank-balance" aria-label="{{balanceLabel}}">
+        <span class="lph-bank-balance-label">{{balanceLabel}}</span>
+        <strong class="lph-bank-balance-value">{{balanceText}}</strong>
+    </section>
+    {{/if}}
+    <div class="lph-bank-section-title">{{localize "LPH.Apps.Bank"}}</div>
+    {{#if total}}
+        {{#each items}}
+        <article class="lph-card lph-bank-row" data-lph-expand role="button" tabindex="0" aria-expanded="false">
+            <div class="lph-bank-row-head">
+                <span class="lph-card-sender">{{#if this.sender}}{{this.sender}}{{else}}{{../appLabel}}{{/if}}</span>
+                {{#if this.amountText}}<span class="lph-bank-amount {{#if this.credit}}is-credit{{else}}is-debit{{/if}}">{{this.amountText}}</span>{{/if}}
+            </div>
+            {{#if this.title}}<h4 class="lph-card-title">{{this.title}}</h4>{{/if}}
+            {{#if this.body}}<div class="lph-bank-detail"><p class="lph-card-body">{{this.body}}</p></div>{{/if}}
+        </article>
+        {{/each}}
+    {{else}}
+        <p class="lph-content-empty">{{emptyText}}</p>
+    {{/if}}
+</div>

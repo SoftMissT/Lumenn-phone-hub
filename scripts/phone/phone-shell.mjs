@@ -222,6 +222,14 @@ export class PhoneShell extends AppBase {
       );
     });
 
+    root.querySelectorAll("[data-lph-launch-app]").forEach((button) => {
+      listen(button, "click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        PhoneShell.#onLaunchApp(event, button);
+      });
+    });
+
     root.querySelectorAll("[data-action]").forEach((element) => {
       if (element.tagName === "BUTTON") return;
       element.setAttribute("role", "button");

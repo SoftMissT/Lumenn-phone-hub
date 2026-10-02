@@ -1,0 +1,20 @@
+<div class="lph-content-app lph-news" data-lph-content="{{appId}}">
+    <header class="lph-news-header">
+        <strong>{{appLabel}}</strong>
+        <span>{{newBadge}}</span>
+    </header>
+    {{#if total}}
+        {{#each items}}
+        <article class="lph-card lph-news-item" data-lph-expand role="button" tabindex="0" aria-expanded="false">
+            <div class="lph-card-head">
+                {{#if this.sender}}<span class="lph-card-sender">{{this.sender}}</span>{{/if}}
+                {{#if this.unread}}<span class="lph-news-badge">{{../newBadge}}</span>{{/if}}
+            </div>
+            {{#if this.title}}<h4 class="lph-news-title">{{this.title}}</h4>{{/if}}
+            {{#if this.body}}<p class="lph-news-excerpt">{{this.excerpt}}</p><div class="lph-news-body"><p class="lph-card-body">{{this.body}}</p></div>{{/if}}
+        </article>
+        {{/each}}
+    {{else}}
+        <p class="lph-content-empty">{{emptyText}}</p>
+    {{/if}}
+</div>

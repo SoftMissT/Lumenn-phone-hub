@@ -12,6 +12,7 @@ import {
   prepareNotificationText,
 } from "../validation/text.mjs";
 import { validateSourceUrl } from "../wallpaper/wallpaper-validator.mjs";
+import { isAllowedWallpaperUrl, isForbiddenProtocol } from "../validation/urls.mjs";
 
 const DEFAULT_TTL_DAYS = Math.round(NOTIFICATION_DEFAULT_TTL_MS / 86400000);
 
@@ -35,6 +36,16 @@ function normalizeImage(value) {
   if (typeof value !== "string" || !value.trim()) return null;
   const url = value.trim();
   return validateSourceUrl(url).valid ? url : null;
+}
+
+const AUDIO_EXTENSIONS = new Set(["mp3", "ogg", "wav", "webm"]);
+
+function normalizeAudio(value) {
+  if (typeof value !== "string" || !value.trim()) return null;
+  const source = value.trim();
+  if (isForbiddenProtocol(source) || !isAllowedWallpaperUrl(source)) return null;
+  const extension = source.split(/[?#]/)[0].toLowerCase().split(".").pop();
+  return AUDIO_EXTENSIONS.has(extension) ? source : null;
 }
 
 export function normalizeNotification(input = {}, options = {}) {
@@ -62,6 +73,7 @@ export function normalizeNotification(input = {}, options = {}) {
     ),
     icon: typeof input.icon === "string" && input.icon ? input.icon : null,
     image: normalizeImage(input.image),
+    audio: normalizeAudio(input.audio),
     // Foto de perfil de quem enviou (o "contato" do app de mensagens). Sem ela,
     // a interface desenha a inicial do nome em um círculo colorido.
     avatar: normalizeImage(input.avatar),

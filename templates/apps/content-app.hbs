@@ -128,7 +128,7 @@
                     {{#if this.icon}}<i class="{{this.icon}}" aria-hidden="true"></i>{{/if}}
                     {{#if this.sender}}<span class="lph-card-sender">{{this.sender}}</span>{{/if}}
                 </div>
-                {{#if this.image}}<img class="lph-card-image" src="{{this.image}}" alt="" loading="lazy">{{/if}}
+                {{#if this.image}}<img class="lph-card-image" data-lph-media-view="{{this.image}}" src="{{this.image}}" alt="" loading="lazy">{{/if}}
                 {{#if this.title}}<h4 class="lph-card-title">{{this.title}}</h4>{{/if}}
                 {{#if this.body}}<p class="lph-card-body">{{this.body}}</p>{{/if}}
             </article>
@@ -136,5 +136,16 @@
         {{/if}}
     {{else}}
         <p class="lph-content-empty">{{emptyText}}</p>
+    {{/if}}
+    {{#if (eq appId "photos")}}
+    <div class="lph-media-viewer" data-lph-media-viewer role="dialog" aria-modal="true" tabindex="-1" hidden>
+        <header class="lph-media-viewer-head">
+            <strong data-lph-media-title></strong>
+            <button type="button" data-lph-media-close aria-label="{{localize 'LPH.Phone.Close'}}">
+                <i class="fas fa-xmark" aria-hidden="true"></i>
+            </button>
+        </header>
+        <img data-lph-media-image alt="">
+    </div>
     {{/if}}
 </div>

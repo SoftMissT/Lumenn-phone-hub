@@ -24,7 +24,9 @@
     {{#if stories}}
         <div class="lph-ig-stories">
             {{#each stories}}
-            <button class="lph-ig-story" type="button" data-lph-story>
+            <button class="lph-ig-story" type="button" data-lph-story
+                    data-image="{{this.image}}" data-sender="{{this.sender}}"
+                    aria-label="{{this.sender}}">
                 <span class="lph-ig-story-ring">
                     <img src="{{this.image}}" alt="" loading="lazy">
                 </span>
@@ -36,14 +38,14 @@
         <div class="lph-ig-stories lph-ig-stories-empty">
             <button class="lph-ig-story" type="button" disabled>
                 <span class="lph-ig-story-ring lph-ig-story-placeholder"><i class="fas fa-plus"></i></span>
-                <span class="lph-ig-story-name">Seu story</span>
+                <span class="lph-ig-story-name">{{storyOwnLabel}}</span>
             </button>
         </div>
     {{/if}}
 
     {{#if total}}
         {{#each items}}
-        <article class="lph-ig-post">
+        <article class="lph-ig-post" data-lph-ig-post data-sender="{{this.sender}}">
             <header class="lph-ig-post-head">
                 <span class="lph-ig-avatar">{{#if this.image}}<img src="{{this.image}}" alt="" loading="lazy">{{else}}<i class="fas fa-user" aria-hidden="true"></i>{{/if}}</span>
                 <span class="lph-ig-user">{{#if this.sender}}{{this.sender}}{{else}}lumenn{{/if}}</span>
@@ -61,18 +63,29 @@
             {{#if this.body}}<p class="lph-ig-body">{{this.body}}</p>{{/if}}
         </article>
         {{/each}}
+        <p class="lph-ig-tab-empty" data-lph-ig-tab-empty hidden>{{instagramEmptyHint}}</p>
     {{else}}
         <div class="lph-ig-empty">
             <span class="lph-ig-empty-icon"><i class="fa-brands fa-instagram"></i></span>
             <strong>{{emptyText}}</strong>
-            <span>As publicações dos personagens aparecerão aqui.</span>
+            <span>{{instagramEmptyHint}}</span>
         </div>
     {{/if}}
+    <div class="lph-ig-story-viewer" data-lph-story-viewer role="dialog" aria-modal="true" tabindex="-1" hidden>
+        <div class="lph-ig-story-progress" aria-hidden="true"><span></span></div>
+        <header class="lph-ig-story-viewer-head">
+            <strong data-lph-story-sender></strong>
+            <button type="button" data-lph-story-close aria-label="{{localize 'LPH.Phone.Close'}}">
+                <i class="fas fa-xmark" aria-hidden="true"></i>
+            </button>
+        </header>
+        <img data-lph-story-image alt="">
+    </div>
     <nav class="lph-ig-tabs" aria-label="Instagram">
-        <i class="fas fa-house"></i>
-        <i class="fas fa-film"></i>
-        <i class="fas fa-comment"></i>
-        <i class="fas fa-magnifying-glass"></i>
-        <i class="fas fa-user"></i>
+        <button type="button" class="is-active" data-lph-ig-tab="home" aria-label="{{localize 'LPH.Apps.InstagramHome'}}" aria-current="page"><i class="fas fa-house"></i></button>
+        <button type="button" aria-label="{{localize 'LPH.Apps.InstagramVideos'}}" disabled><i class="fas fa-film"></i></button>
+        <button type="button" data-lph-ig-tab="messages" aria-label="{{localize 'LPH.Apps.Messages'}}"><i class="fas fa-comment"></i></button>
+        <button type="button" data-lph-ig-tab="explore" aria-label="{{localize 'LPH.Apps.InstagramExplore'}}"><i class="fas fa-magnifying-glass"></i></button>
+        <button type="button" data-lph-ig-tab="profile" aria-label="{{localize 'LPH.Apps.InstagramProfile'}}"><i class="fas fa-user"></i></button>
     </nav>
 </div>

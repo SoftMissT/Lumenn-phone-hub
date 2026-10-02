@@ -1,0 +1,29 @@
+<div class="lph-content-app lph-spotify" data-lph-content="{{appId}}">
+    <header class="lph-spotify-header">
+        <strong>{{appLabel}}</strong>
+        <i class="fas fa-wifi" aria-hidden="true"></i>
+    </header>
+    {{#if total}}
+        {{#each items}}
+        <article class="lph-spotify-track">
+            {{#if this.image}}<img class="lph-spotify-cover" src="{{this.image}}" alt="" loading="lazy">{{else}}<div class="lph-spotify-cover lph-spotify-cover-empty"><i class="fas fa-music" aria-hidden="true"></i></div>{{/if}}
+            <div class="lph-spotify-meta">
+                <span class="lph-spotify-kicker">{{#if this.sender}}{{this.sender}}{{else}}Lumenn{{/if}}</span>
+                <strong>{{#if this.title}}{{this.title}}{{else}}{{this.body}}{{/if}}</strong>
+                {{#if this.body}}<span>{{this.body}}</span>{{/if}}
+            </div>
+            {{#if this.audio}}
+            <button type="button" class="lph-spotify-play" data-lph-play-audio="{{this.audio}}" aria-pressed="false" aria-label="{{localize 'LPH.Apps.SpotifyPlay'}}">
+                <i class="fas fa-play" aria-hidden="true"></i>
+            </button>
+            {{/if}}
+        </article>
+        {{/each}}
+    {{else}}
+        <div class="lph-spotify-empty">
+            <i class="fas fa-music" aria-hidden="true"></i>
+            <strong>{{emptyText}}</strong>
+            <span>{{localize "LPH.Apps.SpotifyEmptyHint"}}</span>
+        </div>
+    {{/if}}
+</div>

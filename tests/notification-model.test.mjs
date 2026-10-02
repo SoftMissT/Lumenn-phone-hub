@@ -64,3 +64,10 @@ test("normalizeNotification rejeita protocolo proibido e link de página", () =>
   assert.equal(normalizeNotification({ image: "" }).image, null);
   assert.equal(normalizeNotification({}).image, null);
 });
+
+test("normalizeNotification guarda áudio permitido e rejeita origem insegura", () => {
+  assert.equal(normalizeNotification({ audio: "music/scene.mp3" }).audio, "music/scene.mp3");
+  assert.equal(normalizeNotification({ audio: "https://cdn.example/scene.ogg" }).audio, "https://cdn.example/scene.ogg");
+  assert.equal(normalizeNotification({ audio: "javascript:alert(1)" }).audio, null);
+  assert.equal(normalizeNotification({ audio: "https://cdn.example/page.html" }).audio, null);
+});

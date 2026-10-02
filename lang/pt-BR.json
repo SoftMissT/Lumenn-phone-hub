@@ -129,6 +129,7 @@
       "App": "Aplicativo",
       "AppSystem": "Sistema (só notificação)",
       "Image": "Imagem (opcional)",
+      "Audio": "Áudio (mp3/ogg/wav/webm)",
       "Done": "Feito."
     },
     "Notifications": {
@@ -149,7 +150,9 @@
       "News": "Notícias",
       "NewsEmpty": "Nenhuma notícia ainda.",
     "Spotify": "Música",
-    "SpotifyEmpty": "Nada tocando.",
+      "SpotifyEmpty": "Nada tocando.",
+      "SpotifyEmptyHint": "O GM pode enviar uma faixa com um caminho de áudio válido.",
+      "SpotifyPlay": "Reproduzir faixa",
       "ReplyPlaceholder": "Responder...",
       "ReplySend": "Enviar",
       "ReplySent": "Enviado",
@@ -161,6 +164,12 @@
     "NewPost": "Publicar foto",
     "CaptionPlaceholder": "Legenda...",
     "Like": "Curtir",
+    "StoryOwn": "Seu story",
+    "InstagramEmptyHint": "As publicações dos personagens aparecerão aqui.",
+    "InstagramHome": "Início",
+    "InstagramVideos": "Vídeos",
+    "InstagramExplore": "Explorar",
+    "InstagramProfile": "Perfil",
     "LikedPosts": "Publicações curtidas",
     "Balance": "Saldo",
     "NewBadge": "NOVA"
