@@ -16,11 +16,11 @@ Sem adaptadores por sistema. Sem backend. Sem dependências externas. Tudo vive 
 
 ## Status
 
-**Versão `v0.0.10` pronta para instalação.** O gate estático está verde; o QA visual/runtime deve ser feito no Foundry pelo operador.
+**Versão `v0.0.11` pronta para instalação.** O gate estático está verde; o QA visual/runtime deve ser feito no Foundry pelo operador.
 
 |                |                                              |
 | -------------- | -------------------------------------------- |
-| **Versão**     | `0.0.10`                                     |
+| **Versão**     | `0.0.11`                                     |
 | **Foundry**    | mínimo `13.350`                              |
 | **Sistemas**   | qualquer (system-agnostic)                   |
 | **Permissões** | jogador usa o próprio celular · GM usa todos |

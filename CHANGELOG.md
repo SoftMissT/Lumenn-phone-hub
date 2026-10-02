@@ -4,7 +4,7 @@ Todas as mudanças relevantes deste módulo são documentadas aqui.
 
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adere a [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## Não lançado
+## [0.0.11] — 2026-10-02
 
 ### Corrigido
 
@@ -15,7 +15,13 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o 
 - Fotos agora abre a imagem em um visualizador de tela cheia com fechamento por botão ou Escape.
 - Banco agora usa um template próprio de dashboard/extrato; a expansão das movimentações permanece acionável.
 - Notícias agora usa um template próprio de manchetes, com expansão do artigo preservada.
-- Música agora aceita áudio validado enviado pelo GM e reproduz/paralisa pelo AudioHelper do Foundry; Instagram ganhou Home, Explorar, Perfil e atalho real para Mensagens.
+- Música agora recebe áudio validado do GM e oferece play/pause pelo AudioHelper do Foundry. Instagram ganhou Home, Explorar, Perfil e atalho real para Mensagens.
+
+### Validação
+
+- Gate local: 61/61 testes.
+- `git diff --check` limpo.
+- QA visual/runtime do Foundry fica para o operador.
 
 ## [0.0.10] — 2026-10-01
 
@@ -202,6 +208,7 @@ Primeiro release. **Fase 1 — fundação, shell e ferramentas de GM.**
 - **PIN:** é um lock de privacidade diegético entre jogadores. Não é autenticação forte, não criptografa dados e não protege contra o GM ou o DevTools do navegador.
 - **Fora do escopo da Fase 1:** Mensagens, redes sociais, Banco, Notícias, Spotify, IA para NPCs, adaptadores por sistema, criptografia ponta-a-ponta e push fora do Foundry. A arquitetura já os acomoda via App Registry.
 
+[0.0.11]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.11
 [0.0.10]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.10
 [0.0.9]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.9
 [0.0.8]: https://github.com/SoftMissT/Lumenn-phone-hub/releases/tag/v0.0.8
