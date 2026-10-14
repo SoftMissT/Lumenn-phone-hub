@@ -12,25 +12,10 @@
         </button>
     </div>
     {{/if}}
-    {{#if canCompose}}
-    <form class="lph-compose" data-lph-compose>
-        <select name="to" required aria-label="{{composeToLabel}}">
-            <option value="">{{composeToLabel}}</option>
-            {{#each recipients}}
-            <option value="{{this.uuid}}">{{this.name}}</option>
-            {{/each}}
-        </select>
-        <input type="text" name="body" maxlength="500" autocomplete="off"
-               placeholder="{{composePlaceholder}}" aria-label="{{composePlaceholder}}">
-        <button type="submit" aria-label="{{sendLabel}}">
-            <i class="fas fa-paper-plane" aria-hidden="true"></i>
-        </button>
-    </form>
-    {{/if}}
     {{#if total}}
         {{#if threaded}}
             {{#each threads}}
-            <article class="lph-thread" data-lph-thread="{{this.id}}">
+            <article class="lph-thread" data-lph-thread="{{this.id}}"{{#if this.pending}} data-lph-pending="true"{{/if}}>
                 <header class="lph-thread-head">
                     <button type="button" class="lph-thread-back" data-lph-thread-back aria-label="{{../backLabel}}">
                         <i class="fas fa-chevron-left" aria-hidden="true"></i>
@@ -42,10 +27,15 @@
                     <span class="lph-avatar" style="--lph-avatar-hue: {{this.avatarHue}}">{{this.initial}}</span>
                     {{/if}}
                     <span class="lph-thread-meta">
-                        <span class="lph-thread-name">{{this.last.sender}}</span>
-                        <span class="lph-thread-preview">{{this.preview}}</span>
+                        <span class="lph-thread-row">
+                            <span class="lph-thread-name">{{this.last.sender}}</span>
+                            {{#if this.lastTime}}<span class="lph-thread-time">{{this.lastTime}}</span>{{/if}}
+                        </span>
+                        <span class="lph-thread-row">
+                            <span class="lph-thread-preview">{{this.preview}}</span>
+                            {{#if this.unread}}<span class="lph-thread-count">{{this.unread}}</span>{{/if}}
+                        </span>
                     </span>
-                    {{#if this.unread}}<span class="lph-thread-count">{{this.unread}}</span>{{/if}}
                     </button>
                 </header>
                 <div class="lph-thread-body">
@@ -70,11 +60,11 @@
                             {{#if this.opensGroup}}<span class="lph-chat-name">{{this.sender}}</span>{{/if}}
                             {{/unless}}
                             <div class="lph-chat-line">
-                                <div class="lph-bubble{{#if this.mine}} lph-bubble-mine{{/if}}">
+                                <div class="lph-bubble{{#if this.mine}} lph-bubble-mine{{/if}}{{#if this.opensGroup}} lph-bubble-tail{{/if}}">
                                     {{#if this.title}}<p class="lph-bubble-title">{{this.title}}</p>{{/if}}
                                     {{#if this.body}}<p class="lph-bubble-body">{{this.body}}</p>{{/if}}
+                                    {{#if this.time}}<span class="lph-chat-time">{{this.time}}</span>{{/if}}
                                 </div>
-                                {{#if this.time}}<span class="lph-chat-time">{{this.time}}</span>{{/if}}
                             </div>
                         </div>
                     </div>
@@ -136,6 +126,25 @@
         {{/if}}
     {{else}}
         <p class="lph-content-empty">{{emptyText}}</p>
+    {{/if}}
+    {{#if canNewChat}}
+    <button type="button" class="lph-msgr-fab" data-lph-newchat-toggle aria-label="{{newChatLabel}}">
+        <i class="fas fa-comment-dots" aria-hidden="true"></i>
+    </button>
+    <div class="lph-newchat" data-lph-newchat>
+        <div class="lph-newchat-head">
+            <button type="button" data-lph-newchat-toggle aria-label="{{backLabel}}">
+                <i class="fas fa-chevron-left" aria-hidden="true"></i>
+            </button>
+            <span class="lph-newchat-title">{{newChatLabel}}</span>
+        </div>
+        {{#each recipients}}
+        <button type="button" class="lph-newchat-item" data-lph-newchat-contact="{{this.uuid}}">
+            <span class="lph-avatar" style="--lph-avatar-hue: {{this.hue}}">{{this.initial}}</span>
+            <span class="lph-newchat-name">{{this.name}}</span>
+        </button>
+        {{/each}}
+    </div>
     {{/if}}
     {{#if (eq appId "photos")}}
     <div class="lph-media-viewer" data-lph-media-viewer role="dialog" aria-modal="true" tabindex="-1" hidden>

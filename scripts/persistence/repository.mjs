@@ -71,18 +71,58 @@ export class LumennRepository {
     return countUnread(store.notifications, actorUuid, state);
   }
 
-  static async createNotification(data = {}) {
-    requireGM("createNotification");
-    const notification = normalizeNotification(data);
+  // Uma leitura e uma escrita para o lote inteiro: N participantes não custam
+  // N ciclos de read-modify-write no JournalEntry.
+  static async createNotifications(inputs = []) {
+    requireGM("createNotifications");
+    const now = Date.now();
+    const notifications = (inputs ?? []).map((input) =>
+      normalizeNotification(input, { now }),
+    );
+    if (!notifications.length) return [];
     const store = await JournalStore.readStore();
-    const merged = {
-      ...(store.notifications ?? {}),
-      [notification.id]: notification,
-    };
+    const merged = { ...(store.notifications ?? {}) };
+    for (const notification of notifications) {
+      merged[notification.id] = notification;
+    }
     store.notifications = pruneToLimit(pruneExpired(merged));
     await JournalStore.writeStore(store);
-    emitNotification(notification);
-    return deepClone(notification);
+    for (const notification of notifications) emitNotification(notification);
+    return notifications.map((notification) => deepClone(notification));
+  }
+
+  static async createNotification(data = {}) {
+    const [notification] = await this.createNotifications([data]);
+    return notification;
+  }
+
+  // Conversa: escreve a cópia do destinatário e a do remetente no MESMO write.
+  // Quem PODE pedir isso, e com que nome, é decidido na autorização do socket
+  // (`authorizeRequest`), não aqui.
+  static async createMessage({
+    fromActorUuid,
+    toActorUuid,
+    thread = null,
+    sender = "",
+    title = "",
+    body = "",
+  } = {}) {
+    if (!fromActorUuid)
+      fail(ERROR_CODES.INVALID_ARGUMENT, "fromActorUuid é obrigatório.");
+    const targets =
+      toActorUuid && toActorUuid !== fromActorUuid
+        ? [toActorUuid, fromActorUuid]
+        : [fromActorUuid];
+    return this.createNotifications(
+      targets.map((target) => ({
+        app: "messages",
+        thread,
+        targetActorUuid: target,
+        sender,
+        title,
+        body,
+      })),
+    );
   }
 
   static async markNotificationRead(actorUuid, ids) {

@@ -7,6 +7,7 @@ import {
 import { Logger } from "../core/logger.mjs";
 import { LumennError } from "../core/errors.mjs";
 import {
+  authorizeRequest,
   createEnvelope,
   validateEnvelope,
   addressesUser,
@@ -32,6 +33,8 @@ async function handleOperation(operation, payload = {}) {
         payload.actorUuid,
         payload.ids,
       );
+    case "lph-send-message":
+      return LumennRepository.createMessage(payload);
     default:
       throw new LumennError(
         ERROR_CODES.INVALID_ARGUMENT,
@@ -102,9 +105,23 @@ async function handleRequest(envelope) {
     return;
   }
   try {
-    const result = await handleOperation(
+    // O envelope prova quem pede; a autorização decide o que o pedido pode
+    // tocar (e reescreve o que o cliente mandou pelo valor confiável).
+    const authorized = authorizeRequest(
       envelope.operation,
       envelope.payload ?? {},
+      senderUser,
+      senderUser.isGM === true,
+    );
+    if (!authorized.allowed) {
+      throw new LumennError(
+        ERROR_CODES.NO_AUTHORITY,
+        `Pedido não autorizado: ${authorized.reason}.`,
+      );
+    }
+    const result = await handleOperation(
+      envelope.operation,
+      authorized.payload,
     );
     socket.emit(
       SOCKET_NAMESPACE,

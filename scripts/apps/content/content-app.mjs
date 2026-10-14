@@ -192,12 +192,9 @@ function decorateThreads(threads, ownName) {
     // Numa lista de conversas o que importa é a última linha e quantas não
     // lidas. O total de mensagens não diz nada e polui a linha.
     preview: headlineExcerpt(thread.last?.body, 60),
+    lastTime: clockOf(thread.last?.createdAt)?.time ?? "",
     unread: thread.messages.filter((m) => m.status === "unread").length,
     lines: buildConversationLines(thread.messages, ownName, clockOf),
-    messages: thread.messages.map((message) => ({
-      ...message,
-      mine: Boolean(ownName) && message.sender === ownName,
-    })),
   }));
 }
 
@@ -233,6 +230,47 @@ export function conversationThread(a, b) {
   return [String(a ?? ""), String(b ?? "")].sort().join("::");
 }
 
+// O outro lado de uma conversa par (`conversationThread`), se existir. O
+// formato é sempre `Actor.x::Actor.y`; threads do GM (`gm::...`) ou avulsos
+// devolvem null e caem no caminho antigo (cópia local + aviso no chat).
+export function otherParticipant(threadId, ownUuid) {
+  if (!ownUuid) return null;
+  const parts = String(threadId ?? "").split("::");
+  if (parts.length !== 2) return null;
+  const other =
+    parts[0] === ownUuid ? parts[1] : parts[1] === ownUuid ? parts[0] : null;
+  return other && other.startsWith("Actor.") ? other : null;
+}
+
+// Conversa pendente: a que o usuário acabou de abrir pelo botão de nova
+// conversa e que ainda não tem mensagem nenhuma no store. Devolve null quando
+// o thread já existe (caso normal) ou quando o id não é par de personagens
+// (thread do GM). Sem isto a conversa nova abriria numa tela sem compositor.
+export function pendingThread(
+  threads = [],
+  threadId,
+  ownUuid,
+  recipients = [],
+) {
+  const id = String(threadId ?? "");
+  if (!id || (threads ?? []).some((thread) => thread.id === id)) return null;
+  const counterpart = otherParticipant(id, ownUuid);
+  if (!counterpart) return null;
+  const contact = (recipients ?? []).find((r) => r.uuid === counterpart);
+  const name = contact?.name ?? counterpart;
+  return {
+    id,
+    last: { sender: name, avatar: null, createdAt: Date.now() },
+    initial: avatarInitial(name),
+    avatarHue: avatarHue(name),
+    preview: "",
+    unread: 0,
+    lastTime: "",
+    lines: [],
+    pending: true,
+  };
+}
+
 function createContentApp(spec) {
   return {
     id: spec.id,
@@ -264,13 +302,35 @@ function createContentApp(spec) {
           unread: item.status === "unread",
         }),
       }));
-      const threads = spec.threaded
-        ? decorateThreads(groupByThread(decorated), ownCharacterName())
-        : null;
       const stories = spec.stories ? buildStories(decorated) : null;
       const canBrowse = canBrowseFiles();
       const canPost = spec.id === "instagram" && canBrowse;
-      const recipients = spec.id === "messages" ? worldRecipients() : null;
+      const selfUuid = actorUuidOf(shell);
+      const recipients =
+        spec.id === "messages"
+          ? worldRecipients()
+              .filter((recipient) => recipient.uuid !== selfUuid)
+              .map((recipient) => ({
+                ...recipient,
+                initial: avatarInitial(recipient.name),
+                hue: avatarHue(recipient.name),
+              }))
+          : null;
+      const threads = spec.threaded
+        ? decorateThreads(groupByThread(decorated), ownCharacterName())
+        : null;
+      // Conversa nova aberta pelo botão: ainda não existe no store; entra como
+      // conversa pendente (vazia) para o compositor aparecer. O primeiro envio
+      // grava de verdade e o render seguinte traz a conversa real.
+      if (threads && shell?.lphActiveThread) {
+        const pending = pendingThread(
+          threads,
+          shell.lphActiveThread,
+          actorUuidOf(shell),
+          recipients,
+        );
+        if (pending) threads.unshift(pending);
+      }
       return renderTemplate(
         `${TEMPLATE_ROOT}/${spec.template ?? "apps/content-app.hbs"}`,
         {
@@ -293,12 +353,8 @@ function createContentApp(spec) {
           ),
           photosNeedsPermission: spec.id === "photos" && !canBrowseFiles(),
           recipients,
-          canCompose: spec.id === "messages" && Boolean(recipients?.length),
-          composeToLabel: localize("LPH.Apps.ComposeTo", "To"),
-          composePlaceholder: localize(
-            "LPH.Apps.ComposePlaceholder",
-            "Write a message...",
-          ),
+          canNewChat: spec.id === "messages" && Boolean(recipients?.length),
+          newChatLabel: localize("LPH.Apps.NewChat", "Nova conversa"),
           backLabel: localize("LPH.Apps.Back", "Back"),
           canPost,
           postLocked: spec.id === "instagram" && !canBrowse,
@@ -360,6 +416,9 @@ function createContentApp(spec) {
           body.classList.remove("is-in-conversation");
           node.classList.remove("is-active");
           shell.lphActiveThread = null;
+          // Conversa pendente (sem nenhuma mensagem) não pode ficar de fantasma
+          // na lista: sair sem enviar re-renderiza a lista limpa.
+          if (node.dataset.lphPending) void shell.render(true);
         };
         bindOnce(node.querySelector("[data-lph-thread-open]"), "click", open);
         bindOnce(node.querySelector("[data-lph-thread-back]"), "click", leave);
@@ -575,8 +634,11 @@ function createContentApp(spec) {
           }
         });
 
-      // Responder: a resposta entra no mesmo thread, endereçada ao próprio
-      // personagem, para sobreviver ao reload como qualquer outra mensagem.
+      // Responder: quando a conversa é um par de personagens, a resposta vai
+      // para os DOIS celulares (o de quem respondeu e o do contato) — antes
+      // ela ficava só no aparelho de quem escreveu e um aviso no chat.
+      // Threads sem par (criadas pela Central do GM) seguem com a cópia local
+      // e o aviso no chat para o GM.
       body.querySelectorAll("[data-lph-reply]").forEach((form) => {
         bindOnce(form, "submit", async (event) => {
           event.preventDefault();
@@ -586,17 +648,30 @@ function createContentApp(spec) {
           if (!text) return;
           const actorUuid = actorUuidOf(shell);
           if (!actorUuid) return;
+          const me = ownCharacterName();
+          const threadId = form.dataset.lphThreadId;
+          const counterpart = otherParticipant(threadId, actorUuid);
           try {
-            await PhoneController.createNotification({
-              app: "messages",
-              thread: form.dataset.lphThreadId,
-              targetActorUuid: actorUuid,
-              sender: ownCharacterName(),
-              title: "",
-              body: text,
-            });
+            if (counterpart) {
+              await PhoneController.sendMessage({
+                fromActorUuid: actorUuid,
+                toActorUuid: counterpart,
+                thread: threadId,
+                sender: me,
+                body: text,
+              });
+            } else {
+              await PhoneController.createNotification({
+                app: "messages",
+                thread: threadId,
+                targetActorUuid: actorUuid,
+                sender: me,
+                title: "",
+                body: text,
+              });
+              notifyGamemaster(me, text);
+            }
             input.value = "";
-            notifyGamemaster(ownCharacterName(), text);
             await shell.render(true);
           } catch (error) {
             Logger.error("Falha ao enviar resposta:", error);
@@ -604,44 +679,22 @@ function createContentApp(spec) {
         });
       });
 
-      // Nova mensagem: escreve duas notificações - uma para o destinatário e
-      // uma cópia para mim. O store é por personagem, então sem a cópia eu não
-      // veria a minha própria mensagem depois do reload.
-      // ponytail: duas escritas por mensagem; com N participantes o certo é o
-      // GM fazer o fan-out no repositório.
-      // AVISO: o handler do GM não valida se o pedido pode escrever no ator de
-      // destino - qualquer jogador pode gravar no celular de outro. É o preço
-      // de o protocolo carregar só o targetActorUuid; aceitável entre amigos,
-      // mas é buraco de spoofing de remetente.
-      body.querySelectorAll("[data-lph-compose]").forEach((form) => {
-        bindOnce(form, "submit", async (event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          const input = form.querySelector('input[name="body"]');
-          const select = form.querySelector('select[name="to"]');
-          const text = String(input?.value ?? "").trim();
-          const to = String(select?.value ?? "");
-          if (!text || !to) return;
+      // Nova conversa (botão no canto): escolhe o contato e abre a conversa
+      // VAZIA dele — o texto vai pelo compositor do rodapé, como em qualquer
+      // mensageiro. O id é o par determinístico, então a primeira mensagem já
+      // cai no mesmo balde que o outro lado calcula.
+      const newChatToggles = body.querySelectorAll("[data-lph-newchat-toggle]");
+      if (newChatToggles.length) {
+        const toggle = () => body.classList.toggle("is-choosing-contact");
+        newChatToggles.forEach((button) => bindOnce(button, "click", toggle));
+      }
+      body.querySelectorAll("[data-lph-newchat-contact]").forEach((button) => {
+        bindOnce(button, "click", async () => {
           const actorUuid = actorUuidOf(shell);
-          if (!actorUuid) return;
-          const me = ownCharacterName();
-          try {
-            for (const target of [to, actorUuid]) {
-              await PhoneController.createNotification({
-                app: "messages",
-                thread: conversationThread(actorUuid, to),
-                targetActorUuid: target,
-                sender: me,
-                title: "",
-                body: text,
-              });
-            }
-            input.value = "";
-            notifyGamemaster(me, text);
-            await shell.render(true);
-          } catch (error) {
-            Logger.error("Falha ao enviar mensagem:", error);
-          }
+          const contact = button.dataset.lphNewchatContact;
+          if (!actorUuid || !contact) return;
+          shell.lphActiveThread = conversationThread(actorUuid, contact);
+          await shell.render(true);
         });
       });
 

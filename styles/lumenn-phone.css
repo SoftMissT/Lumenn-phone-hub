@@ -864,12 +864,6 @@
   overflow: clip;
 }
 
-/* Dentro da conversa o seletor de destinatário não faz sentido: você já está
-   falando com alguém. */
-.lph-content-app.is-in-conversation .lph-compose {
-  display: none;
-}
-
 .lph-content-app.is-in-conversation .lph-thread.is-active .lph-thread-body {
   display: flex;
   flex: 1;
@@ -1969,6 +1963,361 @@
   filter: brightness(1.12);
 }
 
+/* ---- Mensagens com cara de WhatsApp ---------------------------------------
+   A lista é uma lista de conversas de verdade (avatar, nome, prévia, hora e
+   badge), a conversa tem fundo de chat, bolhas com rabo e compositor preso no
+   rodapé, e o botão no canto abre "nova conversa" escolhendo o contato. As
+   cores do WhatsApp vivem em variáveis locais: trocar pela paleta do tema é
+   mexer só aqui. */
+
+.lph-content-app[data-lph-content="messages"] {
+  --lph-wa-accent: #00a884;
+  --lph-wa-badge: #25d366;
+  --lph-wa-list-bg: #ffffff;
+  --lph-wa-row-hover: rgba(0, 0, 0, 0.045);
+  --lph-wa-divider: rgba(0, 0, 0, 0.08);
+  --lph-wa-name: #111b21;
+  --lph-wa-preview: #667781;
+  --lph-wa-time: #667781;
+  --lph-wa-chat-bg: #efeae2;
+  --lph-wa-header-bg: #ffffff;
+  --lph-wa-header-border: rgba(0, 0, 0, 0.08);
+  --lph-wa-bubble-in: #ffffff;
+  --lph-wa-bubble-out: #d9fdd3;
+  --lph-wa-bubble-text: #111b21;
+  --lph-wa-composer-bg: #f0f2f5;
+  --lph-wa-input-bg: #ffffff;
+}
+
+.lph-theme-dark .lph-content-app[data-lph-content="messages"] {
+  --lph-wa-badge: #00a884;
+  --lph-wa-list-bg: #111b21;
+  --lph-wa-row-hover: rgba(255, 255, 255, 0.05);
+  --lph-wa-divider: rgba(255, 255, 255, 0.08);
+  --lph-wa-name: #e9edef;
+  --lph-wa-preview: #8696a0;
+  --lph-wa-time: #8696a0;
+  --lph-wa-chat-bg: #0b141a;
+  --lph-wa-header-bg: #202c33;
+  --lph-wa-header-border: rgba(255, 255, 255, 0.08);
+  --lph-wa-bubble-in: #202c33;
+  --lph-wa-bubble-out: #005c4b;
+  --lph-wa-bubble-text: #e9edef;
+  --lph-wa-composer-bg: #202c33;
+  --lph-wa-input-bg: #2a3942;
+}
+
+/* Lista de conversas: linha cheia, avatar maior, hora em cima e badge embaixo. */
+.lph-content-app[data-lph-content="messages"]:not(.is-in-conversation) {
+  gap: 0;
+  padding: 0;
+  background: var(--lph-wa-list-bg);
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-thread {
+  border-bottom: 1px solid var(--lph-wa-divider);
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-thread-head,
+.lph-content-app[data-lph-content="messages"] .lph-thread-open {
+  min-height: 68px;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-thread-open {
+  gap: 12px;
+  padding: 8px 14px;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-thread-open:hover {
+  background: var(--lph-wa-row-hover);
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-thread-open .lph-avatar {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  font-size: 17px;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-thread-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  width: 100%;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-thread-row .lph-thread-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--lph-wa-name);
+  font-size: 15.5px;
+  font-weight: 600;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-thread-time {
+  flex: 0 0 auto;
+  color: var(--lph-wa-time);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-thread-row .lph-thread-preview {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--lph-wa-preview);
+  font-size: 13px;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-thread-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--lph-wa-badge);
+  color: #ffffff;
+  font-size: 11.5px;
+}
+
+/* Conversa: fundo de chat, cabeçalho de contato e tela de borda a borda. */
+.lph-content-app[data-lph-content="messages"].is-in-conversation {
+  padding: 0;
+  background: var(--lph-wa-chat-bg);
+}
+
+.lph-content-app[data-lph-content="messages"].is-in-conversation .lph-thread.is-active .lph-thread-head {
+  background: var(--lph-wa-header-bg);
+  border-bottom: 1px solid var(--lph-wa-header-border);
+}
+
+.lph-content-app[data-lph-content="messages"].is-in-conversation .lph-thread.is-active .lph-thread-open .lph-avatar {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  font-size: 14px;
+}
+
+.lph-content-app[data-lph-content="messages"].is-in-conversation .lph-thread.is-active .lph-thread-name {
+  color: var(--lph-wa-name);
+  font-size: 15px;
+}
+
+.lph-content-app[data-lph-content="messages"].is-in-conversation .lph-thread.is-active .lph-thread-count {
+  display: none;
+}
+
+.lph-content-app[data-lph-content="messages"].is-in-conversation .lph-msgr-fab {
+  display: none;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-chat-date > span {
+  background: color-mix(in srgb, var(--lph-wa-header-bg) 92%, transparent);
+  color: var(--lph-wa-time);
+  box-shadow: 0 1px 1px rgba(11, 20, 26, 0.08);
+}
+
+/* Bolhas: cantos retos no lado do rabo, sombra fina e hora dentro — como no
+   mensageiro. */
+.lph-content-app[data-lph-content="messages"] .lph-bubble {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 9px 4px;
+  border-radius: 8px;
+  background: var(--lph-wa-bubble-in);
+  box-shadow: 0 1px 1px rgba(11, 20, 26, 0.13);
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-bubble .lph-bubble-body {
+  color: var(--lph-wa-bubble-text);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-bubble .lph-bubble-title {
+  color: var(--lph-wa-time);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-bubble .lph-chat-time {
+  align-self: flex-end;
+  margin-top: 2px;
+  padding: 0;
+  color: var(--lph-wa-time);
+  font-size: 10.5px;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-bubble-mine {
+  background: var(--lph-wa-bubble-out);
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-bubble-mine .lph-bubble-body,
+.lph-content-app[data-lph-content="messages"] .lph-bubble-mine .lph-bubble-title {
+  color: var(--lph-wa-bubble-text);
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-bubble-tail.lph-bubble {
+  border-top-left-radius: 0;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-bubble-tail.lph-bubble-mine {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 0;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-bubble-tail.lph-bubble::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -7px;
+  width: 0;
+  height: 0;
+  border-top: 7px solid var(--lph-wa-bubble-in);
+  border-left: 7px solid transparent;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-bubble-tail.lph-bubble-mine::after {
+  left: auto;
+  right: -7px;
+  border-top-color: var(--lph-wa-bubble-out);
+  border-left: 0;
+  border-right: 7px solid transparent;
+}
+
+/* Compositor: barra cheia no rodapé com pílula de texto e botão redondo. */
+.lph-content-app[data-lph-content="messages"] .lph-reply {
+  margin: 12px -12px -12px;
+  padding: 6px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+  border-top: 0;
+  background: var(--lph-wa-composer-bg);
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-reply input {
+  padding: 10px 14px;
+  border: 0;
+  background: var(--lph-wa-input-bg);
+  color: var(--lph-wa-bubble-text);
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-reply button {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  background: var(--lph-wa-accent);
+}
+
+/* Nova conversa: botão flutuante no canto e a folha de contatos por cima da
+   lista (o estado é uma classe no app; o render seguinte refaz a tela). */
+.lph-content-app[data-lph-content="messages"] .lph-msgr-fab {
+  position: sticky;
+  bottom: 16px;
+  z-index: 3;
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin: auto 16px 16px auto;
+  border: 0;
+  border-radius: 16px;
+  background: var(--lph-wa-accent);
+  color: #ffffff;
+  font-size: 22px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-msgr-fab:hover {
+  filter: brightness(1.06);
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-newchat {
+  display: none;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--lph-wa-list-bg);
+}
+
+.lph-content-app[data-lph-content="messages"].is-choosing-contact .lph-newchat {
+  display: block;
+}
+
+.lph-content-app[data-lph-content="messages"].is-choosing-contact > :is(.lph-thread, .lph-msgr-fab, .lph-content-empty) {
+  display: none;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-newchat-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 56px;
+  padding-right: 12px;
+  background: var(--lph-wa-header-bg);
+  color: var(--lph-wa-name);
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-newchat-head button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--lph-wa-accent);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-newchat-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-newchat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--lph-wa-name);
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-newchat-item:hover {
+  background: var(--lph-wa-row-hover);
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-newchat-item .lph-avatar {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  font-size: 16px;
+}
+
+.lph-content-app[data-lph-content="messages"] .lph-newchat-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Curtir no Instagram. */
 .lph-ig-like {
   padding: 0;
@@ -2019,10 +2368,9 @@
   cursor: not-allowed;
 }
 
-/* Compor: nova mensagem e novo post. Ficam FORA do estado vazio de propósito -
-   se ficassem dentro, não daria para iniciar conversa nem publicar a primeira
-   foto, que é justamente quando mais se precisa deles. */
-.lph-compose,
+/* Compor: novo post. Fica FORA do estado vazio de propósito - se ficasse
+   dentro, não daria para publicar a primeira foto, que é justamente quando
+   mais se precisa dele. */
 .lph-ig-compose {
   display: flex;
   flex: 0 0 auto;
@@ -2031,8 +2379,6 @@
   padding: 8px 12px;
 }
 
-.lph-compose select,
-.lph-compose input,
 .lph-ig-caption {
   min-width: 0;
   padding: 8px 10px;
@@ -2044,23 +2390,14 @@
   font-size: 13px;
 }
 
-.lph-compose select {
-  flex: 0 1 auto;
-  max-width: 42%;
-}
-
-.lph-compose input,
 .lph-ig-caption {
   flex: 1 1 auto;
 }
 
-.lph-compose button,
 .lph-ig-compose button {
   flex: 0 0 auto;
 }
 
-.lph-compose select:focus-visible,
-.lph-compose input:focus-visible,
 .lph-ig-caption:focus-visible {
   outline: 2px solid var(--lph-accent, #d01452);
   outline-offset: 1px;

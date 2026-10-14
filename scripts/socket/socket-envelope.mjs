@@ -61,3 +61,60 @@ export function addressesUser(recipients, userId) {
   if (Array.isArray(recipients)) return recipients.includes(userId);
   return false;
 }
+
+// Autorização de pedidos (V1). O envelope prova QUEM pede (`sender` = user id,
+// confirmado pelo próprio Foundry); esta função decide o que o pedido pode
+// tocar. Regra: um jogador só fala e escreve pelo próprio personagem — a
+// única exceção é o post do Instagram, que nasce para os celulares do mundo.
+//
+// Devolve `{ allowed, payload, reason }`. O payload aprovado é o que vai ao
+// repositório: o nome exibido é reescrito com o valor confiável do usuário,
+// nunca com o que o cliente mandou.
+export function authorizeRequest(operation, payload, user, isGM = false) {
+  const next = { ...(payload ?? {}) };
+  if (isGM) return { allowed: true, payload: next, reason: "" };
+  const ownUuid = user?.character?.uuid ?? null;
+  const ownName = user?.character?.name ?? "";
+
+  if (operation === "lph-send-message") {
+    if (!ownUuid || next.fromActorUuid !== ownUuid) {
+      return {
+        allowed: false,
+        payload: next,
+        reason: "remetente não é o personagem do usuário",
+      };
+    }
+    if (ownName) next.sender = ownName;
+    return { allowed: true, payload: next, reason: "" };
+  }
+
+  if (operation === "lph-create-notification") {
+    const target = next.targetActorUuid;
+    if (!ownUuid || (target !== ownUuid && next.app !== "instagram")) {
+      return {
+        allowed: false,
+        payload: next,
+        reason: "destino não autorizado para este usuário",
+      };
+    }
+    if (ownName) next.sender = ownName;
+    return { allowed: true, payload: next, reason: "" };
+  }
+
+  if (
+    operation === "lph-update-phone" ||
+    operation === "lph-mark-read" ||
+    operation === "lph-dismiss"
+  ) {
+    if (!ownUuid || next.actorUuid !== ownUuid) {
+      return {
+        allowed: false,
+        payload: next,
+        reason: "ator não é o personagem do usuário",
+      };
+    }
+    return { allowed: true, payload: next, reason: "" };
+  }
+
+  return { allowed: true, payload: next, reason: "" };
+}

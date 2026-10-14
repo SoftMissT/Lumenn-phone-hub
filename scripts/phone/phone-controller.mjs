@@ -38,4 +38,12 @@ export const PhoneController = {
     if (isGM()) return LumennRepository.createNotification(data);
     return socketRequest("lph-create-notification", data);
   },
+
+  // Mensagem de chat: o pedido do jogador carrega só o essencial; o GM valida
+  // (o remetente tem de ser o personagem de quem pediu) e escreve as duas
+  // cópias de uma vez.
+  async sendMessage(data) {
+    if (isGM()) return LumennRepository.createMessage(data);
+    return socketRequest("lph-send-message", data);
+  },
 };

@@ -91,11 +91,11 @@ export const SETTINGS_KEYS = Object.freeze({
   FLAG_KEYPRESS_SOUND: "flagKeypressSound",
   FLAG_NOTIFICATION_BANNER: "flagNotificationBanner",
   FLAG_PLAYER_WALLPAPER_UPLOAD: "flagPlayerWallpaperUpload",
-    LIKED_POSTS: "likedPosts",
-    ENABLED_APPS: "enabledApps",
-    CURRENCY_SYMBOL: "currencySymbol",
-    DEVICE_MODEL: "deviceModel",
-  });
+  LIKED_POSTS: "likedPosts",
+  ENABLED_APPS: "enabledApps",
+  CURRENCY_SYMBOL: "currencySymbol",
+  DEVICE_MODEL: "deviceModel",
+});
 
 export const THEMES = Object.freeze(["light", "dark"]);
 

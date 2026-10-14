@@ -127,17 +127,25 @@ function onOpen(shell) {
       return;
     }
     const targetMode = String(form.elements.targetMode?.value ?? "all");
+    const appId = String(form.elements.app?.value ?? "system");
+    const targetActorUuid =
+      targetMode === "single"
+        ? String(form.elements.targetActorUuid?.value ?? "all")
+        : "all";
     const payload = {
       sender: String(form.elements.sender?.value ?? "").trim(),
       title,
       body: String(form.elements.body?.value ?? "").trim(),
       audio: String(form.elements.audio?.value ?? "").trim(),
-      app: String(form.elements.app?.value ?? "system"),
+      app: appId,
       image: imageUrl,
-      targetActorUuid:
-        targetMode === "single"
-          ? String(form.elements.targetActorUuid?.value ?? "all")
-          : "all",
+      targetActorUuid,
+      // Mensagens com destino único caem numa conversa ESTÁVEL daquele
+      // personagem; sem isto cada envio virava uma conversa nova.
+      thread:
+        appId === "messages" && targetMode === "single"
+          ? `gm::${targetActorUuid}`
+          : null,
     };
     try {
       await sendNotificationAsGM(payload);
