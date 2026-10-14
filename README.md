@@ -8,7 +8,7 @@
 [![Downloads](https://img.shields.io/github/downloads/SoftMissT/Lumenn-phone-hub/total?label=downloads&color=0a84ff)](https://github.com/SoftMissT/Lumenn-phone-hub/releases)
 [![Issues](https://img.shields.io/github/issues/SoftMissT/Lumenn-phone-hub?label=issues&color=0a84ff)](https://github.com/SoftMissT/Lumenn-phone-hub/issues)
 
-Um **celular diegético** para mesas de **Foundry VTT (v13–v14)**, totalmente **independente de sistema**. Seus jogadores ganham um smartphone dentro do jogo tela de bloqueio, PIN, wallpaper, notificações e relógio do mundo. O GM ganha uma central para enviar mensagens, abrir o aparelho de qualquer personagem e redefinir dados.
+Um **celular diegético** para mesas de **Foundry VTT (v13–v14)**, totalmente **independente de sistema**. Seus jogadores ganham um smartphone dentro do jogo tela de bloqueio, PIN, wallpaper, notificações, relógio do mundo e **seis apps**: Mensagens, Instagram, Fotos, Banco, Notícias e Música. O GM ganha uma central para postar conteúdo, abrir o aparelho de qualquer personagem e redefinir dados.
 
 Sem adaptadores por sistema. Sem backend. Sem dependências externas. Tudo vive no próprio mundo do Foundry.
 
@@ -16,18 +16,18 @@ Sem adaptadores por sistema. Sem backend. Sem dependências externas. Tudo vive 
 
 ## Status
 
-**Versão `v0.0.11` pronta para instalação.** O gate estático está verde; o QA visual/runtime deve ser feito no Foundry pelo operador.
+**Versão `v0.0.12` pronta para instalação.** O gate estático está verde; o QA visual/runtime deve ser feito no Foundry pelo operador.
 
 |                |                                              |
 | -------------- | -------------------------------------------- |
-| **Versão**     | `0.0.11`                                     |
+| **Versão**     | `0.0.12`                                     |
 | **Foundry**    | mínimo `13.350`                              |
 | **Sistemas**   | qualquer (system-agnostic)                   |
 | **Permissões** | jogador usa o próprio celular · GM usa todos |
 | **Licença**    | MIT                                          |
 
 > [!IMPORTANT]
-> Mensagens, Banco, Notícias, Fotos, Instagram e Música estão disponíveis no App Registry. O conteúdo depende das notificações e permissões configuradas no mundo.
+> Os seis apps de conteúdo já existem e são alimentados pela **Central do GM** (e pelos próprios jogadores, no caso do Instagram, das Fotos e do chat de Mensagens). O conteúdo exibido depende das notificações enviadas no mundo e das permissões de arquivo do Foundry.
 
 > [!WARNING]
 > O manifesto declara `verified: 14.367`; a validação visual/runtime desta release fica a cargo do operador no Foundry.
@@ -66,14 +66,18 @@ Clique no botão **Celular (Lumenn)** na barra de controles de cena (coluna da e
 
 Se nenhum personagem estiver atribuído a você, o módulo avisa em vez de abrir uma tela vazia.
 
+**Mensagens:** abra o app na dock, toque numa conversa para ler o histórico e use **Responder...** no rodapé a resposta chega ao celular do outro personagem. Para começar uma conversa nova, use o campo **Para quem?** no topo. Conversas abertas pela Central do GM registram a sua resposta no seu celular e avisam o GM no chat.
+
 ### GM
 
 Como GM, o botão abre a **Central do GM**, com:
 
-- **Enviar notificação** para um personagem, vários, ou todos os elegíveis;
+- **Enviar conteúdo**: título, texto, imagem, áudio e o **app de destino** (Mensagens, Instagram, Fotos, Banco, Notícias, Música ou só notificação);
 - **Abrir o celular** de qualquer personagem, em Modo GM;
 - **Redefinir PIN** de um personagem;
 - **Redefinir wallpaper** de um personagem.
+
+Mensagens enviadas para o app **Mensagens** com um único destinatário caem sempre na mesma conversa daquele personagem.
 
 No **Modo GM** o telefone mostra uma faixa de identificação (`Modo GM {nome}`) para deixar explícito que aquele não é o seu aparelho.
 
@@ -83,13 +87,13 @@ Se outro módulo conflitar com o grupo de controles, use a macro pronta em [`mac
 
 ---
 
-## Recursos da Fase 1
+## Recursos
 
 ### Phone Shell
 
-Tela de bloqueio, home screen, dock, grade de apps, navegação interna, barra de status (sinal, Wi-Fi, bateria), notch genérico, indicador inferior e **temas claro e escuro**.
+Tela de bloqueio, tela inicial, dock, grade de apps, navegação interna, barra de status (sinal, Wi-Fi, bateria), notch genérico, indicador inferior, **temas claro e escuro** e **4 molduras de aparelho**: iPhone, Xiaomi, Oppo e Samsung.
 
-O Shell conhece apenas o **contrato de app**. Ele não conhece Mensagens, Banco ou qualquer app de conteúdo esses se registram pela API quando existirem.
+O Shell conhece apenas o **contrato de app**. Os apps de conteúdo se registram por esse contrato (e pela API pública), o que permite adicionar novos sem tocar no shell.
 
 ### PIN e bloqueio
 
@@ -121,7 +125,20 @@ Fuso IANA configurável, **ano narrativo** substituível e **rótulo de era** li
 
 ### Central do GM
 
-Envio de notificações em massa, inspeção e controle dos aparelhos, Modo GM e resets tudo em um só lugar, sem console.
+Envio de conteúdo em massa ou para um personagem só título, texto, imagem, áudio e o **app de destino** —, inspeção e controle dos aparelhos, Modo GM e resets: tudo em um só lugar, sem console.
+
+### Apps de conteúdo
+
+Os seis apps são **um motor e seis declarações**: todos leem o mesmo pipeline de notificações.
+
+| App | O que faz |
+| --- | --- |
+| **Mensagens** | HUD de mensageiro: lista de conversas (avatar, prévia, hora e não lidas) e conversa com bolhas, separador de dia e compositor no rodapé. O botão no canto abre conversa nova com qualquer personagem; **Responder** entrega ao outro celular. Mensagens do GM caem numa conversa do personagem. |
+| **Instagram** | Feed de fotos dos personagens com curtidas, stories, abas (Início/Explorar/Perfil) e atalho para Mensagens. |
+| **Fotos** | Grade de fotos com visualizador em tela cheia; o jogador adiciona fotos do próprio Foundry/computador. |
+| **Banco** | Extrato com saldo somado, crédito/débito coloridos, detalhe ao tocar e símbolo de moeda configurável. |
+| **Notícias** | Manchetes com selo de não lida e expansão do artigo no próprio card. |
+| **Música** | Cartão "tocando agora" com play/pause pelo AudioHelper do Foundry. |
 
 ### Acessibilidade
 
@@ -133,15 +150,24 @@ Navegação por teclado, foco visível, regiões `aria-live` para notificações
 
 Em _Configurações → Configurar Definições → Lumenn Phone Hub_:
 
-| Configuração         | O que faz                                                                          |
-| -------------------- | ---------------------------------------------------------------------------------- |
-| **Fuso horário**     | Fuso IANA do relógio (ex.: `America/Sao_Paulo`). Vazio usa o fuso de cada jogador. |
-| **Ano narrativo**    | Substitui o ano real no celular. `0` mantém o ano real.                            |
-| **Rótulo de era**    | Era exibida ao lado do ano (ex.: `AC`, `Era Espacial`).                            |
-| **Wallpaper padrão** | Aplicado a todo celular sem escolha pessoal.                                       |
-| **Log de depuração** | Logs detalhados no console do navegador.                                           |
+| Configuração | O que faz |
+| --- | --- |
+| **Fuso horário** | Fuso IANA do relógio (ex.: `America/Sao_Paulo`). Vazio usa o fuso de cada jogador. |
+| **Ano narrativo** | Substitui o ano real no celular. `0` mantém o ano real. |
+| **Rótulo de era** | Era exibida ao lado do ano (ex.: `AC`, `Era Espacial`). |
+| **Wallpaper padrão** | Aplicado a todo celular sem escolha pessoal. |
+| **Tema padrão do mundo** | Claro/escuro para quem ainda não escolheu o seu. |
+| **Som padrão do mundo** | Liga/desliga o som de quem ainda não escolheu. |
+| **Máximo de notificações** | Quantas notificações ficam guardadas por personagem (10–2000; padrão 200). |
+| **Retenção (dias)** | Dias até uma notificação expirar (`0` desliga; padrão 7). |
+| **Símbolo da moeda** | Símbolo dos valores do Banco (ex.: `R$`). Em branco formata sem símbolo. |
+| **Modelo do aparelho** | Moldura: iPhone, Xiaomi, Oppo ou Samsung. |
+| **Som de digitação** | Toca um som a cada tecla digitada no telefone. |
+| **Banner de notificação** | Mostra o banner quando chega uma notificação. |
+| **Upload de wallpaper pelo jogador** | Permite que o jogador envie uma imagem do próprio computador. |
+| **Log de depuração** | Logs detalhados do Lumenn no console do navegador. |
 
-Tema, sons e redução de efeitos são **por jogador**, ajustados dentro do celular em **Ajustes**.
+Tema, sons e redução de efeitos também são **por jogador**, ajustados dentro do celular em **Ajustes**.
 
 ---
 
@@ -168,7 +194,9 @@ api.apps.list(filter);
 
 **Hooks disponíveis:**
 
-`lumennPhoneReady` · `lumennNotificationCreated` · `lumennNotificationReceived` · `lumennAppRegistered` · `lumennPhoneOpened` · `lumennPhoneClosed`
+`lumennPhoneReady` · `lumennNotificationCreated` · `lumennNotificationReceived` · `lumennAppRegistered` · `lumennPhoneOpened` · `lumennPhoneClosed` · `lumennPhoneDeviceModelChanged`
+
+**Segurança:** o modelo de ameaça, os limites conhecidos e o canal de reporte estão em [SECURITY.md](SECURITY.md).
 
 ---
 
@@ -180,7 +208,11 @@ O código é JavaScript modular, sem etapa de build. Os testes rodam no Node pur
 node --test
 ```
 
-São 12 suítes cobrindo registro de apps, política e lockout de PIN, o fallback de KDF, validação, envelope de socket, fuso/relógio, validação de wallpaper, modelo e store de notificações, e áudio de digitação.
+São 18 arquivos de teste (67 testes) cobrindo registro de apps, o fluxo de Mensagens (threads e autorização de socket), política e lockout de PIN, o fallback de KDF, validação, envelope de socket, fuso/relógio, validação de wallpaper, modelo e store de notificações, apps de conteúdo e áudio de digitação. O gate completo roda tudo de uma vez:
+
+```bash
+node tools/gate.mjs
+```
 
 **Estrutura:**
 
@@ -188,20 +220,23 @@ São 12 suítes cobrindo registro de apps, política e lockout de PIN, o fallbac
 scripts/
   compat/        camada de compatibilidade Foundry v13/v14
   core/          constantes, settings, logger, lifecycle, API pública
-  apps/          App Registry e apps embutidos (Ajustes, Central do GM, Inspector)
-  phone/         shell do telefone e controlador
+  apps/          App Registry, apps embutidos (Ajustes, apps de conteúdo, Central/Inspector do GM)
+  phone/         shell do telefone e controlador (autoridade GM ↔ socket)
   lock/          KDF do PIN (WebCrypto + fallback puro JS) e lockout
   persistence/   repository, journal store, schemas
   notifications/ modelo, store, banner, áudio e serviço
   wallpaper/     validação, storage e serviço
-  socket/        envelope e runtime de socket
+  socket/        envelope, autorização e runtime de socket
   time/          fuso horário e relógio do mundo
   validation/    validadores de texto, ids e URLs
+  ui/            som de digitação
+  gm/            serviços do lado do GM (notificações, inspector)
 lang/            en, pt-BR
 macros/          macro de abertura via API
 templates/       Handlebars
 styles/          base + temas claro e escuro
-tests/           suíte do Node
+tests/           testes do Node (rodam sem Foundry)
+tools/           gate.mjs
 ```
 
 **Compatibilidade:** toda diferença entre v13 e v14 fica isolada em `scripts/compat/`. Se você for contribuir, evite chamar APIs do Foundry direto das telas passe pela camada de compatibilidade.
@@ -210,19 +245,14 @@ tests/           suíte do Node
 
 ## O que ainda não existe
 
-Estes itens estão **explicitamente fora da Fase 1** e não devem ser esperados neste release:
+- **IA para NPCs** reservado no desenho, não implementado;
+- **login OAuth / streaming real** o app de Música é um cartão "tocando agora", não um player de Spotify;
+- **adaptadores por sistema** e integração com fichas;
+- **criptografia ponta-a-ponta** ou PIN como autenticação forte o PIN é um lock diegético (veja [SECURITY.md](SECURITY.md));
+- **push notifications fora do Foundry**;
+- **aplicativo móvel real**.
 
-- chat de **Mensagens**, KakaoTalk, Instagram, feed social, posts e fotos sociais;
-- **Banco** e transações financeiras;
-- **Notícias**;
-- Spotify e login OAuth;
-- IA para NPCs;
-- adaptadores por sistema e integração monetária de sistemas;
-- criptografia ponta-a-ponta, autenticação forte por PIN, biometria;
-- push notifications fora do Foundry;
-- aplicativo móvel real.
-
-A arquitetura já os acomoda: cada app se registra pela API pública e pode adicionar sua própria seção na Central do GM. Nenhum ícone vazio é exibido enquanto eles não existem.
+A arquitetura acomoda novos apps: cada um se registra pela API pública (`api.apps.register`) e pode adicionar a própria seção na Central do GM.
 
 ---
 

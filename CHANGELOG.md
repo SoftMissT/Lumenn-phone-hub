@@ -4,6 +4,29 @@ Todas as mudanças relevantes deste módulo são documentadas aqui.
 
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adere a [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.0.12] — 2026-10-14
+
+### Corrigido
+
+- **Mensagens deixa de ser mão única.** Responder numa conversa entre dois personagens agora entrega a mensagem ao celular do outro lado — antes ela ficava só no aparelho de quem escreveu, com um aviso no chat. O GM escreve as duas cópias numa única gravação.
+- **Mensagens do GM não fragmentam mais.** Envios da Central do GM para um único personagem caem sempre na mesma conversa daquele personagem.
+
+### Segurança
+
+- Pedidos de socket agora são autorizados por remetente (`authorizeRequest`): um jogador só escreve no próprio celular e o nome exibido é sempre o personagem do usuário — a única exceção é o post do Instagram. Antes, qualquer jogador podia gravar no celular de outro e escolher o nome exibido.
+- Adicionado [`SECURITY.md`](SECURITY.md) (modelo de ameaça, limites conhecidos e canal de reporte).
+
+### Alterado
+
+- Enviar uma mensagem passou de duas escritas e dois pedidos de socket para **uma** de cada — menos ciclos de read-modify-write no JournalEntry.
+- **HUD de Mensagens redesenhada com cara de app de mensagens de verdade**: lista de conversas (avatar, nome, prévia, hora e badge), conversa com fundo de chat, bolhas com rabo (verde do WhatsApp no claro e no escuro), hora dentro da bolha, separador de dia em pílula e compositor preso no rodapé. O campo "Para quem?" saiu; conversa nova agora é o botão no canto que abre a lista de contatos.
+- `README.md` atualizado ao estado real (apps de conteúdo, 14 settings de mundo, hooks e estrutura atuais).
+
+### Validação
+
+- Gate local: `68/68` testes (`node tools/gate.mjs`).
+- QA visual/runtime do Foundry fica para o operador; esta release não declara essa validação.
+
 ## [0.0.11] — 2026-10-02
 
 ### Corrigido
